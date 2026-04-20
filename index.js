@@ -1,1 +1,1 @@
-document.getElementById('root').innerHTML = '<h1>看到这行字说明部署终于成功了！</h1>';
+document.getElementById('root').innerHTML = '<h1>如果你看到这行字，说明我们终于赢了！</h1>';
