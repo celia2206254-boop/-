@@ -23,7 +23,6 @@
             margin: 0 auto;
         }
 
-        /* 卡片样式 */
         .card {
             background: white;
             border-radius: 24px;
@@ -36,17 +35,16 @@
             font-size: 24px;
             text-align: center;
             margin-bottom: 8px;
-            color: #1e293b;
+            color: #000000;
         }
 
         .subtitle {
             text-align: center;
-            color: #64748b;
+            color: #555555;
             font-size: 14px;
             margin-bottom: 28px;
         }
 
-        /* 按钮 */
         .btn {
             display: block;
             width: 100%;
@@ -57,7 +55,6 @@
             font-weight: 600;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s;
         }
 
         .btn-primary {
@@ -65,20 +62,11 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #059669;
-        }
-
         .btn-secondary {
             background: #64748b;
             color: white;
         }
 
-        .btn-secondary:hover {
-            background: #475569;
-        }
-
-        /* 题目 */
         .question-item {
             margin-bottom: 28px;
             padding-bottom: 16px;
@@ -88,7 +76,7 @@
         .question-text {
             font-weight: 600;
             font-size: 16px;
-            color: #1e293b;
+            color: #000000;
             margin-bottom: 12px;
             line-height: 1.4;
         }
@@ -106,8 +94,7 @@
             background: white;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
-            color: #334155;
+            color: #000000;
         }
 
         .option-btn.selected {
@@ -116,7 +103,6 @@
             color: white;
         }
 
-        /* 结果页 */
         .score-circle {
             width: 100px;
             height: 100px;
@@ -131,7 +117,7 @@
         .score-number {
             font-size: 36px;
             font-weight: bold;
-            color: #1e293b;
+            color: #000000;
         }
 
         .risk-level {
@@ -148,7 +134,7 @@
 
         .result-desc {
             text-align: center;
-            color: #475569;
+            color: #000000;
             font-size: 14px;
             line-height: 1.6;
             margin-bottom: 20px;
@@ -164,14 +150,14 @@
 
         .ai-title {
             font-weight: 600;
-            color: #065f46;
+            color: #000000;
             margin-bottom: 8px;
             font-size: 14px;
         }
 
         .ai-text {
             font-size: 14px;
-            color: #065f46;
+            color: #000000;
             line-height: 1.5;
         }
 
@@ -181,11 +167,10 @@
             padding-right: 4px;
         }
 
-        /* 进度条 */
         .progress {
             text-align: center;
             font-size: 12px;
-            color: #94a3b8;
+            color: #555555;
             margin-bottom: 16px;
         }
     </style>
@@ -194,7 +179,6 @@
 <div class="container" id="app"></div>
 
 <script>
-    // 题库
     const questions = [
         "你是否经常忘记刚发生的事情？",
         "你是否会重复问同一个问题？",
@@ -206,12 +190,10 @@
         "你是否做出不太合理的决定？"
     ];
 
-    // 状态
-    let currentPage = 'home'; // home, quiz, result
+    let currentPage = 'home';
     let answers = new Array(8).fill(null);
     let aiText = '';
 
-    // 计算得分 (从不=0, 偶尔=1, 经常=2)
     function getTotalScore() {
         let sum = 0;
         for (let i = 0; i < answers.length; i++) {
@@ -220,7 +202,6 @@
         return sum;
     }
 
-    // 获取风险等级
     function getLevel(score) {
         if (score <= 3) return { name: '正常', class: 'risk-normal' };
         if (score <= 7) return { name: '轻度风险', class: 'risk-mild' };
@@ -228,7 +209,6 @@
         return { name: '高风险', class: 'risk-high' };
     }
 
-    // 获取结果描述
     function getResultText(score) {
         if (score <= 3) return "认知功能正常，建议保持良好生活习惯。";
         if (score <= 7) return "存在轻度风险，建议注意休息与观察。";
@@ -236,8 +216,7 @@
         return "存在较高风险，建议尽快就医检查。";
     }
 
-    // 生成 AI 解读
-    function generateAIText(score, levelName) {
+    function generateAIText(score) {
         if (score <= 3) {
             return "您的认知功能表现正常，各项指标均在健康范围内。请继续保持规律作息和适度锻炼，关爱大脑健康。";
         } else if (score <= 7) {
@@ -249,15 +228,12 @@
         }
     }
 
-    // 选择答案
     function selectAnswer(qIndex, value) {
         answers[qIndex] = value;
         render();
     }
 
-    // 提交测试
     function submitQuiz() {
-        // 检查是否全部完成
         for (let i = 0; i < answers.length; i++) {
             if (answers[i] === null) {
                 alert(`请先完成第 ${i+1} 题`);
@@ -265,13 +241,11 @@
             }
         }
         const score = getTotalScore();
-        const level = getLevel(score);
-        aiText = generateAIText(score, level.name);
+        aiText = generateAIText(score);
         currentPage = 'result';
         render();
     }
 
-    // 重新测试
     function resetTest() {
         answers = new Array(8).fill(null);
         aiText = '';
@@ -279,13 +253,11 @@
         render();
     }
 
-    // 开始测试
     function startTest() {
         currentPage = 'quiz';
         render();
     }
 
-    // 已完成的题目数
     function completedCount() {
         let count = 0;
         for (let i = 0; i < answers.length; i++) {
@@ -294,7 +266,6 @@
         return count;
     }
 
-    // 渲染首页
     function renderHome() {
         return `
             <div class="card">
@@ -305,7 +276,6 @@
         `;
     }
 
-    // 渲染测试页
     function renderQuiz() {
         const completed = completedCount();
         const total = questions.length;
@@ -336,7 +306,6 @@
         `;
     }
 
-    // 渲染结果页
     function renderResult() {
         const score = getTotalScore();
         const level = getLevel(score);
@@ -368,7 +337,6 @@
         `;
     }
 
-    // 主渲染函数
     function render() {
         const appDiv = document.getElementById('app');
         if (!appDiv) return;
@@ -385,7 +353,6 @@
         appDiv.innerHTML = html;
     }
 
-    // 初始化
     render();
 </script>
 </body>
