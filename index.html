@@ -1,11 +1,246 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>测试</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认知功能自测</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        .sub {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .question {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            display: flex;
+            gap: 8px;
+        }
+        .opt {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+        .opt.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #4CAF50;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-circle span {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .risk {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .risk.high {
+            color: #f44336;
+        }
+        .risk.normal {
+            color: #4CAF50;
+        }
+        .result-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .ai-box {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            margin-top: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+        .ai-title {
+            font-weight: bold;
+            color: #166534;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .questions-list {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1 style="color: blue;">Hello World</h1>
-    <p>如果看到这行字，说明网站正常工作了</p>
+    <div id="root"></div>
+
+    <script>
+        // 完整的 React 应用（编译后的版本）
+        // 认知功能自测工具
+        
+        const { useState } = React;
+
+        function App() {
+            const [page, setPage] = useState("home");
+            const [answers, setAnswers] = useState(Array(8).fill(null));
+            const [aiText, setAiText] = useState("");
+
+            const questions = [
+                "你是否经常忘记刚发生的事情？",
+                "你是否会重复问同一个问题？",
+                "你是否会搞不清日期或时间？",
+                "你是否在熟悉地方迷路？",
+                "你是否容易分心？",
+                "你做简单计算是否困难？",
+                "你做日常事情是否变困难？",
+                "你是否做出不太合理的决定？",
+            ];
+
+            const getLevel = (score) => {
+                if (score <= 3) return "正常";
+                if (score <= 7) return "轻度风险";
+                if (score <= 11) return "中度风险";
+                return "高风险";
+            };
+
+            const getResultText = (score) => {
+                if (score <= 3) return "认知功能正常，建议保持良好生活习惯。";
+                if (score <= 7) return "存在轻度风险，建议注意休息与观察。";
+                if (score <= 11) return "存在中度风险，建议进行专业评估。";
+                return "存在较高风险，建议尽快就医检查。";
+            };
+
+            const totalScore = answers.reduce((a, b) => a + (b || 0), 0);
+
+            const handleSelect = (idx, val) => {
+                const newArr = [...answers];
+                newArr[idx] = val;
+                setAnswers(newArr);
+            };
+
+            const submit = () => {
+                if (answers.includes(null)) {
+                    alert("请完成所有题目");
+                    return;
+                }
+                setPage("result");
+                let level = getLevel(totalScore);
+                let text = "";
+                if (totalScore <= 3) text = "您的认知功能表现正常，请继续保持健康的生活方式。";
+                else if (totalScore <= 7) text = "您存在轻度认知风险，建议规律作息，适当进行脑力活动。";
+                else if (totalScore <= 11) text = "您存在中度认知风险，建议咨询专业医生进行评估。";
+                else text = "您的检查结果存在多项显著异常，提示健康风险较高。请务必携带完整报告，尽快至正规医院相关科室就诊。";
+                setAiText(text);
+            };
+
+            if (page === "home") {
+                return React.createElement("div", { className: "card" },
+                    React.createElement("h2", null, "认知功能自测"),
+                    React.createElement("p", { className: "sub" }, "关爱大脑健康，从简单测试开始"),
+                    React.createElement("button", { onClick: () => setPage("quiz") }, "开始测试")
+                );
+            }
+
+            if (page === "quiz") {
+                return React.createElement("div", { className: "card" },
+                    React.createElement("div", { className: "questions-list" },
+                        questions.map((q, i) => React.createElement("div", { key: i, className: "question" },
+                            React.createElement("p", null, (i+1) + ". " + q),
+                            React.createElement("div", { className: "options" },
+                                ["从不", "偶尔", "经常"].map((label, val) => React.createElement("button", {
+                                    key: val,
+                                    className: "opt" + (answers[i] === val ? " active" : ""),
+                                    onClick: () => handleSelect(i, val)
+                                }, label))
+                            )
+                        ))
+                    ),
+                    React.createElement("button", { onClick: submit }, "查看报告")
+                );
+            }
+
+            const isHigh = totalScore > 7;
+            return React.createElement("div", { className: "card" },
+                React.createElement("h2", null, "测试结果"),
+                React.createElement("div", { className: "score-circle" },
+                    React.createElement("span", null, totalScore)
+                ),
+                React.createElement("div", { className: "risk " + (isHigh ? "high" : "normal") },
+                    "风险等级：" + getLevel(totalScore)
+                ),
+                React.createElement("p", { className: "result-text" }, getResultText(totalScore)),
+                React.createElement("div", { className: "ai-box" },
+                    React.createElement("div", { className: "ai-title" }, "🩺 AI 医生解读："),
+                    React.createElement("p", { style: { fontSize: "13px", margin: 0 } }, aiText || "深度分析中...")
+                ),
+                React.createElement("button", {
+                    style: { background: "#666", marginTop: "15px" },
+                    onClick: () => {
+                        setAnswers(Array(8).fill(null));
+                        setAiText("");
+                        setPage("home");
+                    }
+                }, "重新测试")
+            );
+        }
+
+        // 渲染应用
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(React.createElement(App));
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
 </body>
 </html>
