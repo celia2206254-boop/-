@@ -30,9 +30,8 @@
         .card {
             background: white;
             border-radius: 24px;
-            padding: 24px 20px;
+            padding: 32px 24px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 16px;
         }
 
         h1 {
@@ -71,40 +70,67 @@
             color: white;
         }
 
-        .question-item {
-            margin-bottom: 28px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #e2e8f0;
+        .btn-outline {
+            background: white;
+            color: #10b981;
+            border: 1px solid #10b981;
+            margin-top: 12px;
+        }
+
+        .question-number {
+            text-align: center;
+            font-size: 14px;
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            border-radius: 4px;
+            transition: width 0.3s ease;
         }
 
         .question-text {
             font-weight: 600;
-            font-size: 16px;
+            font-size: 20px;
             color: #000000;
-            margin-bottom: 12px;
+            margin-bottom: 32px;
             line-height: 1.4;
+            text-align: center;
         }
 
         .options {
             display: flex;
+            flex-direction: column;
             gap: 12px;
+            margin-bottom: 24px;
         }
 
         .option-btn {
-            flex: 1;
-            padding: 10px 0;
+            padding: 14px 16px;
             border: 1px solid #cbd5e1;
-            border-radius: 40px;
+            border-radius: 48px;
             background: white;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             color: #000000;
+            transition: all 0.2s;
         }
 
-        .option-btn.selected {
-            background: #10b981;
+        .option-btn:hover {
             border-color: #10b981;
-            color: white;
+            background: #f0fdf4;
         }
 
         .score-circle {
@@ -165,17 +191,15 @@
             line-height: 1.5;
         }
 
-        .question-list {
-            max-height: 60vh;
-            overflow-y: auto;
-            padding-right: 4px;
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
         }
 
-        .progress {
-            text-align: center;
-            font-size: 12px;
-            color: #555555;
-            margin-bottom: 16px;
+        .nav-buttons .btn {
+            flex: 1;
+            margin-top: 0;
         }
     </style>
 </head>
@@ -194,7 +218,12 @@
         "你是否做出不太合理的决定？"
     ];
 
-    let currentPage = 'home';
+    // 选项文字
+    const optionLabels = ["从不", "偶尔", "经常"];
+    // 选项分值: 从不=0, 偶尔=1, 经常=2
+
+    let currentPage = 'home';  // home, quiz, result
+    let currentIndex = 0;       // 当前第几题 (0-7)
     let answers = new Array(8).fill(null);
     let aiText = '';
 
@@ -232,44 +261,48 @@
         }
     }
 
-    function selectAnswer(qIndex, value) {
-        answers[qIndex] = value;
-        render();
-    }
-
-    function submitQuiz() {
-        for (let i = 0; i < answers.length; i++) {
-            if (answers[i] === null) {
-                alert(`请先完成第 ${i+1} 题`);
-                return;
-            }
+    // 选择答案
+    function selectAnswer(value) {
+        answers[currentIndex] = value;
+        
+        // 如果是最后一题，直接显示结果
+        if (currentIndex === questions.length - 1) {
+            const score = getTotalScore();
+            aiText = generateAIText(score);
+            currentPage = 'result';
+            render();
+        } else {
+            // 进入下一题
+            currentIndex++;
+            render();
         }
-        const score = getTotalScore();
-        aiText = generateAIText(score);
-        currentPage = 'result';
-        render();
     }
 
+    // 上一题
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            render();
+        }
+    }
+
+    // 重置测试
     function resetTest() {
         answers = new Array(8).fill(null);
         aiText = '';
+        currentIndex = 0;
         currentPage = 'home';
         render();
     }
 
     function startTest() {
+        currentIndex = 0;
+        answers = new Array(8).fill(null);
         currentPage = 'quiz';
         render();
     }
 
-    function completedCount() {
-        let count = 0;
-        for (let i = 0; i < answers.length; i++) {
-            if (answers[i] !== null) count++;
-        }
-        return count;
-    }
-
+    // 渲染首页
     function renderHome() {
         return `
             <div class="card">
@@ -280,36 +313,45 @@
         `;
     }
 
+    // 渲染当前题目
     function renderQuiz() {
-        const completed = completedCount();
         const total = questions.length;
+        const current = currentIndex + 1;
+        const progressPercent = (currentIndex / total) * 100;
+        const currentQuestion = questions[currentIndex];
+        const selectedVal = answers[currentIndex];
         
-        let questionsHtml = '';
-        for (let i = 0; i < questions.length; i++) {
-            const selectedVal = answers[i];
-            questionsHtml += `
-                <div class="question-item">
-                    <div class="question-text">${i+1}. ${questions[i]}</div>
-                    <div class="options">
-                        <button class="option-btn ${selectedVal === 0 ? 'selected' : ''}" onclick="selectAnswer(${i}, 0)">从不</button>
-                        <button class="option-btn ${selectedVal === 1 ? 'selected' : ''}" onclick="selectAnswer(${i}, 1)">偶尔</button>
-                        <button class="option-btn ${selectedVal === 2 ? 'selected' : ''}" onclick="selectAnswer(${i}, 2)">经常</button>
-                    </div>
-                </div>
+        let optionsHtml = '';
+        for (let i = 0; i < optionLabels.length; i++) {
+            const isSelected = (selectedVal === i);
+            optionsHtml += `
+                <button class="option-btn" style="${isSelected ? 'background:#10b981;color:white;border-color:#10b981;' : ''}" 
+                    onclick="selectAnswer(${i})">
+                    ${optionLabels[i]}
+                </button>
             `;
         }
         
+        // 上一题按钮只在不是第一题时显示
+        const prevButton = currentIndex > 0 ? 
+            `<button class="btn btn-outline" onclick="prevQuestion()">← 上一题</button>` : '';
+        
         return `
             <div class="card">
-                <div class="progress">已完成 ${completed}/${total} 题</div>
-                <div class="question-list">
-                    ${questionsHtml}
+                <div class="question-number">第 ${current} / ${total} 题</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progressPercent}%;"></div>
                 </div>
-                <button class="btn btn-primary" onclick="submitQuiz()">查看报告</button>
+                <div class="question-text">${currentQuestion}</div>
+                <div class="options">
+                    ${optionsHtml}
+                </div>
+                ${prevButton}
             </div>
         `;
     }
 
+    // 渲染结果页
     function renderResult() {
         const score = getTotalScore();
         const level = getLevel(score);
