@@ -125,10 +125,12 @@
 <body>
     <div id="root"></div>
 
+    <!-- 先加载 React 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+
+    <!-- 再运行你的应用代码 -->
     <script>
-        // 完整的 React 应用（编译后的版本）
-        // 认知功能自测工具
-        
         const { useState } = React;
 
         function App() {
@@ -175,7 +177,6 @@
                     return;
                 }
                 setPage("result");
-                let level = getLevel(totalScore);
                 let text = "";
                 if (totalScore <= 3) text = "您的认知功能表现正常，请继续保持健康的生活方式。";
                 else if (totalScore <= 7) text = "您存在轻度认知风险，建议规律作息，适当进行脑力活动。";
@@ -235,12 +236,8 @@
             );
         }
 
-        // 渲染应用
         const root = ReactDOM.createRoot(document.getElementById("root"));
         root.render(React.createElement(App));
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
 </body>
 </html>
