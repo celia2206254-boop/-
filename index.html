@@ -128,9 +128,10 @@
             transition: all 0.2s;
         }
 
-        .option-btn:hover {
+        .option-btn.selected {
+            background: #10b981;
             border-color: #10b981;
-            background: #f0fdf4;
+            color: white;
         }
 
         .score-circle {
@@ -190,17 +191,6 @@
             color: #000000;
             line-height: 1.5;
         }
-
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .nav-buttons .btn {
-            flex: 1;
-            margin-top: 0;
-        }
     </style>
 </head>
 <body>
@@ -218,12 +208,10 @@
         "你是否做出不太合理的决定？"
     ];
 
-    // 选项文字
     const optionLabels = ["从不", "偶尔", "经常"];
-    // 选项分值: 从不=0, 偶尔=1, 经常=2
 
-    let currentPage = 'home';  // home, quiz, result
-    let currentIndex = 0;       // 当前第几题 (0-7)
+    let currentPage = 'home';
+    let currentIndex = 0;
     let answers = new Array(8).fill(null);
     let aiText = '';
 
@@ -261,24 +249,20 @@
         }
     }
 
-    // 选择答案
     function selectAnswer(value) {
         answers[currentIndex] = value;
         
-        // 如果是最后一题，直接显示结果
         if (currentIndex === questions.length - 1) {
             const score = getTotalScore();
             aiText = generateAIText(score);
             currentPage = 'result';
             render();
         } else {
-            // 进入下一题
             currentIndex++;
             render();
         }
     }
 
-    // 上一题
     function prevQuestion() {
         if (currentIndex > 0) {
             currentIndex--;
@@ -286,7 +270,6 @@
         }
     }
 
-    // 重置测试
     function resetTest() {
         answers = new Array(8).fill(null);
         aiText = '';
@@ -302,7 +285,6 @@
         render();
     }
 
-    // 渲染首页
     function renderHome() {
         return `
             <div class="card">
@@ -313,7 +295,6 @@
         `;
     }
 
-    // 渲染当前题目
     function renderQuiz() {
         const total = questions.length;
         const current = currentIndex + 1;
@@ -323,16 +304,15 @@
         
         let optionsHtml = '';
         for (let i = 0; i < optionLabels.length; i++) {
+            // 关键修复：只有当 selectedVal === i 时才添加 selected 类
             const isSelected = (selectedVal === i);
             optionsHtml += `
-                <button class="option-btn" style="${isSelected ? 'background:#10b981;color:white;border-color:#10b981;' : ''}" 
-                    onclick="selectAnswer(${i})">
+                <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${i})">
                     ${optionLabels[i]}
                 </button>
             `;
         }
         
-        // 上一题按钮只在不是第一题时显示
         const prevButton = currentIndex > 0 ? 
             `<button class="btn btn-outline" onclick="prevQuestion()">← 上一题</button>` : '';
         
@@ -351,7 +331,6 @@
         `;
     }
 
-    // 渲染结果页
     function renderResult() {
         const score = getTotalScore();
         const level = getLevel(score);
