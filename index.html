@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>认知功能专业自测 - 健康评估</title>
-    <html xmlns="http://www.w3.org/1999/xhtml">
     <style>
         * {
             margin: 0;
@@ -116,17 +115,27 @@
         .quiz-header {
             margin-bottom: 24px;
         }
+        .counter-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
         .question-counter {
-            text-align: center;
             font-size: 15px;
             font-weight: 600;
             color: #0f6e3f;
             background: #e6f7ef;
-            display: inline-block;
             padding: 4px 16px;
             border-radius: 40px;
-            margin-bottom: 12px;
-            width: auto;
+            display: inline-block;
+        }
+        .auto-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            background: #f8fafc;
+            padding: 4px 12px;
+            border-radius: 30px;
         }
         .progress-bar {
             width: 100%;
@@ -147,7 +156,7 @@
             font-weight: 700;
             font-size: 22px;
             color: #0f172a;
-            margin: 24px 0 28px;
+            margin: 28px 0 32px;
             line-height: 1.4;
             text-align: center;
             padding: 0 4px;
@@ -160,8 +169,8 @@
             margin-bottom: 28px;
         }
         .option-btn {
-            padding: 15px 18px;
-            border: 1px solid #cbd5e1;
+            padding: 15px 20px;
+            border: 1.5px solid #cbd5e1;
             border-radius: 60px;
             background: white;
             font-size: 16px;
@@ -169,29 +178,16 @@
             cursor: pointer;
             color: #1e293b;
             transition: all 0.2s;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .option-btn .score-badge {
-            background: #f1f5f9;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
+            text-align: center;
         }
         .option-btn.selected {
             background: #0f6e3f;
             border-color: #0f6e3f;
             color: white;
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(15,110,63,0.3);
         }
-        .option-btn.selected .score-badge {
-            background: rgba(255,255,255,0.25);
-            color: white;
-        }
-        .option-btn:active { transform: scale(0.98); background: #f8fafc; }
+        .option-btn:active { transform: scale(0.98); background: #f1f5f9; }
         .option-btn.selected:active { background: #0a5833; }
 
         .nav-buttons {
@@ -208,8 +204,13 @@
             font-weight: 600;
             cursor: pointer;
             color: #334155;
+            transition: 0.2s;
         }
         .nav-btn:active { background: #e2e8f0; }
+        .nav-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
 
         /* 结果页 */
         .score-circle {
@@ -354,7 +355,21 @@
             border-radius: 40px;
             margin-top: 16px;
             font-weight: bold;
+            width: 100%;
+            cursor: pointer;
         }
+        .timer-ring {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            border-top-color: #0f6e3f;
+            animation: spin 0.8s linear infinite;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -385,7 +400,8 @@
         "是否社交意愿下降？"
     ];
     
-    const optionScores = [
+    // 选项分值 (0,1,2,3) 但页面不显示分数，只显示文本
+    const optionItems = [
         { label: "无异常", value: 0 },
         { label: "偶尔出现", value: 1 },
         { label: "经常出现", value: 2 },
@@ -395,8 +411,10 @@
     let currentPage = 'home'; // home, quiz, result
     let currentIndex = 0;
     let answers = new Array(20).fill(null);
+    let autoTimer = null;      // 自动跳转计时器
+    let selectedTempValue = null; // 暂存刚选中的值，用于延迟跳转
     
-    // 总分 & 风险
+    // 总分计算
     function getTotalScore() {
         let sum = 0;
         for (let i = 0; i < answers.length; i++) {
@@ -421,10 +439,8 @@
         "🏥 若持续加重请及时就医"
     ];
     
-    // 当前页面URL
     const CURRENT_URL = window.location.href;
     
-    // 显示toast
     function showToast(msg, duration = 2000) {
         let toast = document.getElementById('global-toast');
         if (!toast) {
@@ -436,6 +452,97 @@
         toast.textContent = msg;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), duration);
+    }
+    
+    // 清除自动跳转计时器
+    function clearAutoTimer() {
+        if (autoTimer) {
+            clearTimeout(autoTimer);
+            autoTimer = null;
+        }
+    }
+    
+    // 执行跳转到下一题或结果
+    function executeNextStep() {
+        clearAutoTimer();
+        // 如果当前不在测试页，则忽略
+        if (currentPage !== 'quiz') return;
+        // 确认当前题目已经有选中值
+        if (answers[currentIndex] !== null) {
+            if (currentIndex + 1 < questions.length) {
+                currentIndex++;
+                // 重新渲染新题目
+                render();
+            } else {
+                // 已经是最后一题，完成测试 -> 结果页
+                currentPage = 'result';
+                render();
+            }
+        }
+    }
+    
+    // 选择答案的核心逻辑: 保存答案，显示选中状态，开启计时器自动跳转
+    function selectAnswer(value) {
+        if (currentPage !== 'quiz') return;
+        // 如果已经是选中同一个值，不做重复动作，但为了体验也可以重置计时器
+        if (answers[currentIndex] === value) {
+            // 相同选项，重新开始计时（延长停留）
+            clearAutoTimer();
+            startAutoTimer();
+            render(); // 刷新保持高亮
+            return;
+        }
+        // 新选项：保存答案
+        answers[currentIndex] = value;
+        // 清除旧计时器
+        clearAutoTimer();
+        // 重新渲染高亮
+        render();
+        // 启动计时器，1.2秒后自动跳转 (舒适延迟)
+        startAutoTimer();
+    }
+    
+    function startAutoTimer() {
+        if (autoTimer) clearTimeout(autoTimer);
+        autoTimer = setTimeout(() => {
+            // 跳转前再次确认当前页是quiz且当前题目已有答案
+            if (currentPage === 'quiz' && answers[currentIndex] !== null) {
+                if (currentIndex + 1 < questions.length) {
+                    currentIndex++;
+                    render();
+                } else {
+                    currentPage = 'result';
+                    render();
+                }
+            }
+            autoTimer = null;
+        }, 1200); // 停留1.2秒后自动进入下一题
+    }
+    
+    function prevQuestion() {
+        if (currentPage !== 'quiz') return;
+        if (currentIndex > 0) {
+            // 清除自动跳转计时器
+            clearAutoTimer();
+            currentIndex--;
+            render();
+        }
+    }
+    
+    function resetTest() {
+        clearAutoTimer();
+        answers = new Array(20).fill(null);
+        currentIndex = 0;
+        currentPage = 'home';
+        render();
+    }
+    
+    function startTest() {
+        clearAutoTimer();
+        answers = new Array(20).fill(null);
+        currentIndex = 0;
+        currentPage = 'quiz';
+        render();
     }
     
     // 分享链接 (纯URL)
@@ -469,8 +576,7 @@
         }
     }
     
-    // 生成海报 (简单版模拟截图样式，使用html2canvas需要额外库？纯前端简易实现canvas生成图片)
-    // 为了满足可选海报功能，我们用html2canvas？为了稳定且不依赖外部，采用动态生成canvas绘制简单风格海报。为了高兼容，不使用外部库，手动绘制canvas海报。
+    // 生成海报canvas (保留个性)
     async function generatePoster() {
         const score = getTotalScore();
         const level = getRiskLevel(score);
@@ -478,10 +584,8 @@
         const ctx = canvas.getContext('2d');
         canvas.width = 500;
         canvas.height = 700;
-        // 背景
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // 标题装饰
         ctx.fillStyle = '#0f6e3f';
         ctx.fillRect(0, 0, canvas.width, 12);
         ctx.font = 'bold 26px "PingFang SC", "Segoe UI"';
@@ -490,8 +594,6 @@
         ctx.font = '16px system-ui';
         ctx.fillStyle = '#5b6e8c';
         ctx.fillText('健康评估·早期关注', 40, 110);
-        
-        // 分数圆
         ctx.beginPath();
         ctx.arc(250, 190, 55, 0, 2 * Math.PI);
         ctx.fillStyle = '#f1f5f9';
@@ -502,13 +604,9 @@
         ctx.font = 'bold 18px system-ui';
         ctx.fillStyle = level.class === 'risk-low' ? '#10b981' : (level.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
         ctx.fillText(level.name, 205, 250);
-        
-        // 描述
         ctx.font = '15px system-ui';
         ctx.fillStyle = '#334155';
         ctx.fillText(level.desc.substring(0, 28)+'...', 50, 290);
-        
-        // 建议标题
         ctx.fillStyle = '#0f172a';
         ctx.font = 'bold 18px system-ui';
         ctx.fillText('📋 健康建议', 40, 340);
@@ -518,22 +616,17 @@
         commonTips.forEach((tip, idx) => {
             ctx.fillText(`${idx+1}. ${tip}`, 45, tipsY + idx*26);
         });
-        
-        // 底部网址
         ctx.font = '12px monospace';
         ctx.fillStyle = '#6c757d';
         let urlShort = CURRENT_URL.length > 40 ? CURRENT_URL.substring(0, 38)+'...' : CURRENT_URL;
         ctx.fillText(urlShort, 45, 630);
         ctx.fillStyle = '#aaa';
         ctx.fillText('扫码或访问链接自测', 45, 660);
-        
-        // 模拟二维码文字块
         ctx.fillStyle = '#f1f5f9';
         ctx.fillRect(380, 590, 80, 80);
         ctx.fillStyle = '#334155';
         ctx.font = '12px system-ui';
         ctx.fillText('测一测', 410, 635);
-        
         return canvas.toDataURL('image/png');
     }
     
@@ -560,52 +653,7 @@
         });
     }
     
-    // 问卷逻辑：选择答案
-    function selectAnswer(scoreVal) {
-        if (currentPage !== 'quiz') return;
-        answers[currentIndex] = scoreVal;
-        // 自动跳下一题
-        if (currentIndex + 1 < questions.length) {
-            currentIndex++;
-            render();
-        } else {
-            // 最后已完成所有题
-            currentPage = 'result';
-            render();
-        }
-    }
-    
-    function prevQuestion() {
-        if (currentIndex > 0) {
-            currentIndex--;
-            render();
-        }
-    }
-    function resetTest() {
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        currentPage = 'home';
-        render();
-    }
-    function startTest() {
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        currentPage = 'quiz';
-        render();
-    }
-    
-    // 渲染各页面
-    function renderHome() {
-        return `
-            <div class="card">
-                <h1>🧠 认知功能专业评估</h1>
-                <div class="subtitle">20题自测 · 关注脑健康</div>
-                <button class="btn btn-primary" onclick="startTest()">开始评估</button>
-                <div class="footer-note">每题请根据近3个月真实感受选择</div>
-            </div>
-        `;
-    }
-    
+    // 渲染测试页 (选项不显示分数, 显示选中状态)
     function renderQuiz() {
         const total = questions.length;
         const currentQNumber = currentIndex + 1;
@@ -614,22 +662,28 @@
         const selectedVal = answers[currentIndex];
         
         let optionsHtml = '';
-        for (let opt of optionScores) {
+        for (let opt of optionItems) {
             const isSelected = (selectedVal === opt.value);
             optionsHtml += `
                 <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">
-                    <span>${opt.label}</span>
-                    <span class="score-badge">${opt.value}分</span>
+                    ${opt.label}
                 </button>
             `;
         }
         
-        const prevDisabled = currentIndex === 0 ? 'disabled style="opacity:0.5;"' : '';
+        // 显示自动跳转提示（如果有选中且计时未跳转时显示动画）
+        const hasSelected = (answers[currentIndex] !== null);
+        const autoHintHtml = hasSelected ? 
+            `<span class="auto-hint"><span class="timer-ring"></span> 1.2秒后自动进入下一题</span>` : 
+            `<span class="auto-hint">选择后自动跳转下一题</span>`;
+        
+        const prevDisabled = currentIndex === 0;
         return `
             <div class="card">
                 <div class="quiz-header">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                    <div class="counter-wrapper">
                         <span class="question-counter">第 ${currentQNumber} / ${total} 题</span>
+                        ${autoHintHtml}
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: ${progressPercent}%;"></div>
@@ -640,14 +694,23 @@
                     ${optionsHtml}
                 </div>
                 <div class="nav-buttons">
-                    <button class="nav-btn" onclick="prevQuestion()" ${prevDisabled}>← 上一题</button>
+                    <button class="nav-btn ${prevDisabled ? 'disabled' : ''}" onclick="prevQuestion()" ${prevDisabled ? 'disabled' : ''}>← 上一题</button>
                 </div>
-                <div class="footer-note" style="margin-top:20px;">请选择最符合的选项（单选）</div>
+                <div class="footer-note" style="margin-top:20px;">点击选项后自动进入下一题，也可手动点击上一题修改</div>
             </div>
         `;
     }
     
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function renderHome() {
+        return `
+            <div class="card">
+                <h1>🧠 认知功能专业评估</h1>
+                <div class="subtitle">20题自测 · 关注脑健康</div>
+                <button class="btn btn-primary" onclick="startTest()">开始评估</button>
+                <div class="footer-note">每题请根据近3个月真实感受选择，选后自动跳转</div>
+            </div>
+        `;
+    }
     
     function renderResult() {
         const score = getTotalScore();
@@ -662,12 +725,10 @@
                 </div>
                 <div class="risk-level ${risk.class}">${risk.name}</div>
                 <div class="result-desc">${risk.desc}</div>
-                
                 <div class="suggest-box">
                     <div class="suggest-title">💡 通用健康建议</div>
                     <ul class="suggest-list">${tipsHtml}</ul>
                 </div>
-                
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
                     <button class="btn btn-share-link" onclick="shareUrl()">
@@ -684,17 +745,22 @@
         `;
     }
     
+    function escapeHtml(str) { 
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); 
+    }
+    
     function render() {
-        const app = document.getElementById('app');
-        if (!app) return;
+        const appDiv = document.getElementById('app');
+        if (!appDiv) return;
         let html = '';
         if (currentPage === 'home') html = renderHome();
         else if (currentPage === 'quiz') html = renderQuiz();
         else if (currentPage === 'result') html = renderResult();
-        app.innerHTML = html;
+        appDiv.innerHTML = html;
     }
     
-    // 全局函数挂载
+    // 全局函数
     window.selectAnswer = selectAnswer;
     window.prevQuestion = prevQuestion;
     window.resetTest = resetTest;
