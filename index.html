@@ -559,6 +559,7 @@
             gap: 10px;
             font-weight: 500;
             color: #1e3a8a;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -596,7 +597,7 @@
                     <div class="entry-icon">📱</div>
                     <div class="entry-title">智能健康设备</div>
                     <div class="entry-desc">居家监测记忆与行为变化</div>
-                    <button class="btn-outline-green" id="viewDeviceBtn">查看设备 →</button>
+                    <button class="btn-outline-green view-device-btn">查看设备 →</button>
                 </div>
             </div>
             <div class="device-showcase">
@@ -608,8 +609,8 @@
                         <li>🚶 活动轨迹异常提醒</li>
                     </ul>
                     <div class="btn-group">
-                        <button class="btn-small" id="deviceDetailBtn">查看详情</button>
-                        <button class="btn-small btn-small-primary" id="deviceConsultBtn">咨询设备</button>
+                        <button class="btn-small device-detail-btn">查看详情</button>
+                        <button class="btn-small btn-small-primary device-consult-btn">咨询设备</button>
                     </div>
                 </div>
             </div>
@@ -641,7 +642,7 @@
                     <li>✅ 异常行为告警推送</li>
                     <li>✅ 家属远程查看报告</li>
                 </ul>
-                <button class="btn-primary" style="margin-top: 12px;" id="deviceContactBtn">联系我们</button>
+                <button class="btn-primary device-contact-btn" style="margin-top: 12px;">联系我们</button>
             </div>
         </div>
 
@@ -655,14 +656,14 @@
                         <p>评估记录 · 设备绑定 · 健康动态</p>
                     </div>
                 </div>
-                <div class="menu-item" id="contactUsBtn">
+                <div class="menu-item contact-us-btn">
                     <div class="menu-left">
                         <span class="menu-icon">📧</span>
                         <span>联系我们</span>
                     </div>
                     <span>→</span>
                 </div>
-                <div class="menu-item" id="myReportsBtn">
+                <div class="menu-item my-reports-btn">
                     <div class="menu-left">
                         <span class="menu-icon">📋</span>
                         <span>历史评估报告</span>
@@ -690,7 +691,7 @@
                     <div class="faq-answer">基础评估和部分监测功能免费，高级分析服务可选订阅，不强制。</div>
                 </div>
             </div>
-            <div class="contact-email-badge" id="emailContactBtn">
+            <div class="contact-email-badge email-contact-btn">
                 📧 联系邮箱：celia2206254@gmail.com
                 <span style="font-size: 18px;">✉️</span>
             </div>
@@ -736,10 +737,26 @@
     const scrollLeftBtn = document.getElementById('scrollLeftBtn');
     const scrollRightBtn = document.getElementById('scrollRightBtn');
     if(scrollLeftBtn && wrapper) {
-        scrollLeftBtn.addEventListener('click', () => wrapper.scrollBy({ left: -280, behavior: 'smooth' }));
-        scrollRightBtn.addEventListener('click', () => wrapper.scrollBy({ left: 280, behavior: 'smooth' }));
+        scrollLeftBtn.onclick = () => wrapper.scrollBy({ left: -280, behavior: 'smooth' });
+        scrollRightBtn.onclick = () => wrapper.scrollBy({ left: 280, behavior: 'smooth' });
     }
 
+    // 页面导航函数
+    function navigateTo(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(pageId + 'Page').classList.add('active-page');
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            const page = btn.getAttribute('data-page');
+            if(page === pageId) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+    }
+    
+    // 发送邮件函数
+    function sendEmail() {
+        window.location.href = 'mailto:celia2206254@gmail.com?subject=咨询认知健康服务&body=您好，我想咨询以下问题：';
+    }
+    
     // 20题认知问卷
     const questions = [
         "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？", "是否忘记约定或日期？", "是否记不住最近发生的事？",
@@ -769,39 +786,36 @@
         return "AI评估提示认知功能存在显著下降风险，建议尽快前往医院神经内科进行专业评估，早期干预至关重要。";
     }
 
-    function renderQuizPageContent() {
-        const total = questions.length;
-        const currentQ = currentIndex + 1;
-        const progress = (currentIndex / total) * 100;
-        const selectedVal = answers[currentIndex];
-        let optionsHtml = '';
-        optionItems.forEach(opt => {
-            const isSelected = (selectedVal === opt.value);
-            optionsHtml += `<button class="option-btn ${isSelected ? 'selected' : ''}" onclick="window.selectAnswer(${opt.value})">${opt.label}</button>`;
-        });
-        return `
-            <div class="quiz-card">
-                <div class="question-counter">第 ${currentQ} / ${total} 题</div>
-                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div>
-                <div class="question-text">${questions[currentIndex]}</div>
-                <div>${optionsHtml}</div>
-                <div class="nav-buttons">
-                    <button class="nav-btn" onclick="window.prevQuestion()" ${currentIndex === 0 ? 'disabled style="opacity:0.5"' : ''}>← 上一题</button>
+    function renderQuizPage() {
+        const quizDiv = document.getElementById('quizPage');
+        if(!quizDiv) return;
+        
+        if(currentIndex < questions.length) {
+            const total = questions.length;
+            const currentQ = currentIndex + 1;
+            const progress = (currentIndex / total) * 100;
+            const selectedVal = answers[currentIndex];
+            let optionsHtml = '';
+            optionItems.forEach(opt => {
+                const isSelected = (selectedVal === opt.value);
+                optionsHtml += `<button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">${opt.label}</button>`;
+            });
+            quizDiv.innerHTML = `
+                <div class="quiz-card">
+                    <div class="question-counter">第 ${currentQ} / ${total} 题</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div>
+                    <div class="question-text">${questions[currentIndex]}</div>
+                    <div>${optionsHtml}</div>
+                    <div class="nav-buttons">
+                        <button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled style="opacity:0.5"' : ''}>← 上一题</button>
+                    </div>
+                    <div class="footer-note">点击选项后自动进入下一题</div>
                 </div>
-                <div class="footer-note">点击选项后自动进入下一题</div>
-            </div>
-        `;
-    }
-    function renderResultPage() {
-        const percent = getPercentageScore();
-        const risk = getRiskLevel(percent);
-        const ai = generateAIText(percent);
-        return `
-            <div class="quiz-card result-area">
-                <h2>📋 评估结果</h2>
-                <div class="score-circle">${percent}</div>
-                <div class="risk-level ${risk.class}" style="font-size:22px; font-weight:bold;">${risk.name}</div>
-                <div class="ai-text">🤖 AI评估：${ai}</div>
-                <div style="margin: 20px 0; background:#f8fafc; padding:14px; border-radius:24px;">${risk.desc}</div>
-                <button class="btn-primary" style="width:100%; margin-bottom:12px;" onclick="window.resetToHome()">重新测试</button>
-                <button class="btn-outline-green" style="width:100%;" onclick="window.backToHome()">返回首页</button
+            `;
+        } else {
+            const percent = getPercentageScore();
+            const risk = getRiskLevel(percent);
+            const ai = generateAIText(percent);
+            quizDiv.innerHTML = `
+                <div class="quiz-card result-area">
+                    <h2>📋 评估结果</
