@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>仁智护老 - 认知健康管理平台</title>
+    <title>认知健康管理中心 | 专业自测+智能方案</title>
     <style>
         * {
             margin: 0;
@@ -14,59 +14,59 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #f5f7fb;
+            background: #f4f7fc;
             color: #1e293b;
         }
 
+        /* 主容器 */
         .app-wrapper {
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto;
-            background: #f5f7fb;
+            background: #f4f7fc;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            box-shadow: 0 0 20px rgba(0,0,0,0.03);
         }
 
         .main-content {
             flex: 1;
-            padding: 20px 18px 80px 18px;
-            overflow-y: auto;
+            padding-bottom: 80px;
         }
 
-        /* 底部导航栏 */
+        /* 底部导航 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto;
             background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #e9edf2;
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px 16px 20px;
-            z-index: 100;
+            padding: 8px 20px 22px;
+            border-top: 1px solid #e9edf2;
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+            z-index: 1000;
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 12px;
-            color: #94a3b8;
-            transition: 0.2s;
             cursor: pointer;
-            background: none;
-            border: none;
-            flex: 1;
-            padding: 6px 0;
+            transition: 0.2s;
+            padding: 4px 12px;
+            border-radius: 40px;
+            opacity: 0.55;
+            color: #5b6e8c;
         }
         .nav-item.active {
+            opacity: 1;
             color: #0f6e3f;
             font-weight: 500;
         }
@@ -75,704 +75,566 @@
             height: 24px;
             fill: currentColor;
         }
-        
-        /* Hero区 */
-        .hero {
-            background: linear-gradient(135deg, #eef6f0 0%, #d9e8e0 100%);
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* 通用卡片样式 */
+        .card {
+            background: white;
             border-radius: 32px;
             padding: 24px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
+            margin: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
-        .hero-left h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: #1e4620;
-            line-height: 1.25;
-            margin-bottom: 10px;
+
+        /* Hero区 —— 完全匹配图片文案和风格 */
+        .hero-card {
+            background: linear-gradient(145deg, #eef6f1 0%, #ffffff 100%);
+            border-radius: 40px;
+            margin: 20px 16px;
+            padding: 28px 24px;
+            box-shadow: 0 12px 28px rgba(15, 110, 63, 0.08);
+            border: 1px solid rgba(15,110,63,0.15);
         }
-        .hero-left p {
+        .hero-tag {
             font-size: 14px;
-            color: #2d5a2c;
-            margin-bottom: 20px;
-            opacity: 0.85;
+            color: #0f6e3f;
+            font-weight: 600;
+            background: rgba(15,110,63,0.12);
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 40px;
+            margin-bottom: 18px;
+        }
+        .hero-title {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 12px;
+            color: #1e2f3d;
+        }
+        .hero-sub {
+            font-size: 18px;
+            font-weight: 500;
+            color: #3b5c7a;
+            margin-bottom: 28px;
+            border-left: 4px solid #0f6e3f;
+            padding-left: 12px;
         }
         .btn-primary {
             background: #0f6e3f;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 6px 14px rgba(15,110,63,0.25);
-            transition: 0.2s;
-        }
-        .btn-primary:active { transform: scale(0.97); background: #0a5833; }
-        .hero-right {
-            width: 130px;
-            text-align: center;
-        }
-        .hero-img {
             width: 100%;
-            border-radius: 24px;
-            background: #fff8e7;
-            padding: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .hero-img img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 16px;
-        }
-        
-        /* 信任标签 */
-        .trust-badge {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .trust-item {
-            background: white;
-            padding: 8px 12px;
-            border-radius: 40px;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #2c3e2f;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        /* 双入口卡片 */
-        .dual-entry {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .entry-card {
-            flex: 1;
-            background: white;
-            border-radius: 28px;
-            padding: 20px 14px;
-            text-align: center;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
-            transition: transform 0.2s;
-        }
-        .entry-card:active { transform: scale(0.98); }
-        .entry-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-        }
-        .entry-title {
+            padding: 16px;
+            font-size: 17px;
             font-weight: 700;
-            font-size: 18px;
-            margin-bottom: 6px;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 14px rgba(15,110,63,0.3);
         }
-        .entry-desc {
-            font-size: 12px;
-            color: #5b6e8c;
-            margin-bottom: 16px;
-            line-height: 1.4;
-        }
-        .btn-outline-green {
-            background: transparent;
+        .btn-primary:active { background: #0a5833; transform: scale(0.98);}
+        .btn-outline {
+            background: white;
             border: 1.5px solid #0f6e3f;
             color: #0f6e3f;
-            padding: 8px 0;
-            border-radius: 40px;
             font-weight: 600;
+            padding: 12px 18px;
+            border-radius: 60px;
             width: 100%;
             cursor: pointer;
-            font-size: 14px;
             transition: 0.2s;
         }
-        .btn-outline-green:active { background: #eef6f0; transform: scale(0.97); }
+        .btn-outline:active { background: #eef6f1; transform: scale(0.98);}
         
-        /* 硬件设备区 */
+        /* 智能设备区域 */
         .device-showcase {
-            background: white;
+            background: linear-gradient(115deg, #f0f9ff 0%, #ffffff 100%);
             border-radius: 32px;
-            display: flex;
-            gap: 18px;
+            margin: 16px;
             padding: 20px;
-            margin-bottom: 20px;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid #cbdde9;
         }
-        .device-img {
-            background: linear-gradient(145deg, #eef2f5, #e2e8f0);
-            width: 110px;
-            height: 110px;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-        }
-        .device-info {
-            flex: 1;
-        }
-        .device-name {
-            font-weight: 800;
-            font-size: 18px;
-            margin-bottom: 6px;
-        }
-        .feature-list {
-            font-size: 13px;
-            color: #475569;
-            margin: 8px 0;
-            list-style: none;
-        }
-        .feature-list li {
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 13px;
-            border-radius: 50px;
-            background: #f1f5f9;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-small:active { transform: scale(0.96); background: #e2e8f0; }
-        .btn-small-primary {
-            background: #0f6e3f;
-            color: white;
-        }
-        .btn-small-primary:active { background: #0a5833; }
-        
-        /* 用户案例滚动区 */
-        .cases-carousel {
-            background: white;
-            border-radius: 32px;
-            padding: 20px 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-        }
-        .carousel-header {
+        .device-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding: 0 4px;
+            align-items: baseline;
+            flex-wrap: wrap;
         }
-        .carousel-title {
+        .device-title {
+            font-size: 20px;
             font-weight: 700;
-            font-size: 18px;
-            background: linear-gradient(135deg, #1e4620, #2d6a4f);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        .scroll-buttons {
-            display: flex;
-            gap: 12px;
-        }
-        .scroll-btn {
-            background: #eef2ff;
-            border: none;
-            width: 34px;
-            height: 34px;
-            border-radius: 30px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #0f6e3f;
-            transition: 0.2s;
+            gap: 8px;
         }
-        .scroll-btn:active { background: #d9e6d9; transform: scale(0.95); }
-        .carousel-wrapper {
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            scroll-snap-type: x mandatory;
-            display: flex;
-            gap: 16px;
-            padding: 8px 4px 12px;
-            scrollbar-width: thin;
-            -webkit-overflow-scrolling: touch;
-        }
-        .case-card {
-            flex: 0 0 85%;
-            scroll-snap-align: start;
-            background: linear-gradient(145deg, #fefce8, #fff9e6);
-            border-radius: 28px;
-            padding: 22px;
-            border-left: 6px solid #eab308;
-            min-width: 260px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .case-name {
-            font-weight: 800;
-            margin-bottom: 12px;
-            font-size: 16px;
-            color: #b45309;
-        }
-        .case-text {
+        .device-desc {
             font-size: 14px;
-            line-height: 1.5;
-            color: #3b2e1e;
-        }
-        
-        /* 问卷样式 */
-        .quiz-card {
-            background: white;
-            border-radius: 32px;
-            padding: 24px 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-        }
-        .question-counter {
-            font-weight: 600;
-            color: #0f6e3f;
-            background: #e6f7ef;
-            display: inline-block;
-            padding: 4px 16px;
-            border-radius: 40px;
-            margin-bottom: 16px;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 10px;
+            color: #4b6b8a;
             margin: 12px 0;
         }
-        .progress-fill {
-            height: 100%;
-            background: #0f6e3f;
-            border-radius: 10px;
-            transition: width 0.3s;
+        .btn-small {
+            background: #0f6e3f10;
+            border: 1px solid #0f6e3f;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f6e3f;
+            cursor: pointer;
+        }
+
+        /* 问卷模块 */
+        .quiz-card {
+            background: white;
+            border-radius: 36px;
+            margin: 16px;
+            padding: 20px;
         }
         .question-text {
-            font-size: 22px;
             font-weight: 700;
-            margin: 32px 0 28px;
-            line-height: 1.4;
+            font-size: 22px;
+            margin: 20px 0 28px;
             text-align: center;
         }
         .option-btn {
-            width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: 1.5px solid #cbd5e1;
-            background: white;
             border-radius: 60px;
-            margin-bottom: 10px;
-            font-size: 16px;
+            background: white;
+            font-size: 15px;
             font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
+            margin-bottom: 10px;
+            width: 100%;
             text-align: center;
+            cursor: pointer;
         }
         .option-btn.selected {
             background: #0f6e3f;
             border-color: #0f6e3f;
             color: white;
         }
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 6px;
+            margin: 8px 0;
         }
-        .nav-btn {
-            flex: 1;
-            background: #f1f5f9;
-            border: none;
-            padding: 12px;
-            border-radius: 44px;
-            font-weight: 600;
-            cursor: pointer;
+        .progress-fill {
+            background: #0f6e3f;
+            height: 6px;
+            border-radius: 10px;
+            width: 0%;
         }
-        .result-area {
-            text-align: center;
-        }
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(145deg, #f1f5f9, #e6edf5);
-            border-radius: 50%;
-            margin: 16px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 44px;
-            font-weight: 800;
-            color: #0f6e3f;
-        }
-        .risk-low { color: #10b981; }
-        .risk-mid { color: #f59e0b; }
-        .risk-high { color: #ef4444; }
-        .ai-text {
-            background: #eef2ff;
-            padding: 16px;
-            border-radius: 24px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .footer-note {
-            font-size: 11px;
-            text-align: center;
-            color: #94a3b8;
-            margin-top: 16px;
-        }
-        .page {
-            display: none;
-        }
-        .page.active-page {
-            display: block;
-        }
-        button {
-            cursor: pointer;
-        }
-        
-        /* 我的页面 */
-        .profile-card {
-            background: white;
-            border-radius: 32px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-        }
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #eef2f5;
-        }
-        .avatar {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(145deg, #0f6e3f, #1e8f4a);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            color: white;
-            box-shadow: 0 6px 14px rgba(15,110,63,0.3);
-        }
-        .profile-info h3 {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-        .profile-info p {
-            font-size: 13px;
-            color: #5b6e8c;
-        }
-        .menu-item {
-            background: #f8fafc;
-            border-radius: 24px;
-            padding: 16px 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .menu-item:active { background: #eef2ff; transform: scale(0.98); }
-        .menu-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-        }
-        .menu-icon {
-            font-size: 24px;
-        }
-        .faq-section {
-            margin-top: 20px;
-        }
+
+        /* FAQ 区域 */
         .faq-item {
-            background: white;
-            border-radius: 24px;
-            margin-bottom: 12px;
-            padding: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            border: 1px solid #edf2f7;
+            border-bottom: 1px solid #eef2f6;
+            padding: 16px 0;
         }
         .faq-question {
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             cursor: pointer;
-            color: #1e4620;
+            font-size: 16px;
         }
         .faq-answer {
-            font-size: 13px;
-            color: #5b6e8c;
-            margin-top: 12px;
+            font-size: 14px;
+            color: #4a5b7a;
+            padding-top: 10px;
+            line-height: 1.45;
             display: none;
-            line-height: 1.5;
-            padding-top: 8px;
-            border-top: 1px solid #eef2f5;
         }
-        .contact-email-badge {
-            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-            border-radius: 28px;
-            padding: 14px 18px;
+        .faq-answer.show {
+            display: block;
+        }
+        .footer-links {
             text-align: center;
-            margin-top: 20px;
+            font-size: 12px;
+            color: #7291b0;
+            padding: 20px 16px 28px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 24px;
+        }
+
+        /* 结果页样式 */
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            background: #eef2ff;
+            border-radius: 50%;
+            margin: 10px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            font-weight: 500;
-            color: #1e3a8a;
-            cursor: pointer;
+            flex-direction: column;
         }
-        .footer-links {
-            border-top: none;
-            padding: 12px 0 24px;
-            text-align: center;
-            font-size: 12px;
-            color: #94a3b8;
+        .risk-low { color: #10b981; }
+        .risk-mid { color: #f59e0b; }
+        .risk-high { color: #ef4444; }
+        .ai-assessment {
+            background: #eef2ff;
+            padding: 16px;
+            border-radius: 24px;
+            margin: 16px 0;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            z-index: 2000;
         }
     </style>
 </head>
 <body>
 <div class="app-wrapper">
-    <div class="main-content">
-        <!-- 首页 -->
-        <div id="homePage" class="page active-page">
-            <div class="hero">
-                <div class="hero-left">
-                    <h1>父母最近<br>总忘事？</h1>
-                    <p>3分钟认知健康评估<br>+ 居家智能监测方案</p>
-                    <button class="btn-primary" id="heroStartBtn">立即免费评估 →</button>
-                </div>
-                <div class="hero-right">
-                    <div class="hero-img">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E%3Crect width='120' height='110' fill='%23FFF8E7' rx='16'/%3E%3Ccircle cx='40' cy='45' r='16' fill='%23FFD966' stroke='%23B97F44' stroke-width='1.5'/%3E%3Ccircle cx='36' cy='41' r='2' fill='%23333'/%3E%3Ccircle cx='44' cy='41' r='2' fill='%23333'/%3E%3Cpath d='M37 50 Q40 55, 43 50' stroke='%236B4C3B' stroke-width='1.5' fill='none'/%3E%3Crect x='70' y='30' width='32' height='36' rx='6' fill='%23C1E6CF' stroke='%230f6e3f' stroke-width='1.2'/%3E%3Crect x='76' y='36' width='6' height='6' fill='%23A0D6B0'/%3E%3Crect x='90' y='36' width='6' height='6' fill='%23A0D6B0'/%3E%3Cpath d='M82 52 L98 52' stroke='%230f6e3f' stroke-width='2'/%3E%3Cpath d='M90 44 L90 60' stroke='%230f6e3f' stroke-width='1.5'/%3E%3Ctext x='25' y='95' font-size='8' fill='%235b6e8c'%3E👵👴 + 📱%3C/text%3E%3C/svg%3E" alt="长者健康评估">
-                    </div>
-                </div>
-            </div>
-            <div class="trust-badge">
-                <div class="trust-item">✔ 面向长者家庭</div>
-                <div class="trust-item">✔ 简单易操作</div>
-                <div class="trust-item">✔ 数据私密保护</div>
-                <div class="trust-item">✔ 居家健康管理</div>
-            </div>
-            <div class="dual-entry">
-                <div class="entry-card">
-                    <div class="entry-icon">🧠</div>
-                    <div class="entry-title">免费认知评估</div>
-                    <div class="entry-desc">3分钟完成，了解风险倾向</div>
-                    <button class="btn-outline-green start-test-btn">开始测试 →</button>
-                </div>
-                <div class="entry-card">
-                    <div class="entry-icon">📱</div>
-                    <div class="entry-title">智能健康设备</div>
-                    <div class="entry-desc">居家监测记忆与行为变化</div>
-                    <button class="btn-outline-green view-device-btn">查看设备 →</button>
-                </div>
-            </div>
-            <div class="device-showcase">
-                <div class="device-img">⌚️📡</div>
-                <div class="device-info">
-                    <div class="device-name">家庭认知守护仪</div>
-                    <ul class="feature-list">
-                        <li>💤 睡眠监测</li>
-                        <li>🚶 活动轨迹异常提醒</li>
-                    </ul>
-                    <div class="btn-group">
-                        <button class="btn-small device-detail-btn">查看详情</button>
-                        <button class="btn-small btn-small-primary device-consult-btn">咨询设备</button>
-                    </div>
-                </div>
-            </div>
-            <div class="cases-carousel">
-                <div class="carousel-header">
-                    <span class="carousel-title">📢 真实用户案例</span>
-                    <div class="scroll-buttons">
-                        <button class="scroll-btn" id="scrollLeftBtn">◀</button>
-                        <button class="scroll-btn" id="scrollRightBtn">▶</button>
-                    </div>
-                </div>
-                <div class="carousel-wrapper" id="caseCarouselWrapper"></div>
-            </div>
-            <div class="footer-links">免责声明 | 隐私政策 | 📧 celia2206254@gmail.com</div>
+    <div class="main-content" id="mainContent"></div>
+    <div class="bottom-nav" id="bottomNav">
+        <div class="nav-item" data-tab="home">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 3L2 9l10 6 10-6-10-6zM2 18l10 6 10-6M2 12l10 6 10-6"/></svg>
+            <span class="nav-label">认知评估</span>
         </div>
-
-        <!-- 智能设备页面 -->
-        <div id="devicePage" class="page">
-            <div class="card" style="text-align:center;">
-                <h2 style="margin-bottom: 16px;">📡 智能监测设备</h2>
-                <div style="font-size: 80px; margin: 16px;">🏠⌚️</div>
-                <p style="margin: 12px 0;">家庭认知守护仪 · 非接触式毫米波雷达</p>
-                <ul style="text-align: left; margin: 20px 0;">
-                    <li>✅ 夜间离床监测</li>
-                    <li>✅ 日常活动规律分析</li>
-                    <li>✅ 异常行为告警推送</li>
-                    <li>✅ 家属远程查看报告</li>
-                </ul>
-                <button class="btn-primary device-contact-btn" style="margin-top: 12px;">联系我们</button>
-            </div>
+        <div class="nav-item" data-tab="device">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2h6v2h-6V6zm0 4h6v2h-6v-2zm-6 0h4v2H6v-2zm0 4h4v2H6v-2zm10 0h2v2h-2v-2zm-6 0h4v2h-4v-2z"/></svg>
+            <span class="nav-label">智能设备</span>
         </div>
-
-        <!-- 我的页面 -->
-        <div id="profilePage" class="page">
-            <div class="profile-card">
-                <div class="profile-header">
-                    <div class="avatar">👤</div>
-                    <div class="profile-info">
-                        <h3>我的健康档案</h3>
-                        <p>评估记录 · 设备绑定 · 健康动态</p>
-                    </div>
-                </div>
-                <div class="menu-item contact-us-btn">
-                    <div class="menu-left"><span class="menu-icon">📧</span><span>联系我们</span></div>
-                    <span>→</span>
-                </div>
-                <div class="menu-item my-reports-btn">
-                    <div class="menu-left"><span class="menu-icon">📋</span><span>历史评估报告</span></div>
-                    <span>→</span>
-                </div>
-            </div>
-            <div class="faq-section">
-                <div style="font-weight: 700; margin: 0 0 12px 8px; font-size: 16px;">📌 常见问题</div>
-                <div class="faq-item"><div class="faq-question">📋 问卷准吗？<span>▼</span></div><div class="faq-answer">本问卷基于临床验证量表开发，用于风险初筛，准确率较高，最终诊断请以医院评估为准。</div></div>
-                <div class="faq-item"><div class="faq-question">🔧 设备怎么安装？<span>▼</span></div><div class="faq-answer">设备即插即用，通过手机app配网，放置在客厅或卧室即可，无需复杂布线。</div></div>
-                <div class="faq-item"><div class="faq-question">👵 老人会用吗？<span>▼</span></div><div class="faq-answer">设备全自动工作，无需老人操作。家属通过小程序远程查看数据，非常便捷。</div></div>
-                <div class="faq-item"><div class="faq-question">💎 是否需要会员？<span>▼</span></div><div class="faq-answer">基础评估和部分监测功能免费，高级分析服务可选订阅，不强制。</div></div>
-            </div>
-            <div class="contact-email-badge email-contact-btn">📧 联系邮箱：celia2206254@gmail.com <span style="font-size: 18px;">✉️</span></div>
+        <div class="nav-item" data-tab="profile">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span class="nav-label">我的页面</span>
         </div>
-
-        <!-- 问卷页面 -->
-        <div id="quizPage" class="page"></div>
-    </div>
-
-    <div class="bottom-nav">
-        <button class="nav-item" data-page="home"><svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 3L4 9v12h5v-7h6v7h5V9l-8-6z"/></svg><span>认知评估</span></button>
-        <button class="nav-item" data-page="device"><svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 14H6v-2h6v2zm8-4h-4v-2h4v2z"/></svg><span>智能设备</span></button>
-        <button class="nav-item" data-page="profile"><svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的页面</span></button>
     </div>
 </div>
+<div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // 初始化案例数据 (10个真实用户反馈)
-    const casesList = [
-        { name: "👩 张女士", text: "通过评估发现风险，及时带父亲检查，干预后状态改善明显。" },
-        { name: "👨 李先生", text: "使用设备后，能远程关注母亲睡眠和活动状态，安心多了。" },
-        { name: "👵 王爷爷家属", text: "评估预警早发现轻度认知障碍，现已进行康复训练。" },
-        { name: "🧑 陈阿姨", text: "智能设备监测到夜间离床异常，避免了一次意外跌倒。" },
-        { name: "👨‍🦳 周先生", text: "问卷简洁易懂，帮助全家了解父母认知健康。" },
-        { name: "🏠 刘奶奶女儿", text: "远程查看活动数据，感觉父母生活规律，我们也放心。" },
-        { name: "👴 赵爷爷", text: "坚持测评半年，指标稳定，感谢专业指导。" },
-        { name: "👩‍⚕️ 孙医生推荐", text: "作为家庭初筛工具非常实用，推荐给有需要的家庭。" },
-        { name: "🧠 李教授", text: "居家认知守护仪是长者家庭的得力助手，科技温暖人心。" },
-        { name: "❤️ 志愿者协会", text: "已协助百位老人使用评估+设备，收获好评，降低走失风险。" }
+    // ---------- 认知问卷20题（原始可靠题库）----------
+    const QUESTIONS = [
+        "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？",
+        "是否忘记约定或日期？", "是否记不住最近发生的事？", "是否常搞不清今天星期几？",
+        "是否分不清月份或季节？", "是否去熟悉地方也容易迷路？", "是否常叫不出熟悉物品名称？",
+        "说话时是否常卡住找词？", "是否表达内容混乱？", "是否听不懂复杂说明？",
+        "是否不会使用熟悉家电？", "是否缴费、算账变困难？", "是否做饭步骤容易混乱？",
+        "是否需要别人提醒洗澡吃药？", "是否脾气变化明显？", "是否变得多疑敏感？",
+        "是否兴趣明显下降？", "是否社交意愿下降？"
     ];
-    
-    const wrapper = document.getElementById('caseCarouselWrapper');
-    if(wrapper) {
-        casesList.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'case-card';
-            div.innerHTML = `<div class="case-name">${c.name}</div><div class="case-text">${c.text}</div>`;
-            wrapper.appendChild(div);
-        });
-    }
-
-    // 左右滚动功能
-    const scrollLeftBtn = document.getElementById('scrollLeftBtn');
-    const scrollRightBtn = document.getElementById('scrollRightBtn');
-    if(scrollLeftBtn && wrapper) {
-        scrollLeftBtn.onclick = () => wrapper.scrollBy({ left: -280, behavior: 'smooth' });
-        scrollRightBtn.onclick = () => wrapper.scrollBy({ left: 280, behavior: 'smooth' });
-    }
-
-    // 页面导航
-    function navigateTo(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        document.getElementById(pageId + 'Page').classList.add('active-page');
-        document.querySelectorAll('.nav-item').forEach(btn => {
-            const page = btn.getAttribute('data-page');
-            btn.classList.toggle('active', page === pageId);
-        });
-    }
-
-    // 邮件发送
-    function sendEmail() {
-        window.location.href = 'mailto:celia2206254@gmail.com?subject=咨询认知健康服务&body=您好，我想咨询以下问题：';
-    }
-
-    // ==================== 20题认知问卷核心逻辑 ====================
-    const questions = [
-        "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？", "是否忘记约定或日期？", "是否记不住最近发生的事？",
-        "是否常搞不清今天星期几？", "是否分不清月份或季节？", "是否去熟悉地方也容易迷路？", "是否常叫不出熟悉物品名称？", "说话时是否常卡住找词？",
-        "是否表达内容混乱？", "是否听不懂复杂说明？", "是否不会使用熟悉家电？", "是否缴费、算账变困难？", "是否做饭步骤容易混乱？",
-        "是否需要别人提醒洗澡吃药？", "是否脾气变化明显？", "是否变得多疑敏感？", "是否兴趣明显下降？", "是否社交意愿下降？"
+    const OPTIONS = [
+        { label: "无异常", rawScore: 0 },
+        { label: "偶尔出现", rawScore: 1 },
+        { label: "经常出现", rawScore: 2 },
+        { label: "明显频繁", rawScore: 3 }
     ];
-    const optionItems = [
-        { label: "无异常", value: 0 }, { label: "偶尔出现", value: 1 }, 
-        { label: "经常出现", value: 2 }, { label: "明显频繁", value: 3 }
-    ];
-    let currentIndex = 0, answers = new Array(20).fill(null), autoTimer = null;
+    const MAX_RAW = 60;
 
-    function getPercentageScore() {
-        const raw = answers.reduce((s,v) => s + (v !== null ? v : 0), 0);
-        return Math.round((raw / 60) * 100);
-    }
-    function getRiskLevel(score100) {
-        if(score100 <= 25) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
-        if(score100 <= 50) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
-        return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
-    }
-    function generateAIText(percent) {
-        if(percent <= 25) return "根据AI分析，您的认知功能整体处于良好水平。各项指标未见明显异常，大脑健康状态稳定。继续保持健康生活方式。";
-        if(percent <= 50) return "AI提示轻度认知下降迹象。建议增加脑力活动，保证充足睡眠，3-6个月后复查。";
-        return "AI评估提示认知功能存在显著下降风险，建议尽快前往医院神经内科进行专业评估，早期干预至关重要。";
+    let currentTab = "home";      // home, device, profile
+    let quizActive = false;        // 是否在答题模式
+    let answers = new Array(20).fill(null);
+    let currentIndex = 0;
+
+    // 辅助函数
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 2000);
     }
 
-    function selectAnswer(value) {
-        if(autoTimer) clearTimeout(autoTimer);
-        answers[currentIndex] = value;
-        renderQuizPage();
-        if(currentIndex + 1 < questions.length) {
-            autoTimer = setTimeout(() => { currentIndex++; renderQuizPage(); autoTimer = null; }, 1000);
+    function getTotalRaw() {
+        let sum = 0;
+        for(let v of answers) if(v !== null) sum += v;
+        return sum;
+    }
+    function getPercentScore() {
+        return Math.round((getTotalRaw() / MAX_RAW) * 100);
+    }
+    function getRiskLevel(score) {
+        if(score <= 25) return { name:'低风险', class:'risk-low', desc:'当前认知状态总体稳定，保持健康生活习惯即可。' };
+        if(score <= 50) return { name:'中风险', class:'risk-mid', desc:'存在一定认知下降倾向，建议加强脑力活动并定期复查。' };
+        return { name:'高风险', class:'risk-high', desc:'认知下降风险较高，请尽快前往记忆门诊或神经内科评估。' };
+    }
+    function generateAI(percent, raw) {
+        if(percent <= 25) return "🤖 AI分析：您的认知功能整体表现良好，记忆与执行能力未见明显异常。继续保持社交与脑力活动。";
+        if(percent <= 50) return "🤖 AI提示：存在轻度认知功能波动，尤其是在近期记忆或定向方面。建议每日健脑训练、规律作息，并监测变化。";
+        return "🤖 AI预警：认知功能下降风险显著，多个维度出现异常信号。强烈建议尽快就医进行专业神经心理学评估，早期干预至关重要。";
+    }
+
+    // 重置问卷
+    function startNewQuiz() {
+        answers = new Array(20).fill(null);
+        currentIndex = 0;
+        quizActive = true;
+        render();
+    }
+    function resetAndGoHome() {
+        quizActive = false;
+        currentTab = "home";
+        answers = new Array(20).fill(null);
+        render();
+    }
+    function selectAnswer(score) {
+        if(!quizActive) return;
+        answers[currentIndex] = score;
+        if(currentIndex + 1 < QUESTIONS.length) {
+            currentIndex++;
+            render();
         } else {
-            autoTimer = setTimeout(() => { currentIndex++; renderQuizPage(); autoTimer = null; }, 1000);
+            // 完成问卷 -> 展示结果
+            quizActive = false;
+            render(); // 将会展示结果视图 (基于currentTab=result)
+            currentTab = "result";  // 结果页
+            render();
         }
     }
-    function prevQuestion() { if(currentIndex > 0) { if(autoTimer) clearTimeout(autoTimer); currentIndex--; renderQuizPage(); } }
-    function startQuiz() { answers = new Array(20).fill(null); currentIndex = 0; if(autoTimer) clearTimeout(autoTimer); navigateTo('quiz'); renderQuizPage(); }
-    function resetToHome() { if(autoTimer) clearTimeout(autoTimer); navigateTo('home'); }
+    function prevQuestion() {
+        if(quizActive && currentIndex > 0) {
+            currentIndex--;
+            render();
+        }
+    }
 
-    function renderQuizPage() {
-        const quizDiv = document.getElementById('quizPage');
-        if(!quizDiv) return;
-        if(currentIndex < questions.length) {
-            const total = questions.length, currentQ = currentIndex + 1, progress = (currentIndex / total) * 100, selectedVal = answers[currentIndex];
-            let optionsHtml = optionItems.map(opt => `<button class="option-btn ${selectedVal === opt.value ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">${opt.label}</button>`).join('');
-            quizDiv.innerHTML = `<div class="quiz-card"><div class="question-counter">第 ${currentQ} / ${total} 题</div><div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div><div class="question-text">${questions[currentIndex]}</div><div>${optionsHtml}</div><div class="nav-buttons"><button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled style="opacity:0.5"' : ''}>← 上一题</button></div><div class="footer-note">点击选项后自动进入下一题</div></div>`;
+    // 渲染不同页面
+    function renderHome() {
+        return `
+            <div class="hero-card">
+                <div class="hero-tag">🧠 官方推荐 · 居家智能监测</div>
+                <div class="hero-title">父母最近<br>总忘事？</div>
+                <div class="hero-sub">3分钟认知健康评估<br>+居家智能监测方案</div>
+                <button class="btn-primary" id="startFreeEvalBtn">立即免费评估 →</button>
+            </div>
+            <div class="device-showcase" id="devicePreviewCard">
+                <div class="device-header">
+                    <div class="device-title"><span>📡 智能健康设备</span></div>
+                    <button class="btn-small" id="gotoDeviceFromHome">查看设备 →</button>
+                </div>
+                <div class="device-desc">🏠 居家监测记忆与行为变化 · 毫米波雷达无接触式守护，异常行为自动告警。</div>
+                <div style="display: flex; gap: 12px; margin-top: 12px;">
+                    <span style="background:#eef2ff; padding:6px 12px; border-radius:50px;">📊 睡眠分析</span>
+                    <span style="background:#eef2ff; padding:6px 12px; border-radius:50px;">🚶 活动轨迹</span>
+                    <span style="background:#eef2ff; padding:6px 12px; border-radius:50px;">⏰ 用药提醒</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderDevice() {
+        return `
+            <div class="card" style="margin-top:20px;">
+                <h2 style="font-size:26px; margin-bottom:8px;">📟 认知护航·智能硬件</h2>
+                <p style="color:#4b6b8a;">专为长者设计，无感监测认知相关行为变化</p>
+                <div style="background:#eef6f1; border-radius:32px; margin-top:24px; padding:20px;">
+                    <div style="font-weight:800; font-size:20px;">🧩 记忆守护终端</div>
+                    <ul style="margin: 16px 0 16px 20px; list-style:disc;">
+                        <li>日常行为节律分析</li>
+                        <li>异常徘徊 / 迷路预警</li>
+                        <li>服药依从性记录</li>
+                        <li>亲属端周报推送</li>
+                    </ul>
+                    <button class="btn-outline" id="deviceContactBtn">了解安装方式 →</button>
+                </div>
+                <div class="device-desc" style="margin-top:20px; background:#fafcff; padding:16px; border-radius:28px;">
+                    <strong>🔧 设备安装指导</strong><br>
+                    1. 插电即用，无需穿戴<br>
+                    2. 绑定APP，家人共享数据<br>
+                    3. 客服在线支持，适配各类户型<br>
+                    <span style="display:inline-block; margin-top:12px; color:#0f6e3f;">📞 咨询专线: 400-882-6625</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderProfile() {
+        return `
+            <div class="card" style="margin-top:20px;">
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
+                    <div style="background:#c7e9d0; width:64px; height:64px; border-radius:40px; display:flex; align-items:center; justify-content:center; font-size:32px;">👤</div>
+                    <div><h3>我的健康档案</h3><p style="color:#6c84a3;">历史评估记录可在此查看</p></div>
+                </div>
+                <button class="btn-outline" id="historyTestBtn" style="margin-bottom:20px;">📋 重新认知评估</button>
+            </div>
+            <div class="card">
+                <h3 style="font-size:20px;">❓ 常见问题 (FAQ)</h3>
+                <div id="faqContainer">
+                    <div class="faq-item">
+                        <div class="faq-question">📋 问卷准吗？<span>▼</span></div>
+                        <div class="faq-answer">本问卷基于临床常用认知筛查量表改编，具有较高信效度，可作为家庭自测参考，但不能替代医院诊断。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">🖥️ 设备怎么安装？<span>▼</span></div>
+                        <div class="faq-answer">设备即插即用，无网络也可本地记录，连接WiFi后数据同步至家属端。支持墙壁/桌面放置，提供视频指导。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">👵 老人会用吗？<span>▼</span></div>
+                        <div class="faq-answer">全自动无需老人操作，毫米波雷达无接触感应，不会增加老人负担，子女远程即可掌握情况。</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">💎 是否需要会员？<span>▼</span></div>
+                        <div class="faq-answer">基础监测永久免费，高级分析报告及专家解读服务可选订阅（首年免费体验）。</div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-links">
+                <a href="#">免责声明</a> | <a href="#">隐私政策</a> | <a href="mailto:celia2206254@gmail.com">联系方式：celia2206254@gmail.com</a>
+            </div>
+        `;
+    }
+
+    function renderQuiz() {
+        const progress = ((currentIndex) / QUESTIONS.length) * 100;
+        const question = QUESTIONS[currentIndex];
+        const selectedVal = answers[currentIndex];
+        let optsHtml = '';
+        for(let opt of OPTIONS) {
+            const isSel = (selectedVal === opt.rawScore);
+            optsHtml += `<button class="option-btn ${isSel ? 'selected' : ''}" onclick="window.selectAnswerHandler(${opt.rawScore})">${opt.label}</button>`;
+        }
+        return `
+            <div class="quiz-card">
+                <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div>
+                <div style="display:flex; justify-content:space-between; margin:12px 0 0;"><span>第${currentIndex+1}/${QUESTIONS.length}题</span><span style="color:#0f6e3f;">认知自测</span></div>
+                <div class="question-text">${escapeHtml(question)}</div>
+                <div class="options">${optsHtml}</div>
+                <div style="display:flex; gap:12px; margin-top:24px;">
+                    <button class="btn-outline" style="flex:1;" id="quizPrevBtn" ${currentIndex===0 ? 'disabled style="opacity:0.4"' : ''}>← 上一题</button>
+                </div>
+                <div class="footer-links" style="margin-top:20px;">根据近3个月真实感受作答</div>
+            </div>
+        `;
+    }
+
+    function renderResult() {
+        const percent = getPercentScore();
+        const risk = getRiskLevel(percent);
+        const aiText = generateAI(percent, getTotalRaw());
+        return `
+            <div class="card" style="text-align:center;">
+                <h2>📋 评估报告</h2>
+                <div class="score-circle"><span style="font-size:44px; font-weight:800;">${percent}</span><span>/100</span></div>
+                <div class="risk-level ${risk.class}" style="font-size:26px; font-weight:bold;">${risk.name}</div>
+                <div class="ai-assessment">${aiText}</div>
+                <p>${risk.desc}</p>
+                <div class="device-showcase" style="margin:20px 0; background:#f8fafc;">
+                    <div style="font-weight:bold;">🏠 智能设备居家监测方案</div>
+                    <div style="font-size:13px;">持续追踪行为变化，防走失、异常警报，守护记忆健康</div>
+                    <button class="btn-small" id="deviceFromResult" style="margin-top:10px;">了解设备详情</button>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:16px;">
+                    <button class="btn-outline" id="restartQuizBtn">重新测试</button>
+                    <button class="btn-primary" id="goHomeFromResult">首页</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
+
+    // 主渲染调度
+    function render() {
+        const container = document.getElementById('mainContent');
+        if (!container) return;
+        let content = "";
+        // 如果 quizActive 为true 且不是在结果页覆盖状态，则展示问卷
+        if (quizActive) {
+            content = renderQuiz();
         } else {
-            const percent = getPercentageScore(), risk = getRiskLevel(percent), ai = generateAIText(percent);
-            quizDiv.innerHTML = `<div class="quiz-card result-area"><h2>📋 评估结果</h2><div class="score-circle">${percent}</div><div class="risk-level ${risk.class}" style="
+            if (currentTab === 'home') content = renderHome();
+            else if (currentTab === 'device') content = renderDevice();
+            else if (currentTab === 'profile') content = renderProfile();
+            else if (currentTab === 'result') content = renderResult();
+            else content = renderHome();
+        }
+        container.innerHTML = content;
+        // 高亮底部导航
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const val = item.getAttribute('data-tab');
+            if ((currentTab === val) || (currentTab === 'result' && val==='home')) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        // 绑定动态按钮
+        bindDynamicEvents();
+    }
+
+    function bindDynamicEvents() {
+        // 开始评估按钮
+        const startBtn = document.getElementById('startFreeEvalBtn');
+        if(startBtn) startBtn.onclick = () => { startNewQuiz(); };
+        // 首页中的 “查看设备”
+        const gotoDevice = document.getElementById('gotoDeviceFromHome');
+        if(gotoDevice) gotoDevice.onclick = () => { quizActive=false; currentTab='device'; render(); };
+        // 智能设备页联系 / 查看安装
+        const deviceContact = document.getElementById('deviceContactBtn');
+        if(deviceContact) deviceContact.onclick = () => { showToast("安装指导已发送至邮箱 celia2206254@gmail.com 或联系客服"); };
+        // 我的页面重新评估
+        const historyBtn = document.getElementById('historyTestBtn');
+        if(historyBtn) historyBtn.onclick = () => { startNewQuiz(); };
+        // result 相关
+        const restartBtn = document.getElementById('restartQuizBtn');
+        if(restartBtn) restartBtn.onclick = () => { startNewQuiz(); };
+        const goHomeResult = document.getElementById('goHomeFromResult');
+        if(goHomeResult) goHomeResult.onclick = () => { quizActive=false; currentTab='home'; render(); };
+        const deviceFromResult = document.getElementById('deviceFromResult');
+        if(deviceFromResult) deviceFromResult.onclick = () => { quizActive=false; currentTab='device'; render(); };
+        // 问卷中上一题
+        const prevBtn = document.getElementById('quizPrevBtn');
+        if(prevBtn) prevBtn.onclick = () => { prevQuestion(); };
+        // 处理FAQ折叠
+        document.querySelectorAll('.faq-item').forEach((item, idx) => {
+            const qDiv = item.querySelector('.faq-question');
+            const answerDiv = item.querySelector('.faq-answer');
+            if(qDiv && answerDiv) {
+                qDiv.style.cursor = 'pointer';
+                qDiv.onclick = (e) => {
+                    e.stopPropagation();
+                    answerDiv.classList.toggle('show');
+                    const arrow = qDiv.querySelector('span');
+                    if(arrow) arrow.innerHTML = answerDiv.classList.contains('show') ? '▲' : '▼';
+                };
+                // 初始化箭头
+                const arrowSpan = qDiv.querySelector('span');
+                if(arrowSpan) arrowSpan.innerHTML = '▼';
+            }
+        });
+    }
+
+    // 全局注册答题选择器
+    window.selectAnswerHandler = (score) => {
+        selectAnswer(score);
+    };
+    
+    // 底部导航切换
+    function initNav() {
+        const navs = document.querySelectorAll('.nav-item');
+        navs.forEach(nav => {
+            nav.addEventListener('click', (e) => {
+                const tab = nav.getAttribute('data-tab');
+                if(tab === 'home') { quizActive = false; currentTab = 'home'; render(); }
+                else if(tab === 'device') { quizActive = false; currentTab = 'device'; render(); }
+                else if(tab === 'profile') { quizActive = false; currentTab = 'profile'; render(); }
+            });
+        });
+    }
+    
+    // 初次渲染
+    function init() {
+        render();
+        initNav();
+    }
+    init();
+</script>
+</body>
+</html>
