@@ -247,6 +247,30 @@
         .risk-low { color: #10b981; }
         .risk-mid { color: #f59e0b; }
         .risk-high { color: #ef4444; }
+        
+        /* AI评估样式 */
+        .ai-assessment {
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            padding: 18px;
+            border-radius: 24px;
+            margin: 20px 0;
+            border-left: 5px solid #3b82f6;
+        }
+        .ai-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e3a8a;
+        }
+        .ai-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1e293b;
+        }
+        
         .result-desc {
             background: #f8fafc;
             padding: 16px;
@@ -256,11 +280,11 @@
             color: #1e293b;
         }
         .suggest-box {
-            background: #eef2ff;
+            background: #fefce8;
             padding: 18px;
             border-radius: 24px;
             margin: 20px 0;
-            border-left: 5px solid #3b82f6;
+            border-left: 5px solid #eab308;
         }
         .suggest-title {
             font-weight: 700;
@@ -397,7 +421,6 @@
     ];
     
     // 每题原始分值: 0,1,2,3  总分范围0-60，需要映射到百分制: 最终得分 = (原始总分 / 60) * 100
-    // 为了方便, 先计算原始总分，再转换为百分制(四舍五入取整)
     const optionItems = [
         { label: "无异常", rawScore: 0 },
         { label: "偶尔出现", rawScore: 1 },
@@ -405,12 +428,11 @@
         { label: "明显频繁", rawScore: 3 }
     ];
     
-    // 最大原始总分 = 20 * 3 = 60，目标百分制满分为100
     const MAX_RAW_SCORE = 60;
     
-    let currentPage = 'home'; // home, quiz, result
+    let currentPage = 'home';
     let currentIndex = 0;
-    let answers = new Array(20).fill(null); // 存储每道题的原始分 0-3
+    let answers = new Array(20).fill(null);
     let autoTimer = null;
     
     // 计算原始总分
@@ -425,19 +447,76 @@
     // 百分制得分: 0-100分
     function getPercentageScore() {
         const raw = getTotalRawScore();
-        // 公式: (raw / 60) * 100 ，保留整数
         let percent = (raw / MAX_RAW_SCORE) * 100;
         return Math.round(percent);
     }
     
-    // 风险等级基于百分制分数: 0-100分映射
-    // 低风险: 0-40分? 但是原始逻辑更合理保留原阈值: 原0-15分(低风险)映射到百分制约0-25分 => 25分以内低风险; 原16-30分(中风险)约26-50分; 原31+约51+ 
-    // 根据医生建议更合理的分段: 0-25分 低风险；26-50分 中风险；51-100分 高风险。
-    // 为了让结果合理且贴合原始设计，使用以下分级:
+    // 风险等级基于百分制分数
     function getRiskLevel(percentScore) {
         if (percentScore <= 25) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
         if (percentScore <= 50) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
         return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
+    }
+    
+    // ========== AI评估文本生成（基于百分比得分和各维度倾向）==========
+    function generateAIAssessment(percentScore, rawScore) {
+        // 分析各维度得分以便给出更个性化建议
+        let memoryScore = 0;      // 1-5题
+        let timeOrientationScore = 0; // 6-8题
+        let languageScore = 0;    // 9-12题
+        let dailyAbilityScore = 0; // 13-16题
+        let emotionScore = 0;      // 17-20题
+        
+        for (let i = 0; i < answers.length; i++) {
+            const val = answers[i] !== null ? answers[i] : 0;
+            if (i < 5) memoryScore += val;
+            else if (i < 8) timeOrientationScore += val;
+            else if (i < 12) languageScore += val;
+            else if (i < 16) dailyAbilityScore += val;
+            else emotionScore += val;
+        }
+        
+        // 各维度最大分值: 记忆15分，时间地点9分，语言12分，生活能力12分，情绪行为12分
+        const memoryPercent = (memoryScore / 15) * 100;
+        const timePercent = (timeOrientationScore / 9) * 100;
+        const languagePercent = (languageScore / 12) * 100;
+        const dailyPercent = (dailyAbilityScore / 12) * 100;
+        const emotionPercent = (emotionScore / 12) * 100;
+        
+        let mainIssues = [];
+        if (memoryPercent > 40) mainIssues.push("记忆力减退");
+        if (timePercent > 40) mainIssues.push("时间地点定向障碍");
+        if (languagePercent > 40) mainIssues.push("语言表达困难");
+        if (dailyPercent > 40) mainIssues.push("日常生活能力下降");
+        if (emotionPercent > 40) mainIssues.push("情绪行为变化");
+        
+        let aiMessage = "";
+        
+        if (percentScore <= 25) {
+            aiMessage = "根据AI分析，您的认知功能整体处于良好水平。各项指标未见明显异常，大脑健康状态稳定。建议您继续保持现有健康生活方式，定期进行认知训练，维持良好的社交活动，这有助于长期保持大脑活力。";
+            if (mainIssues.length > 0) {
+                aiMessage += ` 虽然部分维度（${mainIssues.slice(0,2).join("、")}）有轻微波动，但仍在正常范围，通过针对性训练即可改善。`;
+            }
+        } 
+        else if (percentScore <= 50) {
+            aiMessage = "AI评估提示：您的认知功能存在轻度下降迹象。";
+            if (mainIssues.length > 0) {
+                aiMessage += ` 主要集中在${mainIssues.join("、")}方面。建议您增加脑力活动，如记忆游戏、阅读、数独等，同时保证充足睡眠，减少压力。建议3-6个月后复查，观察变化趋势。`;
+            } else {
+                aiMessage += "整体功能处于临界状态，建议加强认知锻炼并保持规律作息，如有持续不适请咨询医生。";
+            }
+        } 
+        else {
+            aiMessage = "AI评估提示：您的认知功能存在显著下降风险。";
+            if (mainIssues.length > 0) {
+                aiMessage += ` 尤其在${mainIssues.join("、")}方面表现突出。建议您尽快前往医院神经内科或记忆门诊进行全面评估，包括神经心理学检查和影像学检查。早期干预对于延缓认知下降至关重要。`;
+            } else {
+                aiMessage += "综合得分偏高，提示可能存在多方面认知问题，强烈建议尽快就医进行专业诊断，同时开始认知康复训练。";
+            }
+            aiMessage += " 请注意控制血管危险因素（血压、血糖、血脂），这对保护大脑健康非常重要。";
+        }
+        
+        return aiMessage;
     }
     
     // 通用健康建议列表
@@ -488,7 +567,6 @@
         }, 1200);
     }
     
-    // 选择答案: 存储原始分值
     function selectAnswer(rawValue) {
         if (currentPage !== 'quiz') return;
         if (answers[currentIndex] === rawValue) {
@@ -544,6 +622,7 @@
             fallbackCopyUrl();
         }
     }
+    
     async function fallbackCopyUrl() {
         try {
             await navigator.clipboard.writeText(CURRENT_URL);
@@ -559,14 +638,17 @@
         }
     }
     
-    // 生成海报 (百分制分数展示)
+    // 生成海报 (百分制分数展示 + AI摘要)
     async function generatePoster() {
         const percentScore = getPercentageScore();
         const risk = getRiskLevel(percentScore);
+        const rawScore = getTotalRawScore();
+        const aiTextShort = generateAIAssessment(percentScore, rawScore).substring(0, 80) + "...";
+        
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = 500;
-        canvas.height = 700;
+        canvas.height = 720;
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#0f6e3f';
@@ -576,44 +658,65 @@
         ctx.fillText('认知功能自测报告', 40, 70);
         ctx.font = '16px system-ui';
         ctx.fillStyle = '#5b6e8c';
-        ctx.fillText('健康评估·早期关注', 40, 110);
+        ctx.fillText('健康评估·AI解读', 40, 110);
         ctx.beginPath();
-        ctx.arc(250, 190, 55, 0, 2 * Math.PI);
+        ctx.arc(250, 195, 55, 0, 2 * Math.PI);
         ctx.fillStyle = '#f1f5f9';
         ctx.fill();
         ctx.fillStyle = '#0f172a';
         ctx.font = 'bold 38px monospace';
-        ctx.fillText(percentScore, 215, 205);
+        ctx.fillText(percentScore, 215, 210);
         ctx.font = '14px system-ui';
         ctx.fillStyle = '#64748b';
-        ctx.fillText('/ 100', 260, 200);
+        ctx.fillText('/ 100', 260, 205);
         ctx.font = 'bold 18px system-ui';
         ctx.fillStyle = risk.class === 'risk-low' ? '#10b981' : (risk.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
-        ctx.fillText(risk.name, 205, 250);
-        ctx.font = '15px system-ui';
-        ctx.fillStyle = '#334155';
-        let shortDesc = risk.desc.length > 28 ? risk.desc.substring(0, 28)+'…' : risk.desc;
-        ctx.fillText(shortDesc, 50, 290);
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 18px system-ui';
-        ctx.fillText('📋 健康建议', 40, 340);
-        ctx.font = '14px system-ui';
-        ctx.fillStyle = '#475569';
-        let tipsY = 375;
-        commonTips.forEach((tip, idx) => {
-            ctx.fillText(`${idx+1}. ${tip}`, 45, tipsY + idx*26);
-        });
-        ctx.font = '12px monospace';
-        ctx.fillStyle = '#6c757d';
-        let urlShort = CURRENT_URL.length > 40 ? CURRENT_URL.substring(0, 38)+'...' : CURRENT_URL;
-        ctx.fillText(urlShort, 45, 630);
-        ctx.fillStyle = '#aaa';
-        ctx.fillText('扫码或访问链接自测', 45, 660);
-        ctx.fillStyle = '#f1f5f9';
-        ctx.fillRect(380, 590, 80, 80);
-        ctx.fillStyle = '#334155';
+        ctx.fillText(risk.name, 205, 260);
+        
+        // AI简短解读
+        ctx.font = 'bold 15px system-ui';
+        ctx.fillStyle = '#1e3a8a';
+        ctx.fillText('🤖 AI评估摘要', 40, 310);
         ctx.font = '12px system-ui';
-        ctx.fillText('测一测', 410, 635);
+        ctx.fillStyle = '#334155';
+        const wrapText = (text, maxWidth, x, y, lineHeight) => {
+            let lines = [];
+            let currentLine = '';
+            for(let char of text) {
+                let testLine = currentLine + char;
+                let metrics = ctx.measureText(testLine);
+                if(metrics.width > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = char;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            lines.push(currentLine);
+            for(let i=0; i<lines.length; i++) {
+                ctx.fillText(lines[i], x, y + i * lineHeight);
+            }
+            return lines.length * lineHeight;
+        };
+        let aiY = 340;
+        const lineHeight = 18;
+        const usedHeight = wrapText(aiTextShort, 420, 40, aiY, lineHeight);
+        let nextY = aiY + usedHeight + 15;
+        
+        ctx.font = 'bold 14px system-ui';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText('📋 健康建议', 40, nextY);
+        ctx.font = '12px system-ui';
+        ctx.fillStyle = '#475569';
+        let tipsY = nextY + 22;
+        commonTips.forEach((tip, idx) => {
+            if(tipsY + 20 < 680) ctx.fillText(`${idx+1}. ${tip}`, 45, tipsY + idx*22);
+        });
+        
+        ctx.font = '10px monospace';
+        ctx.fillStyle = '#6c757d';
+        let urlShort = CURRENT_URL.length > 38 ? CURRENT_URL.substring(0, 36)+'..' : CURRENT_URL;
+        ctx.fillText(urlShort, 40, 700);
         return canvas.toDataURL('image/png');
     }
     
@@ -640,7 +743,6 @@
         });
     }
     
-    // 渲染测试页（选项不显示分数）
     function renderQuiz() {
         const total = questions.length;
         const currentQNumber = currentIndex + 1;
@@ -691,7 +793,7 @@
         return `
             <div class="card">
                 <h1>🧠 认知功能专业评估</h1>
-                <div class="subtitle">20题自测 · 满分100分</div>
+                <div class="subtitle">20题自测 · 满分100分 · AI智能解读</div>
                 <button class="btn btn-primary" onclick="startTest()">开始评估</button>
                 <div class="footer-note">每题根据真实感受选择，选后自动跳转，可返回修改</div>
             </div>
@@ -702,7 +804,9 @@
         const percentScore = getPercentageScore();
         const rawScore = getTotalRawScore();
         const risk = getRiskLevel(percentScore);
+        const aiAssessment = generateAIAssessment(percentScore, rawScore);
         const tipsHtml = commonTips.map(t => `<li>${t}</li>`).join('');
+        
         return `
             <div class="card">
                 <h1>📋 评估结果</h1>
@@ -711,14 +815,23 @@
                     <div class="score-max">/ 100 分</div>
                 </div>
                 <div class="risk-level ${risk.class}">${risk.name}</div>
+                
+                <div class="ai-assessment">
+                    <div class="ai-title">
+                        <span>🤖 AI 智能评估</span>
+                    </div>
+                    <div class="ai-text">${escapeHtml(aiAssessment)}</div>
+                </div>
+                
                 <div class="result-desc">
-                    <strong>原始总分: ${rawScore} / 60</strong><br>
                     ${risk.desc}
                 </div>
+                
                 <div class="suggest-box">
                     <div class="suggest-title">💡 通用健康建议</div>
                     <ul class="suggest-list">${tipsHtml}</ul>
                 </div>
+                
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
                     <button class="btn btn-share-link" onclick="shareUrl()">
@@ -730,7 +843,7 @@
                         生成分享海报
                     </button>
                 </div>
-                <div class="footer-note">满分100分，分数越高风险越高，请遵专业医师诊断</div>
+                <div class="footer-note">满分100分，分数越高风险越高 | AI评估基于5个认知维度综合分析</div>
             </div>
         `;
     }
@@ -750,7 +863,6 @@
         appDiv.innerHTML = html;
     }
     
-    // 全局函数
     window.selectAnswer = selectAnswer;
     window.prevQuestion = prevQuestion;
     window.resetTest = resetTest;
