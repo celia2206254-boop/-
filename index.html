@@ -2,13 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>认知功能专业自测 - 健康评估</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -31,31 +32,32 @@
             background: white;
             border-radius: 32px;
             padding: 28px 24px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
             transition: all 0.2s;
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 28px;
             text-align: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: #1e293b;
+            letter-spacing: -0.3px;
         }
 
         .subtitle {
             text-align: center;
             color: #5b6e8c;
             font-size: 14px;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .btn {
             display: block;
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             border: none;
             border-radius: 60px;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             text-align: center;
@@ -67,21 +69,13 @@
             color: white;
             box-shadow: 0 2px 8px rgba(15,110,63,0.2);
         }
-        .btn-primary:active { background: #0a5833; transform: scale(0.97); }
+        .btn-primary:active { background: #0a5833; transform: scale(0.98); }
 
         .btn-secondary {
             background: #475569;
             color: white;
         }
-        .btn-secondary:active { background: #334155; transform: scale(0.97); }
-
-        .btn-outline {
-            background: white;
-            color: #0f6e3f;
-            border: 1.5px solid #0f6e3f;
-            margin-top: 12px;
-        }
-        .btn-outline:active { background: #eef9f2; transform: scale(0.97); }
+        .btn-secondary:active { background: #334155; transform: scale(0.98); }
 
         .btn-share-link {
             background: #3b82f6;
@@ -92,7 +86,7 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn-share-link:active { background: #2563eb; transform: scale(0.97); }
+        .btn-share-link:active { background: #2563eb; transform: scale(0.98); }
         
         .btn-share-poster {
             background: #8b5cf6;
@@ -103,7 +97,7 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn-share-poster:active { background: #7c3aed; transform: scale(0.97); }
+        .btn-share-poster:active { background: #7c3aed; transform: scale(0.98); }
         
         .btn-icon-svg {
             width: 18px;
@@ -119,7 +113,7 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
             gap: 8px;
         }
@@ -131,13 +125,6 @@
             padding: 4px 16px;
             border-radius: 40px;
             display: inline-block;
-        }
-        .auto-hint {
-            font-size: 12px;
-            color: #94a3b8;
-            background: #f8fafc;
-            padding: 4px 12px;
-            border-radius: 30px;
         }
         .progress-bar {
             width: 100%;
@@ -158,7 +145,7 @@
             font-weight: 700;
             font-size: 22px;
             color: #0f172a;
-            margin: 28px 0 32px;
+            margin: 32px 0 36px;
             line-height: 1.4;
             text-align: center;
             padding: 0 4px;
@@ -168,10 +155,10 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
         .option-btn {
-            padding: 15px 20px;
+            padding: 16px 20px;
             border: 1.5px solid #cbd5e1;
             border-radius: 60px;
             background: white;
@@ -201,12 +188,13 @@
             flex: 1;
             background: #f1f5f9;
             border: none;
-            padding: 12px;
+            padding: 14px;
             border-radius: 44px;
             font-weight: 600;
             cursor: pointer;
             color: #334155;
             transition: 0.2s;
+            font-size: 15px;
         }
         .nav-btn:active { background: #e2e8f0; }
         .nav-btn.disabled {
@@ -216,33 +204,34 @@
 
         /* 结果页 */
         .score-circle {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            background: #f1f5f9;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e6edf5 100%);
             margin: 10px auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
         .score-number {
-            font-size: 44px;
+            font-size: 48px;
             font-weight: 800;
             color: #0f172a;
             line-height: 1;
         }
         .score-max {
-            font-size: 12px;
+            font-size: 13px;
             color: #64748b;
             margin-top: 4px;
+            font-weight: 500;
         }
         .risk-level {
             text-align: center;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         .risk-low { color: #10b981; }
         .risk-mid { color: #f59e0b; }
@@ -251,33 +240,34 @@
         /* AI评估样式 */
         .ai-assessment {
             background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-            padding: 18px;
-            border-radius: 24px;
+            padding: 20px;
+            border-radius: 28px;
             margin: 20px 0;
             border-left: 5px solid #3b82f6;
         }
         .ai-title {
             font-weight: 700;
-            margin-bottom: 10px;
-            font-size: 16px;
+            margin-bottom: 12px;
+            font-size: 17px;
             display: flex;
             align-items: center;
             gap: 8px;
             color: #1e3a8a;
         }
         .ai-text {
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.6;
             color: #1e293b;
         }
         
         .result-desc {
             background: #f8fafc;
-            padding: 16px;
+            padding: 18px;
             border-radius: 24px;
             margin: 20px 0;
-            line-height: 1.5;
+            line-height: 1.55;
             color: #1e293b;
+            font-size: 15px;
         }
         .suggest-box {
             background: #fefce8;
@@ -342,61 +332,58 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 3000;
             padding: 20px;
+            backdrop-filter: blur(4px);
         }
         .poster-card {
             background: white;
-            border-radius: 32px;
-            max-width: 340px;
+            border-radius: 36px;
+            max-width: 360px;
             width: 100%;
             text-align: center;
-            padding: 24px 20px 30px;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            padding: 20px 20px 28px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
             position: relative;
         }
         .poster-close {
             position: absolute;
-            top: 12px;
-            right: 18px;
-            font-size: 24px;
+            top: 14px;
+            right: 20px;
+            font-size: 28px;
             cursor: pointer;
             color: #94a3b8;
+            font-weight: 300;
         }
+        .poster-close:hover { color: #475569; }
         .btn-download {
             background: #0f6e3f;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 40px;
-            margin-top: 16px;
-            font-weight: bold;
+            padding: 14px;
+            border-radius: 44px;
+            margin-top: 18px;
+            font-weight: 700;
             width: 100%;
             cursor: pointer;
+            font-size: 16px;
         }
-        .timer-ring {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            border: 2px solid #cbd5e1;
-            border-top-color: #0f6e3f;
-            animation: spin 0.8s linear infinite;
-            margin-right: 6px;
-            vertical-align: middle;
+        .poster-img-preview {
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 <div class="container" id="app"></div>
 
 <script>
-    // ---------- 20题问卷内容 ----------
+    // 20题内容
     const questions = [
         "最近是否经常忘记刚说过的话？",
         "是否常忘记东西放在哪里？",
@@ -420,7 +407,6 @@
         "是否社交意愿下降？"
     ];
     
-    // 每题原始分值: 0,1,2,3  总分范围0-60，需要映射到百分制: 最终得分 = (原始总分 / 60) * 100
     const optionItems = [
         { label: "无异常", rawScore: 0 },
         { label: "偶尔出现", rawScore: 1 },
@@ -429,13 +415,11 @@
     ];
     
     const MAX_RAW_SCORE = 60;
-    
     let currentPage = 'home';
     let currentIndex = 0;
     let answers = new Array(20).fill(null);
     let autoTimer = null;
     
-    // 计算原始总分
     function getTotalRawScore() {
         let sum = 0;
         for (let i = 0; i < answers.length; i++) {
@@ -444,29 +428,21 @@
         return sum;
     }
     
-    // 百分制得分: 0-100分
     function getPercentageScore() {
         const raw = getTotalRawScore();
         let percent = (raw / MAX_RAW_SCORE) * 100;
         return Math.round(percent);
     }
     
-    // 风险等级基于百分制分数
     function getRiskLevel(percentScore) {
         if (percentScore <= 25) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
         if (percentScore <= 50) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
         return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
     }
     
-    // ========== AI评估文本生成（基于百分比得分和各维度倾向）==========
+    // AI评估文本
     function generateAIAssessment(percentScore, rawScore) {
-        // 分析各维度得分以便给出更个性化建议
-        let memoryScore = 0;      // 1-5题
-        let timeOrientationScore = 0; // 6-8题
-        let languageScore = 0;    // 9-12题
-        let dailyAbilityScore = 0; // 13-16题
-        let emotionScore = 0;      // 17-20题
-        
+        let memoryScore = 0, timeOrientationScore = 0, languageScore = 0, dailyAbilityScore = 0, emotionScore = 0;
         for (let i = 0; i < answers.length; i++) {
             const val = answers[i] !== null ? answers[i] : 0;
             if (i < 5) memoryScore += val;
@@ -475,8 +451,6 @@
             else if (i < 16) dailyAbilityScore += val;
             else emotionScore += val;
         }
-        
-        // 各维度最大分值: 记忆15分，时间地点9分，语言12分，生活能力12分，情绪行为12分
         const memoryPercent = (memoryScore / 15) * 100;
         const timePercent = (timeOrientationScore / 9) * 100;
         const languagePercent = (languageScore / 12) * 100;
@@ -490,36 +464,24 @@
         if (dailyPercent > 40) mainIssues.push("日常生活能力下降");
         if (emotionPercent > 40) mainIssues.push("情绪行为变化");
         
-        let aiMessage = "";
-        
         if (percentScore <= 25) {
-            aiMessage = "根据AI分析，您的认知功能整体处于良好水平。各项指标未见明显异常，大脑健康状态稳定。建议您继续保持现有健康生活方式，定期进行认知训练，维持良好的社交活动，这有助于长期保持大脑活力。";
-            if (mainIssues.length > 0) {
-                aiMessage += ` 虽然部分维度（${mainIssues.slice(0,2).join("、")}）有轻微波动，但仍在正常范围，通过针对性训练即可改善。`;
-            }
-        } 
-        else if (percentScore <= 50) {
-            aiMessage = "AI评估提示：您的认知功能存在轻度下降迹象。";
-            if (mainIssues.length > 0) {
-                aiMessage += ` 主要集中在${mainIssues.join("、")}方面。建议您增加脑力活动，如记忆游戏、阅读、数独等，同时保证充足睡眠，减少压力。建议3-6个月后复查，观察变化趋势。`;
-            } else {
-                aiMessage += "整体功能处于临界状态，建议加强认知锻炼并保持规律作息，如有持续不适请咨询医生。";
-            }
-        } 
-        else {
-            aiMessage = "AI评估提示：您的认知功能存在显著下降风险。";
-            if (mainIssues.length > 0) {
-                aiMessage += ` 尤其在${mainIssues.join("、")}方面表现突出。建议您尽快前往医院神经内科或记忆门诊进行全面评估，包括神经心理学检查和影像学检查。早期干预对于延缓认知下降至关重要。`;
-            } else {
-                aiMessage += "综合得分偏高，提示可能存在多方面认知问题，强烈建议尽快就医进行专业诊断，同时开始认知康复训练。";
-            }
-            aiMessage += " 请注意控制血管危险因素（血压、血糖、血脂），这对保护大脑健康非常重要。";
+            let msg = "根据AI分析，您的认知功能整体处于良好水平。各项指标未见明显异常，大脑健康状态稳定。建议您继续保持现有健康生活方式，定期进行认知训练，维持良好的社交活动。";
+            if (mainIssues.length > 0) msg += ` 部分维度（${mainIssues.slice(0,2).join("、")}）有轻微波动，通过针对性训练即可改善。`;
+            return msg;
+        } else if (percentScore <= 50) {
+            let msg = "AI评估提示：您的认知功能存在轻度下降迹象。";
+            if (mainIssues.length > 0) msg += ` 主要集中在${mainIssues.join("、")}方面。建议增加脑力活动如记忆游戏、阅读、数独，保证充足睡眠，减少压力。3-6个月后复查。`;
+            else msg += "整体功能处于临界状态，建议加强认知锻炼并保持规律作息。";
+            return msg;
+        } else {
+            let msg = "AI评估提示：您的认知功能存在显著下降风险。";
+            if (mainIssues.length > 0) msg += ` 尤其在${mainIssues.join("、")}方面表现突出。建议尽快前往医院神经内科或记忆门诊进行全面评估，包括神经心理学检查和影像学检查。早期干预至关重要。`;
+            else msg += "综合得分偏高，提示可能存在多方面认知问题，强烈建议尽快就医进行专业诊断，同时开始认知康复训练。";
+            msg += " 请注意控制血管危险因素（血压、血糖、血脂）。";
+            return msg;
         }
-        
-        return aiMessage;
     }
     
-    // 通用健康建议列表
     const commonTips = [
         "🏃 每周运动3次以上",
         "😴 保持规律睡眠",
@@ -544,24 +506,13 @@
         setTimeout(() => toast.classList.remove('show'), duration);
     }
     
-    function clearAutoTimer() {
-        if (autoTimer) {
-            clearTimeout(autoTimer);
-            autoTimer = null;
-        }
-    }
-    
+    function clearAutoTimer() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } }
     function startAutoTimer() {
         if (autoTimer) clearTimeout(autoTimer);
         autoTimer = setTimeout(() => {
             if (currentPage === 'quiz' && answers[currentIndex] !== null) {
-                if (currentIndex + 1 < questions.length) {
-                    currentIndex++;
-                    render();
-                } else {
-                    currentPage = 'result';
-                    render();
-                }
+                if (currentIndex + 1 < questions.length) { currentIndex++; render(); }
+                else { currentPage = 'result'; render(); }
             }
             autoTimer = null;
         }, 1200);
@@ -569,120 +520,92 @@
     
     function selectAnswer(rawValue) {
         if (currentPage !== 'quiz') return;
-        if (answers[currentIndex] === rawValue) {
-            clearAutoTimer();
-            startAutoTimer();
-            render();
-            return;
-        }
+        if (answers[currentIndex] === rawValue) { clearAutoTimer(); startAutoTimer(); render(); return; }
         answers[currentIndex] = rawValue;
         clearAutoTimer();
         render();
         startAutoTimer();
     }
+    function prevQuestion() { if (currentPage === 'quiz' && currentIndex > 0) { clearAutoTimer(); currentIndex--; render(); } }
+    function resetTest() { clearAutoTimer(); answers = new Array(20).fill(null); currentIndex = 0; currentPage = 'home'; render(); }
+    function startTest() { clearAutoTimer(); answers = new Array(20).fill(null); currentIndex = 0; currentPage = 'quiz'; render(); }
     
-    function prevQuestion() {
-        if (currentPage !== 'quiz') return;
-        if (currentIndex > 0) {
-            clearAutoTimer();
-            currentIndex--;
-            render();
-        }
-    }
-    
-    function resetTest() {
-        clearAutoTimer();
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        currentPage = 'home';
-        render();
-    }
-    
-    function startTest() {
-        clearAutoTimer();
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        currentPage = 'quiz';
-        render();
-    }
-    
-    // 分享链接
     async function shareUrl() {
         if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            try {
-                await navigator.share({
-                    title: '认知功能自测',
-                    text: '测一下认知健康状态',
-                    url: CURRENT_URL,
-                });
-                showToast('分享成功 ✓');
-                return;
-            } catch(e) { if(e.name !== 'AbortError') fallbackCopyUrl(); }
-        } else {
-            fallbackCopyUrl();
-        }
+            try { await navigator.share({ title: '认知功能自测', text: '测一下认知健康状态', url: CURRENT_URL }); showToast('分享成功 ✓'); return; } 
+            catch(e) { if(e.name !== 'AbortError') fallbackCopyUrl(); }
+        } else { fallbackCopyUrl(); }
     }
+    async function fallbackCopyUrl() { try { await navigator.clipboard.writeText(CURRENT_URL); showToast('🔗 链接已复制'); } catch(e) { let ta = document.createElement('textarea'); ta.value = CURRENT_URL; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('🔗 链接已复制'); } }
     
-    async function fallbackCopyUrl() {
-        try {
-            await navigator.clipboard.writeText(CURRENT_URL);
-            showToast('🔗 链接已复制，可分享给好友');
-        } catch(e) {
-            let ta = document.createElement('textarea');
-            ta.value = CURRENT_URL;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('🔗 链接已复制');
-        }
-    }
-    
-    // 生成海报 (百分制分数展示 + AI摘要)
-    async function generatePoster() {
+    // 增强版海报生成 (JPEG格式，大而工整)
+    async function generatePosterJPEG() {
         const percentScore = getPercentageScore();
         const risk = getRiskLevel(percentScore);
         const rawScore = getTotalRawScore();
-        const aiTextShort = generateAIAssessment(percentScore, rawScore).substring(0, 80) + "...";
+        const aiFullText = generateAIAssessment(percentScore, rawScore);
+        const shortAi = aiFullText.length > 150 ? aiFullText.substring(0, 147) + "..." : aiFullText;
         
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 500;
-        canvas.height = 720;
-        ctx.fillStyle = '#ffffff';
+        // 大尺寸高清晰 1080宽
+        canvas.width = 1080;
+        canvas.height = 1440;
+        // 背景 柔和白
+        ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 顶部装饰条
         ctx.fillStyle = '#0f6e3f';
-        ctx.fillRect(0, 0, canvas.width, 12);
-        ctx.font = 'bold 26px "PingFang SC", "Segoe UI"';
+        ctx.fillRect(0, 0, canvas.width, 24);
+        
+        // 标题
+        ctx.font = `bold 52px "PingFang SC", "Segoe UI", system-ui`;
         ctx.fillStyle = '#1e293b';
-        ctx.fillText('认知功能自测报告', 40, 70);
-        ctx.font = '16px system-ui';
+        ctx.fillText('认知功能自测报告', 70, 110);
+        
+        ctx.font = `30px system-ui`;
         ctx.fillStyle = '#5b6e8c';
-        ctx.fillText('健康评估·AI解读', 40, 110);
+        ctx.fillText('AI智能评估 · 健康分析', 70, 170);
+        
+        // 分数圆环
+        const centerX = canvas.width/2;
+        const circleY = 320;
         ctx.beginPath();
-        ctx.arc(250, 195, 55, 0, 2 * Math.PI);
+        ctx.arc(centerX, circleY, 100, 0, 2 * Math.PI);
         ctx.fillStyle = '#f1f5f9';
         ctx.fill();
         ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 38px monospace';
-        ctx.fillText(percentScore, 215, 210);
-        ctx.font = '14px system-ui';
+        ctx.font = `bold 68px "SF Mono", monospace`;
+        ctx.fillText(`${percentScore}`, centerX-50, circleY+25);
+        ctx.font = `28px system-ui`;
         ctx.fillStyle = '#64748b';
-        ctx.fillText('/ 100', 260, 205);
-        ctx.font = 'bold 18px system-ui';
-        ctx.fillStyle = risk.class === 'risk-low' ? '#10b981' : (risk.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
-        ctx.fillText(risk.name, 205, 260);
+        ctx.fillText('/ 100', centerX+35, circleY+15);
         
-        // AI简短解读
-        ctx.font = 'bold 15px system-ui';
+        // 等级
+        let levelColor = risk.class === 'risk-low' ? '#10b981' : (risk.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
+        ctx.fillStyle = levelColor;
+        ctx.font = `bold 40px system-ui`;
+        ctx.fillText(risk.name, centerX-70, circleY+105);
+        
+        // AI评估框
+        ctx.fillStyle = '#eef2ff';
+        ctx.shadowColor = 'rgba(0,0,0,0.05)';
+        ctx.shadowBlur = 8;
+        ctx.fillRect(60, 500, canvas.width-120, 280);
+        ctx.shadowColor = 'transparent';
         ctx.fillStyle = '#1e3a8a';
-        ctx.fillText('🤖 AI评估摘要', 40, 310);
-        ctx.font = '12px system-ui';
-        ctx.fillStyle = '#334155';
-        const wrapText = (text, maxWidth, x, y, lineHeight) => {
+        ctx.font = `bold 32px system-ui`;
+        ctx.fillText('🤖 AI 智能评估', 90, 565);
+        ctx.font = `26px system-ui`;
+        ctx.fillStyle = '#1e293b';
+        // 自动换行
+        const wrapTextCanvas = (text, maxWidth, x, y, lineHeight, fontSize) => {
+            ctx.font = `${fontSize}px system-ui`;
+            let words = text.split('');
             let lines = [];
             let currentLine = '';
-            for(let char of text) {
+            for(let char of words) {
                 let testLine = currentLine + char;
                 let metrics = ctx.measureText(testLine);
                 if(metrics.width > maxWidth && currentLine.length > 0) {
@@ -698,49 +621,65 @@
             }
             return lines.length * lineHeight;
         };
-        let aiY = 340;
-        const lineHeight = 18;
-        const usedHeight = wrapText(aiTextShort, 420, 40, aiY, lineHeight);
-        let nextY = aiY + usedHeight + 15;
+        let aiStartY = 620;
+        let used = wrapTextCanvas(shortAi, canvas.width-180, 90, aiStartY, 46, 26);
         
-        ctx.font = 'bold 14px system-ui';
+        // 建议标题
+        let suggestionsY = aiStartY + used + 45;
         ctx.fillStyle = '#0f172a';
-        ctx.fillText('📋 健康建议', 40, nextY);
-        ctx.font = '12px system-ui';
+        ctx.font = `bold 32px system-ui`;
+        ctx.fillText('📋 健康行动建议', 90, suggestionsY);
+        ctx.font = `26px system-ui`;
         ctx.fillStyle = '#475569';
-        let tipsY = nextY + 22;
+        let tipY = suggestionsY + 55;
         commonTips.forEach((tip, idx) => {
-            if(tipsY + 20 < 680) ctx.fillText(`${idx+1}. ${tip}`, 45, tipsY + idx*22);
+            ctx.fillText(`${idx+1}. ${tip}`, 110, tipY + idx*48);
         });
         
-        ctx.font = '10px monospace';
+        // 底部网址
+        ctx.font = `22px monospace`;
         ctx.fillStyle = '#6c757d';
-        let urlShort = CURRENT_URL.length > 38 ? CURRENT_URL.substring(0, 36)+'..' : CURRENT_URL;
-        ctx.fillText(urlShort, 40, 700);
-        return canvas.toDataURL('image/png');
+        let urlShort = CURRENT_URL.length > 50 ? CURRENT_URL.substring(0, 47)+'...' : CURRENT_URL;
+        ctx.fillText(urlShort, 90, canvas.height - 85);
+        ctx.font = `20px system-ui`;
+        ctx.fillStyle = '#aaa';
+        ctx.fillText('扫描二维码或访问链接自测', 90, canvas.height - 45);
+        
+        // 装饰二维码示意块
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(canvas.width-190, canvas.height-150, 130, 130);
+        ctx.fillStyle = '#334155';
+        ctx.font = `22px system-ui`;
+        ctx.fillText('测一测', canvas.width-160, canvas.height-70);
+        
+        // 转为JPEG 高质量
+        return canvas.toDataURL('image/jpeg', 0.92);
     }
     
     async function showPosterModal() {
-        const imageData = await generatePoster();
+        const jpegUrl = await generatePosterJPEG();
         const modalDiv = document.createElement('div');
         modalDiv.className = 'poster-overlay';
         modalDiv.innerHTML = `
             <div class="poster-card">
                 <span class="poster-close" onclick="this.closest('.poster-overlay').remove()">&times;</span>
-                <div style="font-weight:bold; margin-bottom:8px;">📸 结果分享海报</div>
-                <img id="posterImg" src="${imageData}" style="width:100%; border-radius:20px; margin: 8px 0;" />
-                <button class="btn-download" id="downloadPosterBtn">保存图片 / 分享</button>
-                <div style="font-size:11px; margin-top:10px; color:#aaa;">长按或保存图片即可分享</div>
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 12px;">📸 评估报告图片</div>
+                <img class="poster-img-preview" src="${jpegUrl}" alt="报告海报" />
+                <button class="btn-download" id="downloadPosterJpegBtn">保存图片 (JPEG)</button>
+                <div style="font-size: 11px; margin-top: 12px; color: #aaa;">长按或点击保存即可分享</div>
             </div>
         `;
         document.body.appendChild(modalDiv);
-        document.getElementById('downloadPosterBtn')?.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'cognitive_report.png';
-            link.href = imageData;
-            link.click();
-            showToast('海报已保存');
-        });
+        const downloadBtn = document.getElementById('downloadPosterJpegBtn');
+        if(downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.download = 'cognitive_report.jpg';
+                link.href = jpegUrl;
+                link.click();
+                showToast('报告图片已保存');
+            });
+        }
     }
     
     function renderQuiz() {
@@ -749,42 +688,26 @@
         const progressPercent = ((currentIndex) / total) * 100;
         const question = questions[currentIndex];
         const selectedRaw = answers[currentIndex];
-        
         let optionsHtml = '';
         for (let opt of optionItems) {
             const isSelected = (selectedRaw === opt.rawScore);
-            optionsHtml += `
-                <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.rawScore})">
-                    ${opt.label}
-                </button>
-            `;
+            optionsHtml += `<button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.rawScore})">${opt.label}</button>`;
         }
-        
-        const hasSelected = (answers[currentIndex] !== null);
-        const autoHintHtml = hasSelected ? 
-            `<span class="auto-hint"><span class="timer-ring"></span> 1.2秒后自动进入下一题</span>` : 
-            `<span class="auto-hint">选择后自动跳转下一题</span>`;
-        
         const prevDisabled = currentIndex === 0;
         return `
             <div class="card">
                 <div class="quiz-header">
                     <div class="counter-wrapper">
                         <span class="question-counter">第 ${currentQNumber} / ${total} 题</span>
-                        ${autoHintHtml}
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${progressPercent}%;"></div>
-                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div>
                 </div>
                 <div class="question-text">${escapeHtml(question)}</div>
-                <div class="options">
-                    ${optionsHtml}
-                </div>
+                <div class="options">${optionsHtml}</div>
                 <div class="nav-buttons">
                     <button class="nav-btn ${prevDisabled ? 'disabled' : ''}" onclick="prevQuestion()" ${prevDisabled ? 'disabled' : ''}>← 上一题</button>
                 </div>
-                <div class="footer-note" style="margin-top:20px;">根据近3个月感受选择，点击选项后自动进入下一题</div>
+                <div class="footer-note">根据近3个月真实感受选择</div>
             </div>
         `;
     }
@@ -795,7 +718,7 @@
                 <h1>🧠 认知功能专业评估</h1>
                 <div class="subtitle">20题自测 · 满分100分 · AI智能解读</div>
                 <button class="btn btn-primary" onclick="startTest()">开始评估</button>
-                <div class="footer-note">每题根据真实感受选择，选后自动跳转，可返回修改</div>
+                <div class="footer-note">每题根据真实感受选择，可返回修改</div>
             </div>
         `;
     }
@@ -806,7 +729,6 @@
         const risk = getRiskLevel(percentScore);
         const aiAssessment = generateAIAssessment(percentScore, rawScore);
         const tipsHtml = commonTips.map(t => `<li>${t}</li>`).join('');
-        
         return `
             <div class="card">
                 <h1>📋 评估结果</h1>
@@ -815,23 +737,15 @@
                     <div class="score-max">/ 100 分</div>
                 </div>
                 <div class="risk-level ${risk.class}">${risk.name}</div>
-                
                 <div class="ai-assessment">
-                    <div class="ai-title">
-                        <span>🤖 AI 智能评估</span>
-                    </div>
+                    <div class="ai-title"><span>🤖 AI 智能评估</span></div>
                     <div class="ai-text">${escapeHtml(aiAssessment)}</div>
                 </div>
-                
-                <div class="result-desc">
-                    ${risk.desc}
-                </div>
-                
+                <div class="result-desc">${risk.desc}</div>
                 <div class="suggest-box">
                     <div class="suggest-title">💡 通用健康建议</div>
                     <ul class="suggest-list">${tipsHtml}</ul>
                 </div>
-                
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
                     <button class="btn btn-share-link" onclick="shareUrl()">
@@ -840,19 +754,15 @@
                     </button>
                     <button class="btn btn-share-poster" onclick="showPosterModal()">
                         <svg class="btn-icon-svg" viewBox="0 0 24 24" width="18" height="18"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 8h-4v4h-4v-4H6V9h4V5h4v4h4v2z"/></svg>
-                        生成分享海报
+                        生成报告图片
                     </button>
                 </div>
-                <div class="footer-note">满分100分，分数越高风险越高 | AI评估基于5个认知维度综合分析</div>
+                <div class="footer-note">满分100分，分数越高风险越高 | AI多维度分析</div>
             </div>
         `;
     }
     
-    function escapeHtml(str) { 
-        if(!str) return '';
-        return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); 
-    }
-    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
     function render() {
         const appDiv = document.getElementById('app');
         if (!appDiv) return;
@@ -869,7 +779,6 @@
     window.startTest = startTest;
     window.shareUrl = shareUrl;
     window.showPosterModal = showPosterModal;
-    
     render();
 </script>
 </body>
