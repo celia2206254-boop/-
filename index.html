@@ -52,6 +52,45 @@
         .detail-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2001; }
         .detail-card { background: white; border-radius: 36px; padding: 28px; max-width: 320px; width: 80%; text-align: center; }
         .detail-close { margin-top: 20px; background: #0f6e3f; color: white; border: none; border-radius: 40px; padding: 12px; width: 100%; cursor: pointer; }
+        /* Banner 轮播样式 */
+        .banner-container {
+            position: relative;
+            margin: 8px 16px;
+            border-radius: 28px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .banner-slider {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .banner-item {
+            min-width: 100%;
+            padding: 32px 24px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .banner-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .banner-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+        .banner-dots .dot.active {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -79,7 +118,9 @@
     let authMode = "login";
     let isEditing = false;
     let userProfile = { gender: '', age: null };
-    let selectedHistory = null;  // 点击查看的历史记录详情
+    let selectedHistory = null;
+    let bannerInterval = null;
+    let currentBannerIndex = 0;
     
     const QUESTIONS = [
         "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？",
@@ -158,9 +199,56 @@
         } catch(e){ return []; }
     }
     
+    function startBannerLoop() {
+        if(bannerInterval) clearInterval(bannerInterval);
+        bannerInterval = setInterval(() => {
+            const slider = document.querySelector('.banner-slider');
+            const dots = document.querySelectorAll('.dot');
+            if(slider && dots.length) {
+                currentBannerIndex = (currentBannerIndex + 1) % 3;
+                slider.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
+                dots.forEach((dot, i) => {
+                    if(i === currentBannerIndex) dot.classList.add('active');
+                    else dot.classList.remove('active');
+                });
+            }
+        }, 4000);
+    }
+    
     function renderHome() {
         let status = currentUser ? `<div style="background:#eef6f1;border-radius:30px;padding:12px;margin:16px;text-align:center;">👋 欢迎回来，${currentUser.email} <button id="logoutBtn" style="margin-left:12px;border:1px solid #0f6e3f;border-radius:20px;padding:4px 12px;">退出</button></div>` : `<div style="background:#eef6f1;border-radius:30px;padding:12px;margin:16px;text-align:center;">👤 未登录 · <span id="gotoAuthBtn" style="color:#0f6e3f;cursor:pointer;">点击登录/注册</span></div>`;
-        return status + `<div class="hero-card"><div class="hero-tag">🧠 官方推荐 · 居家智能监测</div><div class="hero-title">父母最近<br>总忘事？</div><div class="hero-sub">3分钟认知健康评估<br>+居家智能监测方案</div><button class="btn-primary" id="startQuizBtn">立即免费评估 →</button></div>
+        
+        let bannerHtml = `
+            <div class="banner-container">
+                <div class="banner-slider">
+                    <div class="banner-item" style="background:linear-gradient(135deg,#0f6e3f,#2a9d6e); color:white;">
+                        <div style="font-size:28px; margin-bottom:8px;">🧠</div>
+                        <div style="font-size:18px; font-weight:700;">认知健康月</div>
+                        <div style="font-size:14px; margin-top:8px;">免费评估 + 专属建议</div>
+                        <div style="font-size:12px; margin-top:12px; opacity:0.8;">👆 点击查看详情</div>
+                    </div>
+                    <div class="banner-item" style="background:linear-gradient(135deg,#2c5a7a,#4a8db5); color:white;">
+                        <div style="font-size:28px; margin-bottom:8px;">⌚</div>
+                        <div style="font-size:18px; font-weight:700;">华为手环特惠</div>
+                        <div style="font-size:14px; margin-top:8px;">睡眠监测 + 活动轨迹提醒</div>
+                        <div style="font-size:12px; margin-top:12px; opacity:0.8;">👆 点击了解详情</div>
+                    </div>
+                    <div class="banner-item" style="background:linear-gradient(135deg,#d4a11e,#f5b82e); color:white;">
+                        <div style="font-size:28px; margin-bottom:8px;">👨‍👩‍👧‍👦</div>
+                        <div style="font-size:18px; font-weight:700;">家人守护计划</div>
+                        <div style="font-size:14px; margin-top:8px;">远程查看父母健康报告</div>
+                        <div style="font-size:12px; margin-top:12px; opacity:0.8;">👆 点击了解更多</div>
+                    </div>
+                </div>
+                <div class="banner-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        `;
+        
+        return status + bannerHtml + `<div class="hero-card"><div class="hero-tag">🧠 官方推荐 · 居家智能监测</div><div class="hero-title">父母最近<br>总忘事？</div><div class="hero-sub">3分钟认知健康评估<br>+居家智能监测方案</div><button class="btn-primary" id="startQuizBtn">立即免费评估 →</button></div>
         <div class="device-showcase"><div class="device-header"><h3>⌚ 华为手环</h3><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹</div></div>`;
     }
     
@@ -259,6 +347,18 @@
             else nav.classList.remove('active');
         });
         
+        // 启动Banner轮播（仅在首页且有banner时）
+        if(currentTab === 'home' && document.querySelector('.banner-container')) {
+            startBannerLoop();
+            document.querySelector('.banner-container')?.addEventListener('click', () => {
+                if(currentBannerIndex === 0) showToast("认知健康月活动：免费评估中，点击「立即免费评估」开始");
+                else if(currentBannerIndex === 1) showToast("华为手环详情请咨询客服 400-882-6625");
+                else showToast("家人守护计划：您可以在「我的页面」查看家人健康报告");
+            });
+        } else {
+            if(bannerInterval) clearInterval(bannerInterval);
+        }
+        
         document.getElementById('startQuizBtn')?.addEventListener('click', ()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
         document.getElementById('gotoDeviceBtn')?.addEventListener('click', ()=>{ currentTab='device'; render(); });
         document.getElementById('historyTestBtn')?.addEventListener('click', ()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
@@ -283,7 +383,6 @@
         });
         document.getElementById('shareUrlBtn')?.addEventListener('click', ()=>{ navigator.clipboard.writeText(SHARE_URL); showToast("网址已复制"); });
         
-        // 历史记录点击事件
         document.querySelectorAll('.history-item').forEach(item => {
             item.addEventListener('click', async()=>{
                 let id = item.getAttribute('data-id');
@@ -344,12 +443,4 @@
                 let tab = nav.getAttribute('data-tab');
                 if(tab === 'home') { quizActive=false; currentTab='home'; render(); }
                 else if(tab === 'device') { quizActive=false; currentTab='device'; render(); }
-                else if(tab === 'profile') { quizActive=false; currentTab='profile'; render(); }
-            });
-        });
-    }
-    init();
-})();
-</script>
-</body>
-</html>
+                else if(tab === 'profile') { quizActive=false;
