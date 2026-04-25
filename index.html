@@ -81,8 +81,8 @@
         }
         .btn-outline:active { background: #eef9f2; transform: scale(0.98); }
 
-        /* 分享按钮样式 */
-        .btn-share {
+        /* 分享按钮样式 - 独立设计 */
+        .btn-share-report {
             background: #3b82f6;
             color: white;
             margin-top: 12px;
@@ -91,8 +91,20 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn-share:active { background: #2563eb; transform: scale(0.98); }
-        .btn-share svg {
+        .btn-share-report:active { background: #2563eb; transform: scale(0.98); }
+        
+        .btn-share-url {
+            background: #8b5cf6;
+            color: white;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-share-url:active { background: #7c3aed; transform: scale(0.98); }
+        
+        .btn-share-report svg, .btn-share-url svg {
             width: 18px;
             height: 18px;
             fill: white;
@@ -231,6 +243,9 @@
             pointer-events: none;
             z-index: 1000;
             white-space: nowrap;
+            max-width: 90%;
+            white-space: normal;
+            text-align: center;
         }
         .toast-msg.show {
             opacity: 1;
@@ -240,7 +255,7 @@
         .button-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         /* 底部小字 */
@@ -249,6 +264,13 @@
             font-size: 12px;
             text-align: center;
             color: #aaa;
+        }
+        
+        .divider-text {
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            margin: 4px 0;
         }
     </style>
 </head>
@@ -311,16 +333,15 @@
         }
     }
 
-    // ================= 增强版分享功能：生成完整报告文本 + 网址 =================
-    // 生成详细的可读报告 (包含分数、等级、详细解读、AI建议以及测评网址)
+    // ================= 独立分享功能 =================
+    // 1. 生成完整报告（包含分数、等级、解读、AI建议）不携带网址也可，但为了完整保留内容合理，让报告不含网址单独为报告分享；但是为了满足用户可能也希望报告里带链接？我们分开: 分享报告 = 详细报告文本（不含网址），分享网址 = 仅分享当前测试链接。
+    // 根据用户要求“分享网址可以点击直接分享，不要生成网址的形式”，意思是点击分享网址就直接分享当前页面链接(纯URL)，不需要再生成带文字的报告；分享报告则分享详细评估结果。
     function generateFullReportText() {
         const score = getTotalScore();
         const level = getLevel(score);
         const resultDesc = getResultText(score);
-        // AI解读完整内容
         const aiFullText = aiText;
         
-        // 构建结构清晰的报告文本
         const report = `📊 认知功能自测报告
 ━━━━━━━━━━━━━━━━
 📈 总分：${score} 分
@@ -330,26 +351,10 @@
 🧠 AI健康解读：
 ${aiFullText}
 
-🔗 自测网址：${CURRENT_URL}
-（复制链接打开可进行测试或查看详情）
 ━━━━━━━━━━━━━━━━
-*本报告仅用于个人健康参考，不构成医疗诊断。建议如有不适请咨询专业医生。`;
+*本报告仅用于个人健康参考，不构成医疗诊断。`;
         
         return report;
-    }
-    
-    // 简洁分享版本 (适合社交媒体标题)
-    function generateShortShareText() {
-        const score = getTotalScore();
-        const level = getLevel(score);
-        // 简短摘要
-        let shortAdvice = "";
-        if (score <= 3) shortAdvice = "结果正常，继续保持~";
-        else if (score <= 7) shortAdvice = "轻度风险，建议关注生活习惯。";
-        else if (score <= 11) shortAdvice = "中度风险，建议进一步咨询医生。";
-        else shortAdvice = "高风险，请尽快就医评估！";
-        
-        return `【认知功能自测】我的测评总分：${score}分 (${level.name})。${shortAdvice} 测试链接：${CURRENT_URL}`;
     }
     
     // 显示提示小弹窗
@@ -368,72 +373,90 @@ ${aiFullText}
         }, duration);
     }
 
-    // 核心分享逻辑：优先使用原生 Web Share API (支持完整报告和网址)
-    async function handleShareResult() {
-        // 生成完整报告文本（包含了分数、等级、解读、网址）
+    // 分享报告（完整评估结果，无网址）
+    async function handleShareReport() {
         const fullReport = generateFullReportText();
-        const shortText = generateShortShareText();
         
-        // 尝试使用 Web Share API (移动端原生分享)
+        // 优先使用 Web Share API (移动端可以分享文本)
         if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             try {
                 await navigator.share({
                     title: '认知功能自测报告',
-                    text: shortText,
-                    url: CURRENT_URL,
+                    text: fullReport,
                 });
-                showToast('分享成功 ✓', 1500);
+                showToast('报告分享成功 ✓', 1500);
                 return;
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    console.warn('分享取消或失败:', err);
-                    // 降级使用复制完整报告
-                    fallbackCopyFullReport();
-                } else {
-                    // 用户主动取消，不做额外提示
+                    console.warn('分享失败:', err);
+                    fallbackCopyReportText(fullReport);
                 }
                 return;
             }
         }
         
-        // 桌面端或不支持分享API: 复制完整报告（含网址）到剪贴板
-        fallbackCopyFullReport();
+        // 桌面端或不支持分享API: 复制报告内容
+        fallbackCopyReportText(fullReport);
     }
     
-    // 复制完整报告到剪贴板（包含详细结果和网址）
-    async function fallbackCopyFullReport() {
-        const fullReport = generateFullReportText();
+    // 复制报告文本
+    async function fallbackCopyReportText(text) {
         try {
-            await navigator.clipboard.writeText(fullReport);
-            showToast('✅ 完整报告已复制，可分享给好友或医生', 2200);
+            await navigator.clipboard.writeText(text);
+            showToast('✅ 完整报告已复制，可粘贴分享', 2000);
         } catch (err) {
-            // 降级使用 textarea 方式
             const textarea = document.createElement('textarea');
-            textarea.value = fullReport;
+            textarea.value = text;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            showToast('✅ 报告已复制到剪贴板', 2000);
+            showToast('✅ 报告已复制到剪贴板', 1800);
         }
     }
     
-    // 可选：专门分享纯文本结果的快捷方法（备用）
-    async function handleCopyResultOnly() {
-        const shortText = generateShortShareText();
+    // 分享网址（直接分享当前测试页面的URL，不要生成额外描述文字的形式，但为了体验，若原生分享可携带纯链接，但系统分享通常还可以追加简短说明；为了符合“不要生成网址的形式”，指不要像以前生成一段带网址的长文本，而是只分享链接本身）
+    // 实现两个逻辑：移动端通过 share 分享 url 字段；桌面端点击复制纯链接到剪贴板。
+    async function handleShareUrl() {
+        // 移动端优先使用 Web Share API，分享纯URL
+        if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            try {
+                await navigator.share({
+                    title: '认知功能自测',
+                    text: '分享一个认知健康自测工具',
+                    url: CURRENT_URL,
+                });
+                showToast('链接分享成功 ✓', 1500);
+                return;
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    // 降级复制链接
+                    fallbackCopyUrl();
+                }
+                return;
+            }
+        }
+        // 桌面端或无分享api：复制纯链接到剪贴板
+        fallbackCopyUrl();
+    }
+    
+    // 复制纯网址
+    async function fallbackCopyUrl() {
         try {
-            await navigator.clipboard.writeText(shortText);
-            showToast('结果摘要已复制 ✓', 1500);
-        } catch(e) {
+            await navigator.clipboard.writeText(CURRENT_URL);
+            showToast('🔗 链接已复制，可发送给好友', 1800);
+        } catch (err) {
             const textarea = document.createElement('textarea');
-            textarea.value = shortText;
+            textarea.value = CURRENT_URL;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            showToast('结果已复制', 1500);
+            showToast('🔗 链接已复制', 1500);
         }
     }
+    
+    // 可选: 单独的“复制报告”备用接口
     // ================= 分享功能结束 =================
 
     function selectAnswer(value) {
@@ -557,14 +580,22 @@ ${aiFullText}
                 
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
-                    <button class="btn btn-share" onclick="handleShareResult()">
+                    
+                    <button class="btn btn-share-report" onclick="handleShareReport()">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
                             <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.05 4.11c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/>
                         </svg>
-                        分享报告 & 网址
+                        分享完整报告
+                    </button>
+                    
+                    <button class="btn btn-share-url" onclick="handleShareUrl()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                        </svg>
+                        分享测评链接
                     </button>
                 </div>
-                <div class="footer-note">点击分享可复制完整报告（含分数、解读和自测链接）</div>
+                <div class="footer-note">点击「分享完整报告」可复制详细结果；点击「分享测评链接」直接分享本测试页面</div>
             </div>
         `;
     }
@@ -590,8 +621,8 @@ ${aiFullText}
     window.prevQuestion = prevQuestion;
     window.resetTest = resetTest;
     window.startTest = startTest;
-    window.handleShareResult = handleShareResult;
-    window.handleCopyResultOnly = handleCopyResultOnly;
+    window.handleShareReport = handleShareReport;
+    window.handleShareUrl = handleShareUrl;
 
     render();
 </script>
