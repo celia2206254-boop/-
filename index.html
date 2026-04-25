@@ -86,7 +86,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         
-        /* Hero区 + 图片 */
+        /* Hero区 + 新图片 */
         .hero {
             background: linear-gradient(135deg, #eef6f0 0%, #d9e8e0 100%);
             border-radius: 32px;
@@ -103,6 +103,9 @@
             color: #1e4620;
             line-height: 1.25;
             margin-bottom: 10px;
+        }
+        .hero-left h1 span {
+            display: block;
         }
         .hero-left p {
             font-size: 14px;
@@ -127,7 +130,7 @@
         }
         .btn-primary:active { transform: scale(0.97); background: #0a5833; }
         .hero-right {
-            width: 120px;
+            width: 130px;
             text-align: center;
         }
         .hero-img {
@@ -135,6 +138,13 @@
             border-radius: 24px;
             background: #fff8e7;
             padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .hero-img img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 16px;
         }
         
         /* 信任标签 */
@@ -266,7 +276,7 @@
         }
         .btn-small-primary:active { background: #0a5833; }
         
-        /* 用户案例滚动区 - 美化 */
+        /* 用户案例滚动区 */
         .cases-carousel {
             background: white;
             border-radius: 32px;
@@ -452,7 +462,7 @@
             cursor: pointer;
         }
         
-        /* 我的页面 - 美化版 */
+        /* 我的页面 */
         .profile-card {
             background: white;
             border-radius: 32px;
@@ -489,7 +499,6 @@
             font-size: 13px;
             color: #5b6e8c;
         }
-        
         .menu-item {
             background: #f8fafc;
             border-radius: 24px;
@@ -560,24 +569,13 @@
         <div id="homePage" class="page active-page">
             <div class="hero">
                 <div class="hero-left">
-                    <h1>父母最近总忘事？</h1>
-                    <p>3分钟认知健康评估 + 居家智能监测方案</p>
+                    <h1>父母最近<br>总忘事？</h1>
+                    <p>3分钟认知健康评估<br>+ 居家智能监测方案</p>
                     <button class="btn-primary" id="heroStartBtn">立即免费评估 →</button>
                 </div>
                 <div class="hero-right">
                     <div class="hero-img">
-                        <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="35" cy="50" r="18" fill="#FFD966" stroke="#B97F44" stroke-width="1.5"/>
-                            <circle cx="32" cy="46" r="2" fill="#333"/>
-                            <circle cx="40" cy="46" r="2" fill="#333"/>
-                            <path d="M33 55 Q35 60, 39 55" stroke="#6B4C3B" stroke-width="1.5" fill="none"/>
-                            <rect x="68" y="40" width="28" height="32" rx="6" fill="#C1E6CF" stroke="#0f6e3f" stroke-width="1"/>
-                            <rect x="73" y="45" width="6" height="6" fill="#A0D6B0"/>
-                            <rect x="85" y="45" width="6" height="6" fill="#A0D6B0"/>
-                            <path d="M78 58 L90 58" stroke="#0f6e3f" stroke-width="2"/>
-                            <path d="M84 52 L84 64" stroke="#0f6e3f" stroke-width="1.5"/>
-                            <text x="20" y="88" font-size="8" fill="#5b6e8c">👵👴 + 📱</text>
-                        </svg>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 110'%3E%3Crect width='120' height='110' fill='%23FFF8E7' rx='16'/%3E%3Ccircle cx='40' cy='45' r='16' fill='%23FFD966' stroke='%23B97F44' stroke-width='1.5'/%3E%3Ccircle cx='36' cy='41' r='2' fill='%23333'/%3E%3Ccircle cx='44' cy='41' r='2' fill='%23333'/%3E%3Cpath d='M37 50 Q40 55, 43 50' stroke='%236B4C3B' stroke-width='1.5' fill='none'/%3E%3Crect x='70' y='30' width='32' height='36' rx='6' fill='%23C1E6CF' stroke='%230f6e3f' stroke-width='1.2'/%3E%3Crect x='76' y='36' width='6' height='6' fill='%23A0D6B0'/%3E%3Crect x='90' y='36' width='6' height='6' fill='%23A0D6B0'/%3E%3Cpath d='M82 52 L98 52' stroke='%230f6e3f' stroke-width='2'/%3E%3Cpath d='M90 44 L90 60' stroke='%230f6e3f' stroke-width='1.5'/%3E%3Ctext x='25' y='95' font-size='8' fill='%235b6e8c'%3E👵👴 + 📱%3C/text%3E%3C/svg%3E" alt="长者健康评估">
                     </div>
                 </div>
             </div>
@@ -592,7 +590,7 @@
                     <div class="entry-icon">🧠</div>
                     <div class="entry-title">免费认知评估</div>
                     <div class="entry-desc">3分钟完成，了解风险倾向</div>
-                    <button class="btn-outline-green" id="startAssessBtn">开始测试 →</button>
+                    <button class="btn-outline-green start-test-btn">开始测试 →</button>
                 </div>
                 <div class="entry-card">
                     <div class="entry-icon">📱</div>
@@ -647,7 +645,7 @@
             </div>
         </div>
 
-        <!-- 我的页面 美化版 -->
+        <!-- 我的页面 -->
         <div id="profilePage" class="page">
             <div class="profile-card">
                 <div class="profile-header">
@@ -723,6 +721,7 @@
         { name: "🧠 李教授", text: "居家认知守护仪是长者家庭的得力助手，科技温暖人心。" },
         { name: "❤️ 志愿者协会", text: "已协助百位老人使用评估+设备，收获好评，降低走失风险。" }
     ];
+    
     const wrapper = document.getElementById('caseCarouselWrapper');
     if(wrapper) {
         casesList.forEach(c => {
@@ -732,6 +731,7 @@
             wrapper.appendChild(div);
         });
     }
+    
     // 左右滚动
     const scrollLeftBtn = document.getElementById('scrollLeftBtn');
     const scrollRightBtn = document.getElementById('scrollRightBtn');
@@ -804,19 +804,4 @@
                 <div class="ai-text">🤖 AI评估：${ai}</div>
                 <div style="margin: 20px 0; background:#f8fafc; padding:14px; border-radius:24px;">${risk.desc}</div>
                 <button class="btn-primary" style="width:100%; margin-bottom:12px;" onclick="window.resetToHome()">重新测试</button>
-                <button class="btn-outline-green" style="width:100%;" onclick="window.backToHome()">返回首页</button>
-                <div class="footer-note">满分100分，分数越高风险越高</div>
-                <div class="contact-email-badge" style="margin-top:16px; justify-content:center;">📧 celia2206254@gmail.com</div>
-            </div>
-        `;
-    }
-    function renderQuizPage() {
-        const quizDiv = document.getElementById('quizPage');
-        if(quizDiv) quizDiv.innerHTML = renderQuizPageContent();
-    }
-    window.selectAnswer = function(value) {
-        if (autoTimer) clearTimeout(autoTimer);
-        answers[currentIndex] = value;
-        renderQuizPage();
-        if (currentIndex + 1 < questions.length) {
-            autoTimer = setTimeout(() => { currentIndex++; renderQuizPage(); autoTimer = null; }, 100
+                <button class="btn-outline-green" style="width:100%;" onclick="window.backToHome()">返回首页</button
