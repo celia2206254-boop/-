@@ -16,11 +16,7 @@
         .nav-item.active{opacity:1;color:#0f6e3f;background:rgba(15,110,63,0.1);}
         .nav-icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;}
         .nav-label{font-size:11px;font-weight:500;}
-        .card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;}
-        .welcome-card{background:linear-gradient(135deg,#0f6e3f,#1a8a4e);border-radius:28px;padding:20px;margin-bottom:20px;color:white;}
-        .welcome-text{font-size:20px;font-weight:600;margin-bottom:4px;}
-        .welcome-email{font-size:13px;opacity:0.85;margin-bottom:16px;}
-        .logout-btn{background:rgba(255,255,255,0.2);border:none;padding:8px 16px;border-radius:40px;color:white;font-size:13px;cursor:pointer;}
+        .card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.02);}
         .hero-card{background:linear-gradient(135deg,#f0f9f3,#fff);border-radius:32px;padding:28px 24px;margin-bottom:20px;}
         .hero-tag{font-size:12px;color:#0f6e3f;font-weight:600;background:rgba(15,110,63,0.12);display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:40px;margin-bottom:20px;}
         .hero-title{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:12px;color:#0a2e1e;}
@@ -61,7 +57,7 @@
         .detail-card{background:white;border-radius:32px;padding:28px;max-width:300px;width:80%;text-align:center;}
         .detail-close{margin-top:20px;background:#0f6e3f;color:white;border:none;border-radius:40px;padding:12px;width:100%;cursor:pointer;}
         .toast-msg{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:50px;font-size:13px;opacity:0;transition:0.18s;pointer-events:none;z-index:2000;white-space:nowrap;}
-        .banner-container{position:relative;margin-bottom:20px;border-radius:28px;overflow:hidden;cursor:pointer;}
+        .banner-container{position:relative;margin-bottom:20px;border-radius:28px;overflow:hidden;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
         .banner-slider{display:flex;transition:transform 0.5s ease;}
         .banner-item{min-width:100%;padding:32px 20px;text-align:center;}
         .banner-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;}
@@ -71,6 +67,7 @@
         .text-center{text-align:center;}
         .share-buttons{display:flex;gap:12px;margin-top:20px;}
         .btn-share{flex:1;background:#0f6e3f;color:white;border:none;border-radius:60px;padding:12px;cursor:pointer;}
+        .login-hint{background:#eef6f1;border-radius:28px;padding:12px;text-align:center;margin-bottom:16px;cursor:pointer;color:#0f6e3f;font-weight:500;}
     </style>
 </head>
 <body>
@@ -83,7 +80,9 @@
     </div>
 </div>
 <div id="toastMsg" class="toast-msg"></div>
-<script>(function() {
+
+<script>
+(function() {
     const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -113,10 +112,15 @@
 
     function startBannerLoop() { if(bannerInterval) clearInterval(bannerInterval); bannerInterval = setInterval(()=>{ let s = document.querySelector('.banner-slider'), d = document.querySelectorAll('.dot'); if(s&&d.length){ currentBannerIndex = (currentBannerIndex+1)%3; s.style.transform = 'translateX(-'+(currentBannerIndex*100)+'%)'; d.forEach((dot,i)=>{ if(i===currentBannerIndex) dot.classList.add('active'); else dot.classList.remove('active'); }); } },4000); }
 
+    // 首页 - 已去掉欢迎回来模块
     function renderHome() {
-        let status = currentUser ? '<div class="welcome-card"><div class="flex-between"><div><div class="welcome-text">👋 欢迎回来</div><div class="welcome-email">'+currentUser.email+'</div></div><button id="logoutBtn" class="logout-btn">退出</button></div></div>' : '<div class="card" style="background:#eef6f1;text-align:center;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;"><span style="font-size:24px;">👤</span><span style="font-weight:500;">未登录</span></div><span id="gotoAuthBtn" style="color:#0f6e3f;font-weight:600;cursor:pointer;">点击登录/注册</span></div>';
+        let loginHint = '';
+        if(!currentUser) {
+            loginHint = '<div class="login-hint" id="gotoAuthBtn">📝 登录/注册 查看历史记录</div>';
+        }
         let bannerHtml = '<div class="banner-container"><div class="banner-slider"><div class="banner-item" style="background:linear-gradient(135deg,#0f6e3f,#2a9d6e);color:white;"><div style="font-size:32px;margin-bottom:8px;">🧠</div><div style="font-size:18px;font-weight:700;">认知健康月</div><div style="font-size:13px;margin-top:6px;">免费评估 + 专属建议</div></div><div class="banner-item" style="background:linear-gradient(135deg,#2c5a7a,#4a8db5);color:white;"><div style="font-size:32px;margin-bottom:8px;">⌚</div><div style="font-size:18px;font-weight:700;">智能设备联动</div><div style="font-size:13px;margin-top:6px;">睡眠监测 + 活动轨迹</div></div><div class="banner-item" style="background:linear-gradient(135deg,#d4a11e,#f5b82e);color:white;"><div style="font-size:32px;margin-bottom:8px;">👨‍👩‍👧‍👦</div><div style="font-size:18px;font-weight:700;">家人守护计划</div><div style="font-size:13px;margin-top:6px;">远程查看健康报告</div></div></div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div></div>';
-        return status + bannerHtml + '<div class="hero-card"><div class="hero-tag"><span>🧠</span> 官方推荐 · 居家智能监测</div><div class="hero-title">父母最近<br>总忘事？</div><div class="hero-sub">3分钟认知健康评估<br>+ 居家智能监测方案</div><button class="btn-primary" id="startQuizBtn"><span>📋</span> 立即免费评估 →</button></div><div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
+        
+        return loginHint + bannerHtml + '<div class="hero-card"><div class="hero-tag"><span>🧠</span> 官方推荐 · 居家智能监测</div><div class="hero-title">父母最近<br>总忘事？</div><div class="hero-sub">3分钟认知健康评估<br>+ 居家智能监测方案</div><button class="btn-primary" id="startQuizBtn"><span>📋</span> 立即免费评估 →</button></div><div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
     }
 
     function renderDevice() { return '<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><span style="font-size:42px;">⌚</span><h2 style="font-size:24px;">华为手环</h2></div><p style="color:#2b6e4e;margin-bottom:20px;font-weight:500;">专为认知健康及长者安全设计的智能可穿戴设备</p><div style="background:#f0f9f4;border-radius:24px;padding:20px;"><div style="font-weight:700;font-size:18px;margin-bottom:16px;">🎯 核心认知守护功能</div><ul style="margin-left:20px;"><li style="margin-bottom:10px;"><strong>💤 睡眠监测</strong> – 分析睡眠规律与认知健康关联性</li><li style="margin-bottom:10px;"><strong>🚶 活动轨迹异常提醒</strong> – 识别久坐、夜间离床等行为</li><li><strong>📅 认知健康周报</strong> – 生成认知趋势分析</li></ul><button class="btn-primary" id="deviceContactBtn" style="margin-top:24px;">📧 咨询详情</button></div></div>'; }
@@ -131,7 +135,7 @@
         else for(let h of historyList) { let d=new Date(h.created_at); let dateStr=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); let timeStr=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); let rc=h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'); historyHtml+='<div class="history-item" data-id="'+h.id+'"><div><div class="history-score">'+h.score+' 分</div><div class="history-date">'+dateStr+'</div><div class="history-time">'+timeStr+'</div></div><div style="color:'+rc+';font-weight:600;">'+h.risk_level+'</div></div>'; }
         if(isEditing) return '<div class="card"><h3 style="margin-bottom:16px;">✏️ 编辑个人资料</h3><select id="editGender" class="profile-select"><option value="">请选择性别</option><option value="男"'+(userProfile.gender==='男'?' selected':'')+'>男</option><option value="女"'+(userProfile.gender==='女'?' selected':'')+'>女</option></select><input type="number" id="editAge" class="profile-input" placeholder="年龄" value="'+(userProfile.age||'')+'" style="margin-top:12px;"><button class="btn-primary" id="saveProfileBtn" style="margin-top:16px;">保存修改</button><button class="btn-outline" id="cancelEditBtn" style="margin-top:10px;">取消</button></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
         let gd = userProfile.gender||'未设置', ad = userProfile.age?userProfile.age+' 岁':'未设置';
-        return '<div class="card"><div class="flex-between" style="margin-bottom:16px;"><div><h3>我的健康档案</h3><p style="color:#64748b;font-size:13px;">'+currentUser.email+'</p></div><div><button id="logoutProfileBtn" class="logout-btn" style="background:#e2e8f0;color:#1e293b;">退出</button><button id="editProfileBtn" style="margin-left:8px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">✏️ 编辑</button></div></div><div class="info-row"><span class="info-label"><span>👤</span> 性别</span><span>'+gd+'</span></div><div class="info-row"><span class="info-label"><span>🎂</span> 年龄</span><span>'+ad+'</span></div><div class="info-row"><span class="info-label"><span>📊</span> 最近评估分数</span><span style="font-weight:800;color:#0f6e3f;">'+(latestScore!==null?latestScore+' 分':'暂无')+'</span></div></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
+        return '<div class="card"><div class="flex-between" style="margin-bottom:16px;"><div><h3>我的健康档案</h3><p style="color:#64748b;font-size:13px;">'+currentUser.email+'</p></div><div><button id="logoutProfileBtn" class="logout-btn" style="background:#e2e8f0;color:#1e293b;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">退出</button><button id="editProfileBtn" style="margin-left:8px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">✏️ 编辑</button></div></div><div class="info-row"><span class="info-label"><span>👤</span> 性别</span><span>'+gd+'</span></div><div class="info-row"><span class="info-label"><span>🎂</span> 年龄</span><span>'+ad+'</span></div><div class="info-row"><span class="info-label"><span>📊</span> 最近评估分数</span><span style="font-weight:800;color:#0f6e3f;">'+(latestScore!==null?latestScore+' 分':'暂无')+'</span></div></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
     }
 
     function renderQuiz() { let opts=''; for(let o of OPTIONS) opts+='<button class="option-btn '+(answers[currentIndex]===o.rawScore?'selected':'')+'" onclick="selectAnswer('+o.rawScore+')">'+o.label+'</button>'; return '<div class="quiz-card"><div class="progress-bar"><div class="progress-fill" style="width:'+((currentIndex/QUESTIONS.length)*100)+'%;"></div></div><div class="flex-between" style="margin-bottom:16px;"><span>第'+(currentIndex+1)+'/'+QUESTIONS.length+'题</span><span style="color:#0f6e3f;">认知自测</span></div><div class="question-text">'+QUESTIONS[currentIndex]+'</div>'+opts+'<button class="btn-outline" id="prevBtn" '+(currentIndex===0?'disabled style="opacity:0.5"':'')+'>← 上一题</button></div>'; }
