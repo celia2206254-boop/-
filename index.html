@@ -6,6 +6,8 @@
     <title>认知健康管理中心 | 专业自测+智能方案</title>
     <!-- html2canvas 库用于生成图片 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- Supabase 客户端库 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -371,6 +373,31 @@
             color: #0f6e3f;
         }
         .btn-share:active { transform: scale(0.97);}
+
+        /* 登录/注册表单样式 */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .auth-input {
+            padding: 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 16px;
+            width: 100%;
+            background: white;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: #0f6e3f;
+        }
+        .auth-switch {
+            text-align: center;
+            margin-top: 16px;
+            color: #0f6e3f;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -394,7 +421,20 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // 认知问卷20题
+    // ==================== Supabase 配置 ====================
+    const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 全局状态
+    let currentUser = null;        // 当前登录用户
+    let currentTab = "home";      
+    let quizActive = false;        
+    let answers = new Array(20).fill(null);
+    let currentIndex = 0;
+    let authMode = "login";        // "login" 或 "register"
+
+    // 固定问卷题
     const QUESTIONS = [
         "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？",
         "是否忘记约定或日期？", "是否记不住最近发生的事？", "是否常搞不清今天星期几？",
@@ -411,15 +451,9 @@
         { label: "明显频繁", rawScore: 3 }
     ];
     const MAX_RAW = 60;
-
-    let currentTab = "home";      
-    let quizActive = false;        
-    let answers = new Array(20).fill(null);
-    let currentIndex = 0;
-
-    // 固定的分享链接地址 (根据用户要求)
     const SHARE_URL = "https://www.renzhiceshi.online/";
 
+    // ==================== 辅助函数 ====================
     function showToast(msg) {
         const toast = document.getElementById('toastMsg');
         toast.textContent = msg;
@@ -446,79 +480,90 @@
         return "🤖 AI预警：认知功能下降风险显著，多个维度出现异常信号。建议进行更详细的健康管理及医学咨询。";
     }
 
-    function startNewQuiz() {
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        quizActive = true;
-        render();
-    }
-    
-    function selectAnswer(score) {
-        if(!quizActive) return;
-        answers[currentIndex] = score;
-        if(currentIndex + 1 < QUESTIONS.length) {
-            currentIndex++;
-            render();
-        } else {
-            quizActive = false;
-            currentTab = "result";
-            render();
-        }
-    }
-    function prevQuestion() {
-        if(quizActive && currentIndex > 0) {
-            currentIndex--;
-            render();
-        }
-    }
-
-    // 生成图片功能
-    async function shareAsImage() {
-        const reportElement = document.getElementById('reportCaptureArea');
-        if (!reportElement) {
-            showToast("暂无法生成图片，请重试");
+    // 保存评估结果到 Supabase
+    async function saveScoreToSupabase(score) {
+        if (!currentUser) {
+            console.log("未登录，不保存成绩");
             return;
         }
         try {
-            showToast("生成报告中...");
-            const canvas = await html2canvas(reportElement, {
-                scale: 2.5,
-                backgroundColor: '#ffffff',
-                logging: false,
-                useCORS: false
-            });
-            const imageData = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `认知评估报告_${new Date().toISOString().slice(0,19)}.png`;
-            link.href = imageData;
-            link.click();
-            showToast("报告图片已保存");
+            const { error } = await supabase
+                .from('profiles')
+                .upsert({ 
+                    id: currentUser.id, 
+                    email: currentUser.email,
+                    cognitive_score: score,
+                    updated_at: new Date().toISOString()
+                });
+            if (error) {
+                console.error("保存失败:", error);
+            } else {
+                console.log("保存成功");
+            }
         } catch (err) {
-            console.error(err);
-            showToast("生成失败，可刷新重试");
+            console.error("保存出错:", err);
         }
     }
 
-    // 分享网址：复制固定的 SHARE_URL (https://www.renzhiceshi.online/)
-    async function copyFixedUrl() {
+    // 加载用户的历史评估分数
+    async function loadUserScore() {
+        if (!currentUser) return null;
         try {
-            await navigator.clipboard.writeText(SHARE_URL);
-            showToast("网址已复制，可分享给好友");
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('cognitive_score')
+                .eq('id', currentUser.id)
+                .single();
+            if (error && error.code !== 'PGRST116') {
+                console.error("加载失败:", error);
+                return null;
+            }
+            return data?.cognitive_score || null;
         } catch (err) {
-            // 降级方案
-            const textarea = document.createElement('textarea');
-            textarea.value = SHARE_URL;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast("网址已复制");
+            console.error("加载出错:", err);
+            return null;
         }
     }
 
-    // 首页渲染
-    function renderHome() {
+    // 登出
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        currentUser = null;
+        showToast("已退出登录");
+        render();
+    }
+
+    // ==================== 认证 UI ====================
+    function renderAuth() {
         return `
+            <div class="card" style="margin-top: 40px;">
+                <h2 style="text-align:center; margin-bottom: 28px;">${authMode === 'login' ? '登录' : '注册'}</h2>
+                <div class="auth-form">
+                    <input type="email" id="authEmail" class="auth-input" placeholder="邮箱" autocomplete="email">
+                    <input type="password" id="authPassword" class="auth-input" placeholder="密码（至少6位）" autocomplete="${authMode === 'login' ? 'current-password' : 'new-password'}">
+                    <button class="btn-primary" id="authSubmitBtn">${authMode === 'login' ? '登录' : '注册'}</button>
+                </div>
+                <div class="auth-switch" id="authSwitchBtn">
+                    ${authMode === 'login' ? '没有账号？点击注册' : '已有账号？点击登录'}
+                </div>
+            </div>
+        `;
+    }
+
+    // ==================== 各页面渲染 ====================
+    function renderHome() {
+        // 如果已登录，显示用户名
+        const loginStatus = currentUser ? 
+            `<div style="background:#eef6f1; border-radius: 30px; padding: 12px 20px; margin-bottom: 16px; text-align:center;">
+                👋 欢迎回来，${currentUser.email}
+                <button id="logoutHomeBtn" style="margin-left: 12px; background:none; border:1px solid #0f6e3f; border-radius:20px; padding:4px 12px; cursor:pointer;">退出</button>
+             </div>` : 
+            `<div style="background:#eef6f1; border-radius: 30px; padding: 12px 20px; margin-bottom: 16px; text-align:center;">
+                👤 未登录 · <span id="gotoAuthBtn" style="color:#0f6e3f; font-weight:600; cursor:pointer;">点击登录/注册</span>
+             </div>`;
+        
+        return `
+            ${loginStatus}
             <div class="hero-card">
                 <div class="hero-tag">🧠 官方推荐 · 居家智能监测</div>
                 <div class="hero-title">父母最近<br>总忘事？</div>
@@ -539,7 +584,6 @@
         `;
     }
 
-    // 设备页
     function renderDevice() {
         return `
             <div class="card" style="margin-top:20px;">
@@ -562,11 +606,23 @@
     }
 
     function renderProfile() {
+        // 未登录时直接显示登录界面
+        if (!currentUser) {
+            return renderAuth();
+        }
+        
         return `
             <div class="card" style="margin-top:20px;">
-                <div style="display:flex; align-items:center; gap:18px; margin-bottom:28px;">
-                    <div style="background:#d4f0df; width:70px; height:70px; border-radius:50px; display:flex; align-items:center; justify-content:center; font-size:34px;">👤</div>
-                    <div><h3 style="font-size:22px;">我的健康档案</h3><p style="color:#6286a8;">历史评估记录可在此查看</p></div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
+                    <div style="display:flex; align-items:center; gap:18px;">
+                        <div style="background:#d4f0df; width:70px; height:70px; border-radius:50px; display:flex; align-items:center; justify-content:center; font-size:34px;">👤</div>
+                        <div><h3 style="font-size:22px;">我的健康档案</h3><p style="color:#6286a8;">${currentUser.email}</p></div>
+                    </div>
+                    <button id="logoutProfileBtn" style="background:#f0f0f0; border:none; border-radius:30px; padding:8px 16px; cursor:pointer;">退出</button>
+                </div>
+                <div id="historyScoreArea" style="background:#f0f9f4; border-radius:28px; padding:20px; margin-bottom:20px; text-align:center;">
+                    <div style="font-size:14px; color:#5b6e8c;">最近一次评估分数</div>
+                    <div id="historyScoreValue" style="font-size:48px; font-weight:800; color:#0f6e3f;">--</div>
                 </div>
                 <button class="btn-outline" id="historyTestBtn" style="margin-bottom:18px;">📋 重新认知评估</button>
             </div>
@@ -620,7 +676,6 @@
         `;
     }
 
-    // 结果页：风险描述在AI框内，分享网址按钮复制固定链接
     function renderResult() {
         const percent = getPercentScore();
         const risk = getRiskLevel(percent);
@@ -653,88 +708,29 @@
 
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
 
-    function render() {
-        const container = document.getElementById('mainContent');
-        if (!container) return;
-        let content = "";
-        if (quizActive) {
-            content = renderQuiz();
-        } else {
-            if (currentTab === 'home') content = renderHome();
-            else if (currentTab === 'device') content = renderDevice();
-            else if (currentTab === 'profile') content = renderProfile();
-            else if (currentTab === 'result') content = renderResult();
-            else content = renderHome();
-        }
-        container.innerHTML = content;
-        // 高亮底部导航
-        document.querySelectorAll('.nav-item').forEach(item => {
-            const val = item.getAttribute('data-tab');
-            if ((currentTab === val) || (currentTab === 'result' && val==='home')) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-        bindDynamicEvents();
-    }
-
+    // ==================== 事件绑定 ====================
     function bindDynamicEvents() {
-        const startBtn = document.getElementById('startFreeEvalBtn');
-        if(startBtn) startBtn.onclick = () => { startNewQuiz(); };
-        const gotoDevice = document.getElementById('gotoDeviceFromHome');
-        if(gotoDevice) gotoDevice.onclick = () => { quizActive=false; currentTab='device'; render(); };
-        const deviceContact = document.getElementById('deviceContactBtn');
-        if(deviceContact) deviceContact.onclick = () => { showToast("华为手环购买链接/详细安装说明已发送至邮箱 celia2206254@gmail.com，或咨询官方客服 400-882-6625"); };
-        const historyBtn = document.getElementById('historyTestBtn');
-        if(historyBtn) historyBtn.onclick = () => { startNewQuiz(); };
-        const restartBtn = document.getElementById('restartQuizBtn');
-        if(restartBtn) restartBtn.onclick = () => { startNewQuiz(); };
-        const prevBtn = document.getElementById('quizPrevBtn');
-        if(prevBtn) prevBtn.onclick = () => { prevQuestion(); };
+        // 登出按钮（首页）
+        const logoutHomeBtn = document.getElementById('logoutHomeBtn');
+        if(logoutHomeBtn) logoutHomeBtn.onclick = () => handleLogout();
         
-        const shareImageBtn = document.getElementById('shareImageBtn');
-        if(shareImageBtn) shareImageBtn.onclick = () => { shareAsImage(); };
-        const shareUrlBtn = document.getElementById('shareUrlBtn');
-        if(shareUrlBtn) shareUrlBtn.onclick = () => { copyFixedUrl(); };
+        // 退出按钮（我的页面）
+        const logoutProfileBtn = document.getElementById('logoutProfileBtn');
+        if(logoutProfileBtn) logoutProfileBtn.onclick = () => handleLogout();
         
-        // FAQ折叠
-        document.querySelectorAll('.faq-item').forEach((item) => {
-            const qDiv = item.querySelector('.faq-question');
-            const answerDiv = item.querySelector('.faq-answer');
-            if(qDiv && answerDiv) {
-                qDiv.style.cursor = 'pointer';
-                qDiv.onclick = (e) => {
-                    e.stopPropagation();
-                    answerDiv.classList.toggle('show');
-                    const arrow = qDiv.querySelector('span');
-                    if(arrow) arrow.innerHTML = answerDiv.classList.contains('show') ? '▲' : '▼';
-                };
-                const arrowSpan = qDiv.querySelector('span');
-                if(arrowSpan && (!arrowSpan.innerHTML.trim() || arrowSpan.innerHTML === '▼')) arrowSpan.innerHTML = '▼';
-            }
-        });
-    }
-
-    window.selectAnswerHandler = (score) => { selectAnswer(score); };
-
-    function initNav() {
-        const navs = document.querySelectorAll('.nav-item');
-        navs.forEach(nav => {
-            nav.addEventListener('click', (e) => {
-                const tab = nav.getAttribute('data-tab');
-                if(tab === 'home') { quizActive = false; currentTab = 'home'; render(); }
-                else if(tab === 'device') { quizActive = false; currentTab = 'device'; render(); }
-                else if(tab === 'profile') { quizActive = false; currentTab = 'profile'; render(); }
-            });
-        });
-    }
-    
-    function init() {
-        render();
-        initNav();
-    }
-    init();
-</script>
-</body>
-</html>
+        // 跳转到认证页面
+        const gotoAuthBtn = document.getElementById('gotoAuthBtn');
+        if(gotoAuthBtn) gotoAuthBtn.onclick = () => { currentTab = 'profile'; render(); };
+        
+        // 认证相关按钮
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        if(authSubmitBtn) {
+            authSubmitBtn.onclick = async () => {
+                const email = document.getElementById('authEmail')?.value;
+                const password = document.getElementById('authPassword')?.value;
+                if (!email || !password) {
+                    showToast("请填写邮箱和密码");
+                    return;
+                }
+                if (authMode === 'login') {
+                    const { data, error } = await sup
