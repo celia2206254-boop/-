@@ -67,6 +67,25 @@
         .home-btn{position:absolute;top:20px;left:20px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;font-size:14px;font-weight:500;color:#0f6e3f;cursor:pointer;display:flex;align-items:center;gap:6px;z-index:10;}
         .home-btn:active{background:#e2e8f0;transform:scale(0.96);}
         .result-card{position:relative;padding-top:50px;}
+        /* 说明文字样式 - 小字、浅灰、不突兀 */
+        .info-note {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.5;
+            text-align: left;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-radius: 20px;
+            border-left: 3px solid #cbd5e1;
+        }
+        .info-note .ref {
+            font-size: 10px;
+            color: #cbd5e1;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 0.5px solid #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -91,7 +110,7 @@
     let answers = new Array(20).fill(null), currentIndex = 0, authMode = "login";
     let isEditing = false, userProfile = { gender: '', age: null };
     let selectedHistory = null, bannerInterval = null, currentBannerIndex = 0;
-    let showAllHistory = false;  // 控制历史报告显示全部还是收起
+    let showAllHistory = false;
 
     const QUESTIONS = ["最近是否经常忘记刚说过的话？","是否常忘记东西放在哪里？","是否重复询问同一件事？","是否忘记约定或日期？","是否记不住最近发生的事？","是否常搞不清今天星期几？","是否分不清月份或季节？","是否去熟悉地方也容易迷路？","是否常叫不出熟悉物品名称？","说话时是否常卡住找词？","是否表达内容混乱？","是否听不懂复杂说明？","是否不会使用熟悉家电？","是否缴费、算账变困难？","是否做饭步骤容易混乱？","是否需要别人提醒洗澡吃药？","是否脾气变化明显？","是否变得多疑敏感？","是否兴趣明显下降？","是否社交意愿下降？"];
     const OPTIONS = [{label:"无异常",rawScore:0},{label:"偶尔出现",rawScore:1},{label:"经常出现",rawScore:2},{label:"明显频繁",rawScore:3}];
@@ -159,7 +178,13 @@
             '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
             '</div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span></div></div>';
         
-        return loginHint + bannerHtml + '<div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
+        // 说明文字
+        let infoNote = '<div class="info-note">' +
+            '📋 日常行为模式（如睡眠、活动轨迹）的长期、无感监测，可作为社区场景下认知功能减退的早期预警指标。异常活动轨迹与睡眠碎片化程度，能独立预测轻度认知损害向阿尔茨海默病转化的风险。' +
+            '<div class="ref">参考来源：中国阿尔茨海默病协会（2023）. 认知障碍早期筛查社区实施专家共识；Dodge, H. H., et al. (2019). JAMA Network Open, 2(12), e1917644.</div>' +
+            '</div>';
+        
+        return loginHint + bannerHtml + '<div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>' + infoNote;
     }
 
     function renderDevice() { return '<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><span style="font-size:42px;">⌚</span><h2 style="font-size:24px;">华为手环</h2></div><p style="color:#2b6e4e;margin-bottom:20px;font-weight:500;">专为认知健康及长者安全设计的智能可穿戴设备</p><div style="background:#f0f9f4;border-radius:24px;padding:20px;"><div style="font-weight:700;font-size:18px;margin-bottom:16px;">🎯 核心认知守护功能</div><ul style="margin-left:20px;"><li style="margin-bottom:10px;"><strong>💤 睡眠监测</strong> – 分析睡眠规律与认知健康关联性</li><li style="margin-bottom:10px;"><strong>🚶 活动轨迹异常提醒</strong> – 识别久坐、夜间离床等行为</li><li><strong>📅 认知健康周报</strong> – 生成认知趋势分析</li></ul><button class="btn-primary" id="deviceContactBtn" style="margin-top:24px;">📧 咨询详情</button></div></div>'; }
@@ -171,7 +196,6 @@
         let latestScore = await loadUserScore();
         let historyList = await loadHistory();
         
-        // 默认显示3条，点击「查看全部」后显示所有
         let displayList = showAllHistory ? historyList : historyList.slice(0, 3);
         let historyHtml = '<div class="flex-between" style="margin-bottom:16px;"><h3>📊 历史评估报告</h3><span style="font-size:13px; color:#64748b;">共 ' + historyList.length + ' 条记录</span></div>';
         
@@ -185,7 +209,6 @@
                 let rc = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'); 
                 historyHtml += '<div class="history-item" data-id="'+h.id+'"><div><div class="history-score">'+h.score+' 分</div><div class="history-date">'+dateStr+'</div><div class="history-time">'+timeStr+'</div></div><div style="color:'+rc+';font-weight:600;">'+h.risk_level+'</div></div>'; 
             }
-            // 如果记录超过3条且不是全部显示状态，显示「查看全部」按钮
             if(historyList.length > 3 && !showAllHistory) {
                 historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:12px;">📋 查看全部 ' + historyList.length + ' 条历史报告</button>';
             }
@@ -247,11 +270,9 @@
             });
         } else { if(bannerInterval) clearInterval(bannerInterval); }
         
-        // 回到首页按钮
         const backHomeBtn = document.getElementById('backHomeBtn');
         if(backHomeBtn) backHomeBtn.addEventListener('click', () => { currentTab = 'home'; quizActive = false; render(); });
         
-        // 历史报告展开/收起按钮
         const showAllBtn = document.getElementById('showAllHistoryBtn');
         if(showAllBtn) showAllBtn.addEventListener('click', () => { showAllHistory = true; render(); });
         const hideAllBtn = document.getElementById('hideAllHistoryBtn');
