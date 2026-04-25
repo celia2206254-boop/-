@@ -136,10 +136,6 @@
             background: #fff8e7;
             padding: 8px;
         }
-        .hero-img svg, .hero-img img {
-            width: 100%;
-            display: block;
-        }
         
         /* 信任标签 */
         .trust-badge {
@@ -175,7 +171,9 @@
             padding: 20px 14px;
             text-align: center;
             box-shadow: 0 6px 14px rgba(0,0,0,0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        .entry-card:active { transform: scale(0.98); }
         .entry-icon {
             font-size: 40px;
             margin-bottom: 12px;
@@ -201,8 +199,9 @@
             width: 100%;
             cursor: pointer;
             font-size: 14px;
+            transition: 0.2s;
         }
-        .btn-outline-green:active { background: #eef6f0; }
+        .btn-outline-green:active { background: #eef6f0; transform: scale(0.97); }
         
         /* 硬件设备区 */
         .device-showcase {
@@ -213,9 +212,10 @@
             padding: 20px;
             margin-bottom: 20px;
             align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         .device-img {
-            background: #eef2f5;
+            background: linear-gradient(145deg, #eef2f5, #e2e8f0);
             width: 110px;
             height: 110px;
             border-radius: 28px;
@@ -257,30 +257,37 @@
             border: none;
             font-weight: 500;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-small:active { transform: scale(0.96); background: #e2e8f0; }
         .btn-small-primary {
             background: #0f6e3f;
             color: white;
         }
+        .btn-small-primary:active { background: #0a5833; }
         
-        /* 用户案例滚动区 - 左右滚动 */
+        /* 用户案例滚动区 - 美化 */
         .cases-carousel {
             background: white;
             border-radius: 32px;
-            padding: 16px 12px;
+            padding: 20px 16px;
             margin-bottom: 20px;
-            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
         }
         .carousel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             padding: 0 4px;
         }
         .carousel-title {
             font-weight: 700;
-            font-size: 16px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #1e4620, #2d6a4f);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
         }
         .scroll-buttons {
             display: flex;
@@ -289,8 +296,8 @@
         .scroll-btn {
             background: #eef2ff;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 30px;
             font-size: 18px;
             font-weight: bold;
@@ -299,7 +306,9 @@
             align-items: center;
             justify-content: center;
             color: #0f6e3f;
+            transition: 0.2s;
         }
+        .scroll-btn:active { background: #d9e6d9; transform: scale(0.95); }
         .carousel-wrapper {
             overflow-x: auto;
             scroll-behavior: smooth;
@@ -313,16 +322,23 @@
         .case-card {
             flex: 0 0 85%;
             scroll-snap-align: start;
-            background: #fefce8;
+            background: linear-gradient(145deg, #fefce8, #fff9e6);
             border-radius: 28px;
-            padding: 20px;
+            padding: 22px;
             border-left: 6px solid #eab308;
             min-width: 260px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .case-name {
             font-weight: 800;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 16px;
+            color: #b45309;
+        }
+        .case-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #3b2e1e;
         }
         
         /* 问卷样式 */
@@ -330,6 +346,7 @@
             background: white;
             border-radius: 32px;
             padding: 24px 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
         }
         .question-counter {
             font-weight: 600;
@@ -378,6 +395,7 @@
             border-color: #0f6e3f;
             color: white;
         }
+        .option-btn:active { transform: scale(0.98); }
         .nav-buttons {
             display: flex;
             gap: 12px;
@@ -398,7 +416,7 @@
         .score-circle {
             width: 120px;
             height: 120px;
-            background: #f1f5f9;
+            background: linear-gradient(145deg, #f1f5f9, #e6edf5);
             border-radius: 50%;
             margin: 16px auto;
             display: flex;
@@ -406,6 +424,7 @@
             justify-content: center;
             font-size: 44px;
             font-weight: 800;
+            color: #0f6e3f;
         }
         .risk-low { color: #10b981; }
         .risk-mid { color: #f59e0b; }
@@ -432,16 +451,105 @@
         button {
             cursor: pointer;
         }
-        .contact-email {
-            text-align: center;
-            font-size: 12px;
+        
+        /* 我的页面 - 美化版 */
+        .profile-card {
+            background: white;
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eef2f5;
+        }
+        .avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, #0f6e3f, #1e8f4a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 6px 14px rgba(15,110,63,0.3);
+        }
+        .profile-info h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .profile-info p {
+            font-size: 13px;
             color: #5b6e8c;
-            margin-top: 16px;
-            padding: 8px;
+        }
+        
+        .menu-item {
             background: #f8fafc;
-            border-radius: 40px;
-            display: inline-block;
-            width: auto;
+            border-radius: 24px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .menu-item:active { background: #eef2ff; transform: scale(0.98); }
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+        .menu-icon {
+            font-size: 24px;
+        }
+        .faq-section {
+            margin-top: 20px;
+        }
+        .faq-item {
+            background: white;
+            border-radius: 24px;
+            margin-bottom: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #edf2f7;
+        }
+        .faq-question {
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+            color: #1e4620;
+        }
+        .faq-answer {
+            font-size: 13px;
+            color: #5b6e8c;
+            margin-top: 12px;
+            display: none;
+            line-height: 1.5;
+            padding-top: 8px;
+            border-top: 1px solid #eef2f5;
+        }
+        .contact-email-badge {
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            border-radius: 28px;
+            padding: 14px 18px;
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #1e3a8a;
         }
     </style>
 </head>
@@ -458,7 +566,6 @@
                 </div>
                 <div class="hero-right">
                     <div class="hero-img">
-                        <!-- 使用内嵌SVG绘制生动图片: 老人+子女+设备场景 -->
                         <svg viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="35" cy="50" r="18" fill="#FFD966" stroke="#B97F44" stroke-width="1.5"/>
                             <circle cx="32" cy="46" r="2" fill="#333"/>
@@ -494,7 +601,6 @@
                     <button class="btn-outline-green" id="viewDeviceBtn">查看设备 →</button>
                 </div>
             </div>
-            <!-- 硬件设备区 -->
             <div class="device-showcase">
                 <div class="device-img">⌚️📡</div>
                 <div class="device-info">
@@ -505,11 +611,11 @@
                     </ul>
                     <div class="btn-group">
                         <button class="btn-small" id="deviceDetailBtn">查看详情</button>
-                        <button class="btn-small btn-small-primary" id="deviceConsultBtn">立即咨询</button>
+                        <button class="btn-small btn-small-primary" id="deviceConsultBtn">咨询设备</button>
                     </div>
                 </div>
             </div>
-            <!-- 用户案例滚动区 左右滚动按钮 -->
+            <!-- 用户案例滚动区 -->
             <div class="cases-carousel">
                 <div class="carousel-header">
                     <span class="carousel-title">📢 真实用户案例</span>
@@ -518,16 +624,10 @@
                         <button class="scroll-btn" id="scrollRightBtn">▶</button>
                     </div>
                 </div>
-                <div class="carousel-wrapper" id="caseCarouselWrapper">
-                    <!-- 动态生成10个案例 -->
-                </div>
-            </div>
-            <!-- 联系方式邮箱 -->
-            <div style="text-align: center; margin-top: 8px; margin-bottom: 24px;">
-                <span class="contact-email">📧 联系邮箱：celia2206254@gmail.com</span>
+                <div class="carousel-wrapper" id="caseCarouselWrapper"></div>
             </div>
             <div class="footer-links" style="border-top: none; padding: 12px 0 24px; text-align:center; font-size:12px; color:#94a3b8;">
-                免责声明 | 隐私政策 | 客服咨询
+                免责声明 | 隐私政策 | 📧 celia2206254@gmail.com
             </div>
         </div>
 
@@ -543,42 +643,62 @@
                     <li>✅ 异常行为告警推送</li>
                     <li>✅ 家属远程查看报告</li>
                 </ul>
-                <button class="btn-primary" style="margin-top: 12px;">了解详情</button>
-                <div class="contact-email" style="margin-top: 20px;">📧 celia2206254@gmail.com</div>
+                <button class="btn-primary" style="margin-top: 12px;" id="deviceContactBtn">联系我们</button>
             </div>
-            <div class="footer-links">人工智能辅助仅供参考</div>
         </div>
 
-        <!-- 我的页面 + FAQ -->
+        <!-- 我的页面 美化版 -->
         <div id="profilePage" class="page">
-            <div class="profile-header" style="display:flex; align-items:center; gap:16px; background:white; border-radius:32px; padding:20px; margin-bottom:20px;">
-                <div style="width:64px; height:64px; background:#cbd5e1; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px;">👤</div>
-                <div><h3>我的健康档案</h3><p style="font-size:13px; color:#5b6e8c;">评估记录 · 设备绑定</p></div>
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar">👤</div>
+                    <div class="profile-info">
+                        <h3>我的健康档案</h3>
+                        <p>评估记录 · 设备绑定 · 健康动态</p>
+                    </div>
+                </div>
+                <div class="menu-item" id="contactUsBtn">
+                    <div class="menu-left">
+                        <span class="menu-icon">📧</span>
+                        <span>联系我们</span>
+                    </div>
+                    <span>→</span>
+                </div>
+                <div class="menu-item" id="myReportsBtn">
+                    <div class="menu-left">
+                        <span class="menu-icon">📋</span>
+                        <span>历史评估报告</span>
+                    </div>
+                    <span>→</span>
+                </div>
             </div>
-            <div style="font-weight:700; margin:0 0 12px 0;">📌 常见问题</div>
-            <div id="faqContainer">
-                <div class="faq-item" style="background:white; border-radius:24px; margin-bottom:12px; padding:18px;">
-                    <div class="faq-question" style="font-weight:700; display:flex; justify-content:space-between; cursor:pointer;">📋 问卷准吗？<span>▼</span></div>
-                    <div class="faq-answer" style="display:none; font-size:13px; margin-top:10px;">本问卷基于临床验证量表开发，用于风险初筛，准确率较高，最终诊断请以医院评估为准。</div>
+            
+            <div class="faq-section">
+                <div style="font-weight: 700; margin: 0 0 12px 8px; font-size: 16px;">📌 常见问题</div>
+                <div class="faq-item">
+                    <div class="faq-question">📋 问卷准吗？<span>▼</span></div>
+                    <div class="faq-answer">本问卷基于临床验证量表开发，用于风险初筛，准确率较高，最终诊断请以医院评估为准。</div>
                 </div>
-                <div class="faq-item" style="background:white; border-radius:24px; margin-bottom:12px; padding:18px;">
-                    <div class="faq-question" style="font-weight:700; display:flex; justify-content:space-between; cursor:pointer;">🔧 设备怎么安装？<span>▼</span></div>
-                    <div class="faq-answer" style="display:none; font-size:13px;">设备即插即用，通过手机app配网，放置在客厅或卧室即可。</div>
+                <div class="faq-item">
+                    <div class="faq-question">🔧 设备怎么安装？<span>▼</span></div>
+                    <div class="faq-answer">设备即插即用，通过手机app配网，放置在客厅或卧室即可，无需复杂布线。</div>
                 </div>
-                <div class="faq-item" style="background:white; border-radius:24px; margin-bottom:12px; padding:18px;">
-                    <div class="faq-question" style="font-weight:700; display:flex; justify-content:space-between; cursor:pointer;">👵 老人会用吗？<span>▼</span></div>
-                    <div class="faq-answer" style="display:none; font-size:13px;">设备全自动工作，无需老人操作，家属远程查看数据。</div>
+                <div class="faq-item">
+                    <div class="faq-question">👵 老人会用吗？<span>▼</span></div>
+                    <div class="faq-answer">设备全自动工作，无需老人操作。家属通过小程序远程查看数据，非常便捷。</div>
                 </div>
-                <div class="faq-item" style="background:white; border-radius:24px; margin-bottom:12px; padding:18px;">
-                    <div class="faq-question" style="font-weight:700; display:flex; justify-content:space-between; cursor:pointer;">💎 是否需要会员？<span>▼</span></div>
-                    <div class="faq-answer" style="display:none; font-size:13px;">基础评估免费，高级分析可选订阅。</div>
+                <div class="faq-item">
+                    <div class="faq-question">💎 是否需要会员？<span>▼</span></div>
+                    <div class="faq-answer">基础评估和部分监测功能免费，高级分析服务可选订阅，不强制。</div>
                 </div>
             </div>
-            <div class="contact-email" style="display: block; text-align: center; margin: 16px auto;">📧 联系邮箱：celia2206254@gmail.com</div>
-            <div class="footer-links" style="text-align:center; margin-top:20px;">关于我们 | 用户协议</div>
+            <div class="contact-email-badge" id="emailContactBtn">
+                📧 联系邮箱：celia2206254@gmail.com
+                <span style="font-size: 18px;">✉️</span>
+            </div>
         </div>
 
-        <!-- 问卷页面 (动态) -->
+        <!-- 问卷页面 -->
         <div id="quizPage" class="page"></div>
     </div>
 
@@ -599,25 +719,25 @@
         { name: "👨‍🦳 周先生", text: "问卷简洁易懂，帮助全家了解父母认知健康。" },
         { name: "🏠 刘奶奶女儿", text: "远程查看活动数据，感觉父母生活规律，我们也放心。" },
         { name: "👴 赵爷爷", text: "坚持测评半年，指标稳定，感谢专业指导。" },
-        { name: "👩‍⚕️ 孙医生推荐", text: "作为家庭初筛工具非常实用。" },
-        { name: "🧠 李教授", text: "居家认知守护仪是长者家庭的得力助手。" },
-        { name: "❤️ 志愿者协会", text: "已协助百位老人使用评估+设备，收获好评。" }
+        { name: "👩‍⚕️ 孙医生推荐", text: "作为家庭初筛工具非常实用，推荐给有需要的家庭。" },
+        { name: "🧠 李教授", text: "居家认知守护仪是长者家庭的得力助手，科技温暖人心。" },
+        { name: "❤️ 志愿者协会", text: "已协助百位老人使用评估+设备，收获好评，降低走失风险。" }
     ];
     const wrapper = document.getElementById('caseCarouselWrapper');
     if(wrapper) {
         casesList.forEach(c => {
             const div = document.createElement('div');
             div.className = 'case-card';
-            div.innerHTML = `<div class="case-name">${c.name}</div><div>${c.text}</div>`;
+            div.innerHTML = `<div class="case-name">${c.name}</div><div class="case-text">${c.text}</div>`;
             wrapper.appendChild(div);
         });
     }
-    // 左右滚动功能
+    // 左右滚动
     const scrollLeftBtn = document.getElementById('scrollLeftBtn');
     const scrollRightBtn = document.getElementById('scrollRightBtn');
     if(scrollLeftBtn && wrapper) {
-        scrollLeftBtn.addEventListener('click', () => { wrapper.scrollBy({ left: -280, behavior: 'smooth' }); });
-        scrollRightBtn.addEventListener('click', () => { wrapper.scrollBy({ left: 280, behavior: 'smooth' }); });
+        scrollLeftBtn.addEventListener('click', () => wrapper.scrollBy({ left: -280, behavior: 'smooth' }));
+        scrollRightBtn.addEventListener('click', () => wrapper.scrollBy({ left: 280, behavior: 'smooth' }));
     }
 
     // 20题认知问卷
@@ -680,13 +800,13 @@
             <div class="quiz-card result-area">
                 <h2>📋 评估结果</h2>
                 <div class="score-circle">${percent}</div>
-                <div class="risk-level ${risk.class}">${risk.name}</div>
+                <div class="risk-level ${risk.class}" style="font-size:22px; font-weight:bold;">${risk.name}</div>
                 <div class="ai-text">🤖 AI评估：${ai}</div>
                 <div style="margin: 20px 0; background:#f8fafc; padding:14px; border-radius:24px;">${risk.desc}</div>
                 <button class="btn-primary" style="width:100%; margin-bottom:12px;" onclick="window.resetToHome()">重新测试</button>
                 <button class="btn-outline-green" style="width:100%;" onclick="window.backToHome()">返回首页</button>
                 <div class="footer-note">满分100分，分数越高风险越高</div>
-                <div class="contact-email" style="margin-top:16px;">📧 联系邮箱：celia2206254@gmail.com</div>
+                <div class="contact-email-badge" style="margin-top:16px; justify-content:center;">📧 celia2206254@gmail.com</div>
             </div>
         `;
     }
@@ -699,77 +819,4 @@
         answers[currentIndex] = value;
         renderQuizPage();
         if (currentIndex + 1 < questions.length) {
-            autoTimer = setTimeout(() => {
-                currentIndex++;
-                renderQuizPage();
-                autoTimer = null;
-            }, 1000);
-        } else {
-            autoTimer = setTimeout(() => {
-                const quizContainer = document.getElementById('quizPage');
-                if(quizContainer) quizContainer.innerHTML = renderResultPage();
-                autoTimer = null;
-            }, 1000);
-        }
-    };
-    window.prevQuestion = function() {
-        if (currentIndex > 0) {
-            if(autoTimer) clearTimeout(autoTimer);
-            currentIndex--;
-            renderQuizPage();
-        }
-    };
-    function startQuiz() {
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        if(autoTimer) clearTimeout(autoTimer);
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        document.getElementById('quizPage').classList.add('active-page');
-        renderQuizPage();
-        updateNavActive('quiz');
-    }
-    window.resetToHome = function() { backToHome(); };
-    window.backToHome = function() {
-        if(autoTimer) clearTimeout(autoTimer);
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        document.getElementById('homePage').classList.add('active-page');
-        updateNavActive('home');
-    };
-    function updateNavActive(activeId) {
-        document.querySelectorAll('.nav-item').forEach(btn => {
-            const page = btn.getAttribute('data-page');
-            if((activeId === 'home' && page === 'home') || (activeId === 'device' && page === 'device') || (activeId === 'profile' && page === 'profile'))
-                btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-    }
-    function navigateTo(pageId) {
-        if(autoTimer) clearTimeout(autoTimer);
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        if(pageId === 'home') document.getElementById('homePage').classList.add('active-page');
-        else if(pageId === 'device') document.getElementById('devicePage').classList.add('active-page');
-        else if(pageId === 'profile') document.getElementById('profilePage').classList.add('active-page');
-        else if(pageId === 'quiz') document.getElementById('quizPage').classList.add('active-page');
-        updateNavActive(pageId);
-    }
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const page = btn.getAttribute('data-page');
-            if(page === 'home') navigateTo('home');
-            else if(page === 'device') navigateTo('device');
-            else if(page === 'profile') navigateTo('profile');
-        });
-    });
-    document.getElementById('heroStartBtn')?.addEventListener('click', startQuiz);
-    document.getElementById('startAssessBtn')?.addEventListener('click', startQuiz);
-    document.getElementById('viewDeviceBtn')?.addEventListener('click', () => navigateTo('device'));
-    document.getElementById('deviceDetailBtn')?.addEventListener('click', () => alert('查看详情：毫米波雷达监测睡眠与活动轨迹。'));
-    document.getElementById('deviceConsultBtn')?.addEventListener('click', () => alert('咨询热线 400-882-6618，也可邮件 celia2206254@gmail.com'));
-
-    // FAQ 折叠
-    document.querySelectorAll('.faq-item').forEach(item => {
-        const q = item.querySelector('.faq-question');
-        const ans = item.querySelector('.faq-answer');
-        q.addEventListener('click', () => {
-            const isOpen = ans.style.display === 'block';
-            document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none
+            autoTimer = setTimeout(() => { currentIndex++; renderQuizPage(); autoTimer = null; }, 100
