@@ -67,7 +67,6 @@
         .home-btn{position:absolute;top:20px;left:20px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;font-size:14px;font-weight:500;color:#0f6e3f;cursor:pointer;display:flex;align-items:center;gap:6px;z-index:10;}
         .home-btn:active{background:#e2e8f0;transform:scale(0.96);}
         .result-card{position:relative;padding-top:50px;}
-        /* 说明文字样式 - 小字、加深、无背景框、往下移 */
         .info-note {
             font-size: 11px;
             color: #64748b;
@@ -167,9 +166,10 @@
         if(!currentUser) {
             loginHint = '<div class="login-hint" id="gotoAuthBtn">📝 登录/注册 查看历史记录</div>';
         }
+        // 使用又拍云 CDN 链接（已替换，支持 HTTPS）
         let bannerHtml = '<div class="banner-container"><div class="banner-slider">' +
-            '<div class="banner-item" id="bannerFirst"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
-            '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
+            '<div class="banner-item" id="bannerFirst"><img src="https://celia2206254banner.test.upcdn.net/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
+            '<div class="banner-item"><img src="https://celia2206254banner.test.upcdn.net/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
             '</div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span></div></div>';
         
         return loginHint + bannerHtml + '<div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
