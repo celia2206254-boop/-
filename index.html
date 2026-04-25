@@ -17,13 +17,6 @@
         .nav-icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;}
         .nav-label{font-size:11px;font-weight:500;}
         .card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;}
-        .hero-card{background:linear-gradient(135deg,#f0f9f3,#fff);border-radius:32px;padding:28px 24px;margin-bottom:20px;}
-        .hero-tag{font-size:12px;color:#0f6e3f;font-weight:600;background:rgba(15,110,63,0.12);display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:40px;margin-bottom:20px;}
-        .hero-title{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:12px;color:#0a2e1e;}
-        .hero-sub{font-size:16px;color:#475569;margin-bottom:28px;padding-left:12px;border-left:3px solid #0f6e3f;}
-        .btn-primary{background:#0f6e3f;color:white;width:100%;padding:16px 20px;font-size:16px;font-weight:600;border-radius:60px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
-        .btn-primary:active{background:#0a5833;transform:scale(0.97);}
-        .btn-outline{background:white;border:1.5px solid #0f6e3f;color:#0f6e3f;font-weight:600;padding:14px 18px;border-radius:60px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
         .device-card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;}
         .device-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
         .device-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px;}
@@ -69,6 +62,8 @@
         .share-buttons{display:flex;gap:12px;margin-top:20px;}
         .btn-share{flex:1;background:#0f6e3f;color:white;border:none;border-radius:60px;padding:12px;cursor:pointer;}
         .login-hint{background:#eef6f1;border-radius:28px;padding:12px;text-align:center;margin-bottom:16px;cursor:pointer;color:#0f6e3f;font-weight:500;}
+        .btn-primary{background:#0f6e3f;color:white;width:100%;padding:16px 20px;font-size:16px;font-weight:600;border-radius:60px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+        .btn-outline{background:white;border:1.5px solid #0f6e3f;color:#0f6e3f;font-weight:600;padding:14px 18px;border-radius:60px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
     </style>
 </head>
 <body>
@@ -131,13 +126,13 @@
         if(!currentUser) {
             loginHint = '<div class="login-hint" id="gotoAuthBtn">📝 登录/注册 查看历史记录</div>';
         }
-        // 只保留2张banner图，无文字
+        // 只有banner轮播和设备卡片，没有Hero区域
         let bannerHtml = '<div class="banner-container"><div class="banner-slider">' +
             '<div class="banner-item" id="bannerFirst"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
             '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
             '</div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span></div></div>';
         
-        return loginHint + bannerHtml + '<div class="hero-card"><div class="hero-tag"><span>🧠</span> 官方推荐 · 居家智能监测</div><div class="hero-title">父母最近<br>总忘事？</div><div class="hero-sub">3分钟认知健康评估<br>+ 居家智能监测方案</div><button class="btn-primary" id="startQuizBtn"><span>📋</span> 立即免费评估 →</button></div><div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
+        return loginHint + bannerHtml + '<div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
     }
 
     function renderDevice() { return '<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><span style="font-size:42px;">⌚</span><h2 style="font-size:24px;">华为手环</h2></div><p style="color:#2b6e4e;margin-bottom:20px;font-weight:500;">专为认知健康及长者安全设计的智能可穿戴设备</p><div style="background:#f0f9f4;border-radius:24px;padding:20px;"><div style="font-weight:700;font-size:18px;margin-bottom:16px;">🎯 核心认知守护功能</div><ul style="margin-left:20px;"><li style="margin-bottom:10px;"><strong>💤 睡眠监测</strong> – 分析睡眠规律与认知健康关联性</li><li style="margin-bottom:10px;"><strong>🚶 活动轨迹异常提醒</strong> – 识别久坐、夜间离床等行为</li><li><strong>📅 认知健康周报</strong> – 生成认知趋势分析</li></ul><button class="btn-primary" id="deviceContactBtn" style="margin-top:24px;">📧 咨询详情</button></div></div>'; }
@@ -169,7 +164,6 @@
         document.querySelectorAll('.nav-item').forEach(n=>{ let t=n.getAttribute('data-tab'); if(currentTab===t||(currentTab==='result'&&t==='home')) n.classList.add('active'); else n.classList.remove('active'); });
         if(currentTab==='home' && document.querySelector('.banner-container')) { 
             startBannerLoop(); 
-            // 第一张图片点击跳转问卷
             const firstBanner = document.getElementById('bannerFirst');
             if(firstBanner) {
                 firstBanner.style.cursor = 'pointer';
@@ -187,7 +181,6 @@
                 else if(currentBannerIndex===1) showToast("华为手环详情可邮件咨询");
             });
         } else { if(bannerInterval) clearInterval(bannerInterval); }
-        document.getElementById('startQuizBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
         document.getElementById('gotoDeviceBtn')?.addEventListener('click',()=>{ currentTab='device'; render(); });
         document.getElementById('historyTestBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
         document.getElementById('restartBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
