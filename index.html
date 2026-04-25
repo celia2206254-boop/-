@@ -50,7 +50,6 @@
         .detail-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2001; }
         .detail-card { background: white; border-radius: 36px; padding: 28px; max-width: 320px; width: 80%; text-align: center; }
         .detail-close { margin-top: 20px; background: #0f6e3f; color: white; border: none; border-radius: 40px; padding: 12px; width: 100%; cursor: pointer; }
-        /* Banner 样式 */
         .banner-container { position: relative; margin: 8px 16px; border-radius: 28px; overflow: hidden; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .banner-slider { display: flex; transition: transform 0.5s ease; }
         .banner-item { min-width: 100%; padding: 32px 24px; text-align: center; box-sizing: border-box; }
@@ -414,3 +413,11 @@
                 if(tab === 'home') { quizActive = false; currentTab = 'home'; render(); }
                 else if(tab === 'device') { quizActive = false; currentTab = 'device'; render(); }
                 else if(tab === 'profile') { quizActive = false; currentTab = 'profile'; render(); }
+            });
+        });
+    }
+    init();
+})();
+</script>
+</body>
+</html>
