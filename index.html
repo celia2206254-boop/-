@@ -29,9 +29,9 @@
 
         .card {
             background: white;
-            border-radius: 28px;
-            padding: 28px 22px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 32px;
+            padding: 28px 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
             transition: all 0.2s;
         }
 
@@ -65,7 +65,7 @@
         .btn-primary {
             background: #0f6e3f;
             color: white;
-            box-shadow: 0 2px 6px rgba(15,110,63,0.2);
+            box-shadow: 0 2px 8px rgba(15,110,63,0.2);
         }
         .btn-primary:active { background: #0a5833; transform: scale(0.97); }
 
@@ -120,6 +120,8 @@
             justify-content: space-between;
             align-items: baseline;
             margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .question-counter {
             font-size: 15px;
@@ -214,8 +216,8 @@
 
         /* 结果页 */
         .score-circle {
-            width: 110px;
-            height: 110px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: #f1f5f9;
             margin: 10px auto 16px;
@@ -223,12 +225,18 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .score-number {
-            font-size: 42px;
+            font-size: 44px;
             font-weight: 800;
             color: #0f172a;
+            line-height: 1;
+        }
+        .score-max {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
         }
         .risk-level {
             text-align: center;
@@ -335,18 +343,6 @@
             cursor: pointer;
             color: #94a3b8;
         }
-        .poster-qr {
-            margin: 16px auto;
-            width: 140px;
-            height: 140px;
-            background: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            font-size: 12px;
-            color: #475569;
-        }
         .btn-download {
             background: #0f6e3f;
             color: white;
@@ -360,13 +356,13 @@
         }
         .timer-ring {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             border: 2px solid #cbd5e1;
             border-top-color: #0f6e3f;
             animation: spin 0.8s linear infinite;
-            margin-left: 6px;
+            margin-right: 6px;
             vertical-align: middle;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -400,22 +396,25 @@
         "是否社交意愿下降？"
     ];
     
-    // 选项分值 (0,1,2,3) 但页面不显示分数，只显示文本
+    // 每题原始分值: 0,1,2,3  总分范围0-60，需要映射到百分制: 最终得分 = (原始总分 / 60) * 100
+    // 为了方便, 先计算原始总分，再转换为百分制(四舍五入取整)
     const optionItems = [
-        { label: "无异常", value: 0 },
-        { label: "偶尔出现", value: 1 },
-        { label: "经常出现", value: 2 },
-        { label: "明显频繁", value: 3 }
+        { label: "无异常", rawScore: 0 },
+        { label: "偶尔出现", rawScore: 1 },
+        { label: "经常出现", rawScore: 2 },
+        { label: "明显频繁", rawScore: 3 }
     ];
+    
+    // 最大原始总分 = 20 * 3 = 60，目标百分制满分为100
+    const MAX_RAW_SCORE = 60;
     
     let currentPage = 'home'; // home, quiz, result
     let currentIndex = 0;
-    let answers = new Array(20).fill(null);
-    let autoTimer = null;      // 自动跳转计时器
-    let selectedTempValue = null; // 暂存刚选中的值，用于延迟跳转
+    let answers = new Array(20).fill(null); // 存储每道题的原始分 0-3
+    let autoTimer = null;
     
-    // 总分计算
-    function getTotalScore() {
+    // 计算原始总分
+    function getTotalRawScore() {
         let sum = 0;
         for (let i = 0; i < answers.length; i++) {
             if (answers[i] !== null) sum += answers[i];
@@ -423,13 +422,25 @@
         return sum;
     }
     
-    function getRiskLevel(score) {
-        if (score <= 15) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
-        if (score <= 30) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
+    // 百分制得分: 0-100分
+    function getPercentageScore() {
+        const raw = getTotalRawScore();
+        // 公式: (raw / 60) * 100 ，保留整数
+        let percent = (raw / MAX_RAW_SCORE) * 100;
+        return Math.round(percent);
+    }
+    
+    // 风险等级基于百分制分数: 0-100分映射
+    // 低风险: 0-40分? 但是原始逻辑更合理保留原阈值: 原0-15分(低风险)映射到百分制约0-25分 => 25分以内低风险; 原16-30分(中风险)约26-50分; 原31+约51+ 
+    // 根据医生建议更合理的分段: 0-25分 低风险；26-50分 中风险；51-100分 高风险。
+    // 为了让结果合理且贴合原始设计，使用以下分级:
+    function getRiskLevel(percentScore) {
+        if (percentScore <= 25) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
+        if (percentScore <= 50) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
         return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
     }
     
-    // 统一建议列表
+    // 通用健康建议列表
     const commonTips = [
         "🏃 每周运动3次以上",
         "😴 保持规律睡眠",
@@ -454,7 +465,6 @@
         setTimeout(() => toast.classList.remove('show'), duration);
     }
     
-    // 清除自动跳转计时器
     function clearAutoTimer() {
         if (autoTimer) {
             clearTimeout(autoTimer);
@@ -462,50 +472,9 @@
         }
     }
     
-    // 执行跳转到下一题或结果
-    function executeNextStep() {
-        clearAutoTimer();
-        // 如果当前不在测试页，则忽略
-        if (currentPage !== 'quiz') return;
-        // 确认当前题目已经有选中值
-        if (answers[currentIndex] !== null) {
-            if (currentIndex + 1 < questions.length) {
-                currentIndex++;
-                // 重新渲染新题目
-                render();
-            } else {
-                // 已经是最后一题，完成测试 -> 结果页
-                currentPage = 'result';
-                render();
-            }
-        }
-    }
-    
-    // 选择答案的核心逻辑: 保存答案，显示选中状态，开启计时器自动跳转
-    function selectAnswer(value) {
-        if (currentPage !== 'quiz') return;
-        // 如果已经是选中同一个值，不做重复动作，但为了体验也可以重置计时器
-        if (answers[currentIndex] === value) {
-            // 相同选项，重新开始计时（延长停留）
-            clearAutoTimer();
-            startAutoTimer();
-            render(); // 刷新保持高亮
-            return;
-        }
-        // 新选项：保存答案
-        answers[currentIndex] = value;
-        // 清除旧计时器
-        clearAutoTimer();
-        // 重新渲染高亮
-        render();
-        // 启动计时器，1.2秒后自动跳转 (舒适延迟)
-        startAutoTimer();
-    }
-    
     function startAutoTimer() {
         if (autoTimer) clearTimeout(autoTimer);
         autoTimer = setTimeout(() => {
-            // 跳转前再次确认当前页是quiz且当前题目已有答案
             if (currentPage === 'quiz' && answers[currentIndex] !== null) {
                 if (currentIndex + 1 < questions.length) {
                     currentIndex++;
@@ -516,13 +485,27 @@
                 }
             }
             autoTimer = null;
-        }, 1200); // 停留1.2秒后自动进入下一题
+        }, 1200);
+    }
+    
+    // 选择答案: 存储原始分值
+    function selectAnswer(rawValue) {
+        if (currentPage !== 'quiz') return;
+        if (answers[currentIndex] === rawValue) {
+            clearAutoTimer();
+            startAutoTimer();
+            render();
+            return;
+        }
+        answers[currentIndex] = rawValue;
+        clearAutoTimer();
+        render();
+        startAutoTimer();
     }
     
     function prevQuestion() {
         if (currentPage !== 'quiz') return;
         if (currentIndex > 0) {
-            // 清除自动跳转计时器
             clearAutoTimer();
             currentIndex--;
             render();
@@ -545,7 +528,7 @@
         render();
     }
     
-    // 分享链接 (纯URL)
+    // 分享链接
     async function shareUrl() {
         if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             try {
@@ -576,10 +559,10 @@
         }
     }
     
-    // 生成海报canvas (保留个性)
+    // 生成海报 (百分制分数展示)
     async function generatePoster() {
-        const score = getTotalScore();
-        const level = getRiskLevel(score);
+        const percentScore = getPercentageScore();
+        const risk = getRiskLevel(percentScore);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = 500;
@@ -599,14 +582,18 @@
         ctx.fillStyle = '#f1f5f9';
         ctx.fill();
         ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 44px monospace';
-        ctx.fillText(score, 210, 208);
+        ctx.font = 'bold 38px monospace';
+        ctx.fillText(percentScore, 215, 205);
+        ctx.font = '14px system-ui';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('/ 100', 260, 200);
         ctx.font = 'bold 18px system-ui';
-        ctx.fillStyle = level.class === 'risk-low' ? '#10b981' : (level.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
-        ctx.fillText(level.name, 205, 250);
+        ctx.fillStyle = risk.class === 'risk-low' ? '#10b981' : (risk.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
+        ctx.fillText(risk.name, 205, 250);
         ctx.font = '15px system-ui';
         ctx.fillStyle = '#334155';
-        ctx.fillText(level.desc.substring(0, 28)+'...', 50, 290);
+        let shortDesc = risk.desc.length > 28 ? risk.desc.substring(0, 28)+'…' : risk.desc;
+        ctx.fillText(shortDesc, 50, 290);
         ctx.fillStyle = '#0f172a';
         ctx.font = 'bold 18px system-ui';
         ctx.fillText('📋 健康建议', 40, 340);
@@ -653,25 +640,24 @@
         });
     }
     
-    // 渲染测试页 (选项不显示分数, 显示选中状态)
+    // 渲染测试页（选项不显示分数）
     function renderQuiz() {
         const total = questions.length;
         const currentQNumber = currentIndex + 1;
         const progressPercent = ((currentIndex) / total) * 100;
         const question = questions[currentIndex];
-        const selectedVal = answers[currentIndex];
+        const selectedRaw = answers[currentIndex];
         
         let optionsHtml = '';
         for (let opt of optionItems) {
-            const isSelected = (selectedVal === opt.value);
+            const isSelected = (selectedRaw === opt.rawScore);
             optionsHtml += `
-                <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">
+                <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.rawScore})">
                     ${opt.label}
                 </button>
             `;
         }
         
-        // 显示自动跳转提示（如果有选中且计时未跳转时显示动画）
         const hasSelected = (answers[currentIndex] !== null);
         const autoHintHtml = hasSelected ? 
             `<span class="auto-hint"><span class="timer-ring"></span> 1.2秒后自动进入下一题</span>` : 
@@ -696,7 +682,7 @@
                 <div class="nav-buttons">
                     <button class="nav-btn ${prevDisabled ? 'disabled' : ''}" onclick="prevQuestion()" ${prevDisabled ? 'disabled' : ''}>← 上一题</button>
                 </div>
-                <div class="footer-note" style="margin-top:20px;">点击选项后自动进入下一题，也可手动点击上一题修改</div>
+                <div class="footer-note" style="margin-top:20px;">根据近3个月感受选择，点击选项后自动进入下一题</div>
             </div>
         `;
     }
@@ -705,26 +691,30 @@
         return `
             <div class="card">
                 <h1>🧠 认知功能专业评估</h1>
-                <div class="subtitle">20题自测 · 关注脑健康</div>
+                <div class="subtitle">20题自测 · 满分100分</div>
                 <button class="btn btn-primary" onclick="startTest()">开始评估</button>
-                <div class="footer-note">每题请根据近3个月真实感受选择，选后自动跳转</div>
+                <div class="footer-note">每题根据真实感受选择，选后自动跳转，可返回修改</div>
             </div>
         `;
     }
     
     function renderResult() {
-        const score = getTotalScore();
-        const risk = getRiskLevel(score);
+        const percentScore = getPercentageScore();
+        const rawScore = getTotalRawScore();
+        const risk = getRiskLevel(percentScore);
         const tipsHtml = commonTips.map(t => `<li>${t}</li>`).join('');
         return `
             <div class="card">
                 <h1>📋 评估结果</h1>
                 <div class="score-circle">
-                    <div class="score-number">${score}</div>
-                    <div style="font-size:12px; color:#64748b;">总分 (0-60)</div>
+                    <div class="score-number">${percentScore}</div>
+                    <div class="score-max">/ 100 分</div>
                 </div>
                 <div class="risk-level ${risk.class}">${risk.name}</div>
-                <div class="result-desc">${risk.desc}</div>
+                <div class="result-desc">
+                    <strong>原始总分: ${rawScore} / 60</strong><br>
+                    ${risk.desc}
+                </div>
                 <div class="suggest-box">
                     <div class="suggest-title">💡 通用健康建议</div>
                     <ul class="suggest-list">${tipsHtml}</ul>
@@ -740,7 +730,7 @@
                         生成分享海报
                     </button>
                 </div>
-                <div class="footer-note">自测结果仅供参考，请遵专业医师诊断</div>
+                <div class="footer-note">满分100分，分数越高风险越高，请遵专业医师诊断</div>
             </div>
         `;
     }
