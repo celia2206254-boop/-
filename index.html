@@ -24,6 +24,7 @@
         .btn-primary { background: #0f6e3f; color: white; width: 100%; padding: 18px 16px; font-size: 17px; font-weight: 700; border-radius: 60px; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(15,110,63,0.28); }
         .btn-primary:active { background: #0a5833; transform: scale(0.97);}
         .btn-outline { background: white; border: 1.5px solid #0f6e3f; color: #0f6e3f; font-weight: 600; padding: 14px 18px; border-radius: 60px; width: 100%; cursor: pointer; font-size: 15px; }
+        .btn-secondary { background: #eef2f7; color: #1e293b; font-weight: 600; padding: 12px 18px; border-radius: 40px; width: 100%; cursor: pointer; font-size: 14px; border: none; margin-top: 12px; }
         .device-showcase { background: linear-gradient(110deg, #ffffff 0%, #f8fdf9 100%); border-radius: 36px; margin: 16px; padding: 24px 22px; border: 0.5px solid #dde9e2; }
         .device-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .device-title { font-size: 22px; font-weight: 720; display: flex; align-items: center; gap: 10px; }
@@ -45,13 +46,20 @@
         .share-buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn-share { flex: 1; background: #0f6e3f; color: white; border: none; border-radius: 60px; padding: 12px; font-weight: 600; cursor: pointer; }
         .auth-form { display: flex; flex-direction: column; gap: 16px; }
-        .auth-input { padding: 16px; border: 1.5px solid #e2e8f0; border-radius: 60px; font-size: 16px; width: 100%; }
+        .auth-input, .profile-input, .profile-select { padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 60px; font-size: 16px; width: 100%; background: white; }
         .auth-switch { text-align: center; margin-top: 16px; color: #0f6e3f; cursor: pointer; }
         .footer-links { text-align: center; font-size: 12px; color: #7a98b5; padding: 24px 16px 32px; border-top: 0.5px solid #e6edf4; margin-top: 20px; }
         .faq-item { border-bottom: 1px solid #edf2f7; padding: 18px 0; }
         .faq-question { font-weight: 680; display: flex; justify-content: space-between; cursor: pointer; font-size: 17px; }
         .faq-answer { font-size: 15px; color: #557da5; padding-top: 12px; display: none; }
         .faq-answer.show { display: block; }
+        .history-item { background: #f8fafc; border-radius: 20px; padding: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .history-score { font-size: 24px; font-weight: 800; color: #0f6e3f; }
+        .history-date { font-size: 12px; color: #94a3b8; }
+        .edit-icon { background: none; border: none; font-size: 18px; cursor: pointer; padding: 6px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eef2f7; }
+        .info-label { font-weight: 600; color: #475569; }
+        .info-value { color: #1e293b; }
     </style>
 </head>
 <body>
@@ -67,20 +75,22 @@
 
 <script>
     (function() {
-        // ========== Supabase 配置 ==========
+        // Supabase 配置
         const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // ========== 全局状态 ==========
+        // 全局状态
         let _currentUser = null;
         let _currentTab = "home";
         let _quizActive = false;
         let _answers = new Array(20).fill(null);
         let _currentIndex = 0;
         let _authMode = "login";
+        let _isEditing = false;
+        let _userProfile = { gender: '', age: null };
         
-        // ========== 问卷数据 ==========
+        // 问卷数据
         const QUESTIONS = [
             "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？",
             "是否忘记约定或日期？", "是否记不住最近发生的事？", "是否常搞不清今天星期几？",
@@ -99,7 +109,6 @@
         const MAX_RAW = 60;
         const SHARE_URL = "https://www.renzhiceshi.online/";
         
-        // ========== 辅助函数 ==========
         function showToast(msg) {
             const toast = document.getElementById('toastMsg');
             if (!toast) return;
@@ -121,21 +130,59 @@
             if(score <= 50) return { name:'中风险', class:'risk-mid', desc:'存在一定认知下降倾向，建议加强脑力活动并定期复查。' };
             return { name:'高风险', class:'risk-high', desc:'认知功能需引起关注，建议加强日常监测。' };
         }
+        function getRiskText(score) {
+            if(score <= 25) return '低风险';
+            if(score <= 50) return '中风险';
+            return '高风险';
+        }
         function generateAI(percent) {
             if(percent <= 25) return "🤖 AI分析：您的认知功能整体表现良好，记忆与执行能力未见明显异常。";
             if(percent <= 50) return "🤖 AI提示：存在轻度认知功能波动，尤其是在近期记忆或定向方面。";
             return "🤖 AI预警：认知功能下降风险显著，多个维度出现异常信号。";
         }
         
-        // ========== 数据库操作 ==========
+        // 数据库操作
+        async function loadUserProfile() {
+            if (!_currentUser) return;
+            try {
+                const { data } = await _supabase.from('profiles').select('gender, age').eq('id', _currentUser.id).single();
+                if (data) {
+                    _userProfile.gender = data.gender || '';
+                    _userProfile.age = data.age || null;
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function updateUserProfile(gender, age) {
+            if (!_currentUser) return;
+            try {
+                await _supabase.from('profiles').upsert({ 
+                    id: _currentUser.id, 
+                    email: _currentUser.email,
+                    gender: gender,
+                    age: age ? parseInt(age) : null
+                });
+                _userProfile.gender = gender;
+                _userProfile.age = age;
+                showToast("资料已更新");
+                render();
+            } catch(e) { showToast("更新失败"); }
+        }
+        
         async function saveScoreToSupabase(score) {
             if (!_currentUser) return;
+            const riskText = getRiskText(score);
             try {
                 await _supabase.from('profiles').upsert({ 
                     id: _currentUser.id, 
                     email: _currentUser.email, 
                     cognitive_score: score,
                     updated_at: new Date().toISOString()
+                });
+                await _supabase.from('assessment_history').insert({
+                    user_id: _currentUser.id,
+                    score: score,
+                    risk_level: riskText
                 });
             } catch(e) { console.error(e); }
         }
@@ -148,7 +195,18 @@
             } catch(e) { return null; }
         }
         
-        // ========== 页面渲染函数 ==========
+        async function loadAssessmentHistory() {
+            if (!_currentUser) return [];
+            try {
+                const { data } = await _supabase.from('assessment_history')
+                    .select('score, risk_level, created_at')
+                    .eq('user_id', _currentUser.id)
+                    .order('created_at', { ascending: false });
+                return data || [];
+            } catch(e) { return []; }
+        }
+        
+        // 页面渲染
         function renderAuth() {
             return `<div class="card" style="margin-top:40px;"><h2 style="text-align:center; margin-bottom:28px;">${_authMode === 'login' ? '登录' : '注册'}</h2>
             <div class="auth-form"><input type="email" id="authEmail" class="auth-input" placeholder="邮箱"><input type="password" id="authPassword" class="auth-input" placeholder="密码（至少6位）"><button class="btn-primary" id="authSubmitBtn">${_authMode === 'login' ? '登录' : '注册'}</button></div>
@@ -170,12 +228,70 @@
             <button class="btn-primary" id="deviceContactBtn" style="margin-top:20px;">查看详情 →</button></div></div>`;
         }
         
-        function renderProfile() {
+        async function renderProfile() {
             if (!_currentUser) return renderAuth();
-            return `<div class="card" style="margin-top:20px;"><div style="display:flex; justify-content:space-between; align-items:center;"><div><h3>我的健康档案</h3><p>${_currentUser.email}</p></div><button id="logoutProfileBtn" style="background:#f0f0f0; border:none; border-radius:30px; padding:8px 16px;">退出</button></div>
-            <div id="historyScoreArea" style="background:#f0f9f4; border-radius:28px; padding:20px; margin-top:20px; text-align:center;"><div>最近一次评估分数</div><div id="historyScoreValue" style="font-size:48px; font-weight:800; color:#0f6e3f;">--</div></div>
-            <button class="btn-outline" id="historyTestBtn" style="margin-top:20px;">📋 重新认知评估</button></div>
-            <div class="card"><h3>❓ 常见问题</h3><div class="faq-item"><div class="faq-question">问卷准吗？<span>▼</span></div><div class="faq-answer">可作为家庭自测参考，不能替代医院诊断。</div></div></div>
+            
+            await loadUserProfile();
+            const latestScore = await loadUserScore();
+            const historyList = await loadAssessmentHistory();
+            
+            let historyHtml = '<h3 style="margin-bottom:16px;">📊 历史评估报告</h3>';
+            if (historyList.length === 0) {
+                historyHtml += '<p style="color:#94a3b8; text-align:center; padding:20px;">暂无评估记录，去做一次测试吧~</p>';
+            } else {
+                for (let item of historyList) {
+                    const date = new Date(item.created_at);
+                    const dateStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2,'0')}`;
+                    historyHtml += `
+                        <div class="history-item">
+                            <div>
+                                <div class="history-score">${item.score} 分</div>
+                                <div class="history-date">${dateStr}</div>
+                            </div>
+                            <div style="color:${item.score<=25?'#10b981':item.score<=50?'#f59e0b':'#ef4444'}; font-weight:600;">${item.risk_level}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            if (_isEditing) {
+                return `<div class="card" style="margin-top:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3>编辑个人资料</h3>
+                        <button class="edit-icon" id="cancelEditBtn">✖️</button>
+                    </div>
+                    <div class="auth-form">
+                        <input type="text" id="editGender" class="profile-input" placeholder="性别（男/女）" value="${_userProfile.gender || ''}">
+                        <input type="number" id="editAge" class="profile-input" placeholder="年龄" value="${_userProfile.age || ''}">
+                        <button class="btn-primary" id="saveProfileBtn">保存修改</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>📊 历史评估报告</h3>
+                    ${historyHtml}
+                    <button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button>
+                </div>
+                <div class="footer-links"><a href="#">免责声明</a> | <a href="#">隐私政策</a> | <a href="mailto:celia2206254@gmail.com">联系方式</a></div>`;
+            }
+            
+            return `<div class="card" style="margin-top:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <div><h3>我的健康档案</h3><p style="color:#94a3b8; font-size:14px;">${_currentUser.email}</p></div>
+                    <div><button id="logoutProfileBtn" style="background:#f0f0f0; border:none; border-radius:30px; padding:8px 16px; margin-right:8px;">退出</button><button id="editProfileBtn" class="edit-icon" style="background:#eef2f7; border-radius:30px; padding:8px 16px;">✏️ 编辑</button></div>
+                </div>
+                <div class="info-row"><span class="info-label">性别</span><span class="info-value">${_userProfile.gender || '未设置'}</span></div>
+                <div class="info-row"><span class="info-label">年龄</span><span class="info-value">${_userProfile.age || '未设置'}</span></div>
+                <div class="info-row"><span class="info-label">最近评估分数</span><span class="info-value" style="font-weight:800; color:#0f6e3f;">${latestScore !== null ? latestScore + ' 分' : '暂无'}</span></div>
+            </div>
+            <div class="card">
+                <h3>📊 历史评估报告</h3>
+                ${historyHtml}
+                <button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button>
+            </div>
+            <div class="card"><h3>❓ 常见问题</h3>
+                <div class="faq-item"><div class="faq-question">问卷准吗？<span>▼</span></div><div class="faq-answer">可作为家庭自测参考，不能替代医院诊断。</div></div>
+                <div class="faq-item"><div class="faq-question">数据安全吗？<span>▼</span></div><div class="faq-answer">您的数据经过加密存储，只有您自己可以查看。</div></div>
+            </div>
             <div class="footer-links"><a href="#">免责声明</a> | <a href="#">隐私政策</a> | <a href="mailto:celia2206254@gmail.com">联系方式</a></div>`;
         }
         
@@ -196,41 +312,28 @@
             <div class="share-buttons"><button class="btn-share" id="shareImageBtn">📸 生成图片</button><button class="btn-share" id="shareUrlBtn">🔗 分享网址</button></div><button class="btn-outline" id="restartQuizBtn">重新测试</button></div>`;
         }
         
-        // ========== 主渲染 ==========
-        function render() {
+        async function render() {
             const container = document.getElementById('mainContent');
             if (!container) return;
             let content = "";
             if (_quizActive) content = renderQuiz();
             else if (_currentTab === 'home') content = renderHome();
             else if (_currentTab === 'device') content = renderDevice();
-            else if (_currentTab === 'profile') content = renderProfile();
+            else if (_currentTab === 'profile') content = await renderProfile();
             else if (_currentTab === 'result') content = renderResult();
             else content = renderHome();
             container.innerHTML = content;
             
-            // 高亮底部导航
             document.querySelectorAll('.nav-item').forEach(item => {
                 const val = item.getAttribute('data-tab');
                 if ((_currentTab === val) || (_currentTab === 'result' && val==='home')) item.classList.add('active');
                 else item.classList.remove('active');
             });
             
-            // 绑定事件
             bindEvents();
-            
-            // 如果是profile页面且有用户，加载历史分数
-            if (_currentTab === 'profile' && _currentUser) {
-                loadUserScore().then(score => {
-                    const scoreEl = document.getElementById('historyScoreValue');
-                    if (scoreEl) scoreEl.innerText = score !== null ? score : '暂无';
-                });
-            }
         }
         
-        // ========== 事件绑定 ==========
         function bindEvents() {
-            // 首页按钮
             document.getElementById('startFreeEvalBtn')?.addEventListener('click', () => { _quizActive = true; _currentIndex = 0; _answers = new Array(20).fill(null); render(); });
             document.getElementById('gotoDeviceFromHome')?.addEventListener('click', () => { _currentTab = 'device'; render(); });
             document.getElementById('deviceContactBtn')?.addEventListener('click', () => showToast("请联系客服 400-882-6625"));
@@ -238,7 +341,6 @@
             document.getElementById('restartQuizBtn')?.addEventListener('click', () => { _quizActive = true; _currentIndex = 0; _answers = new Array(20).fill(null); render(); });
             document.getElementById('quizPrevBtn')?.addEventListener('click', () => { if(_currentIndex > 0) { _currentIndex--; render(); } });
             
-            // 分享功能
             document.getElementById('shareImageBtn')?.addEventListener('click', async () => { 
                 const el = document.getElementById('reportCaptureArea'); 
                 if(el){ 
@@ -252,12 +354,20 @@
             });
             document.getElementById('shareUrlBtn')?.addEventListener('click', () => { navigator.clipboard.writeText(SHARE_URL); showToast("网址已复制"); });
             
-            // 登出
             document.getElementById('logoutHomeBtn')?.addEventListener('click', () => window.logout());
             document.getElementById('logoutProfileBtn')?.addEventListener('click', () => window.logout());
             document.getElementById('gotoAuthBtn')?.addEventListener('click', () => { _currentTab = 'profile'; render(); });
+            document.getElementById('editProfileBtn')?.addEventListener('click', () => { _isEditing = true; render(); });
+            document.getElementById('cancelEditBtn')?.addEventListener('click', () => { _isEditing = false; render(); });
             
-            // 认证相关
+            document.getElementById('saveProfileBtn')?.addEventListener('click', async () => {
+                const gender = document.getElementById('editGender')?.value || '';
+                const age = document.getElementById('editAge')?.value || '';
+                await updateUserProfile(gender, age);
+                _isEditing = false;
+                render();
+            });
+            
             const authSubmit = document.getElementById('authSubmitBtn');
             if(authSubmit) {
                 authSubmit.onclick = async () => {
@@ -287,53 +397,4 @@
             const authSwitch = document.getElementById('authSwitchBtn');
             if(authSwitch) authSwitch.onclick = () => { _authMode = _authMode === 'login' ? 'register' : 'login'; render(); };
             
-            // FAQ折叠
-            document.querySelectorAll('.faq-question').forEach(q => {
-                q.onclick = () => { q.nextElementSibling?.classList.toggle('show'); };
-            });
-        }
-        
-        // ========== 全局函数 ==========
-        window.selectAnswer = (score) => {
-            if(!_quizActive) return;
-            _answers[_currentIndex] = score;
-            if(_currentIndex + 1 < QUESTIONS.length) {
-                _currentIndex++;
-                render();
-            } else {
-                const finalScore = getPercentScore();
-                _quizActive = false;
-                _currentTab = 'result';
-                if(_currentUser) saveScoreToSupabase(finalScore);
-                render();
-            }
-        };
-        
-        window.logout = async function() {
-            await _supabase.auth.signOut();
-            _currentUser = null;
-            render();
-        };
-        
-        // ========== 初始化 ==========
-        async function init() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (user) _currentUser = user;
-            render();
-            
-            // 底部导航
-            document.querySelectorAll('.nav-item').forEach(nav => {
-                nav.addEventListener('click', () => {
-                    const tab = nav.getAttribute('data-tab');
-                    if(tab === 'home') { _quizActive = false; _currentTab = 'home'; render(); }
-                    else if(tab === 'device') { _quizActive = false; _currentTab = 'device'; render(); }
-                    else if(tab === 'profile') { _quizActive = false; _currentTab = 'profile'; render(); }
-                });
-            });
-        }
-        
-        init();
-    })();
-</script>
-</body>
-</html>
+            document.querySelectorAll('.faq-question').forEach(q =>
