@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>认知功能自测 - 健康评估</title>
+    <title>认知功能专业自测 - 健康评估</title>
+    <html xmlns="http://www.w3.org/1999/xhtml">
     <style>
         * {
             margin: 0;
@@ -22,30 +23,31 @@
         }
 
         .container {
-            max-width: 500px;
+            max-width: 550px;
             width: 100%;
             margin: 0 auto;
         }
 
         .card {
             background: white;
-            border-radius: 24px;
-            padding: 32px 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 28px;
+            padding: 28px 22px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 26px;
             text-align: center;
-            margin-bottom: 8px;
-            color: #000000;
+            margin-bottom: 6px;
+            color: #1e293b;
         }
 
         .subtitle {
             text-align: center;
-            color: #555555;
+            color: #5b6e8c;
             font-size: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .btn {
@@ -53,7 +55,7 @@
             width: 100%;
             padding: 14px;
             border: none;
-            border-radius: 40px;
+            border-radius: 60px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
@@ -62,38 +64,38 @@
         }
 
         .btn-primary {
-            background: #10b981;
+            background: #0f6e3f;
             color: white;
+            box-shadow: 0 2px 6px rgba(15,110,63,0.2);
         }
-        .btn-primary:active { background: #0e9f6e; transform: scale(0.98); }
+        .btn-primary:active { background: #0a5833; transform: scale(0.97); }
 
         .btn-secondary {
-            background: #64748b;
+            background: #475569;
             color: white;
         }
-        .btn-secondary:active { background: #556579; transform: scale(0.98); }
+        .btn-secondary:active { background: #334155; transform: scale(0.97); }
 
         .btn-outline {
             background: white;
-            color: #10b981;
-            border: 1px solid #10b981;
+            color: #0f6e3f;
+            border: 1.5px solid #0f6e3f;
             margin-top: 12px;
         }
-        .btn-outline:active { background: #eef9f2; transform: scale(0.98); }
+        .btn-outline:active { background: #eef9f2; transform: scale(0.97); }
 
-        /* 分享按钮样式 - 独立设计 */
-        .btn-share-report {
+        .btn-share-link {
             background: #3b82f6;
             color: white;
-            margin-top: 12px;
+            margin-top: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
-        .btn-share-report:active { background: #2563eb; transform: scale(0.98); }
+        .btn-share-link:active { background: #2563eb; transform: scale(0.97); }
         
-        .btn-share-url {
+        .btn-share-poster {
             background: #8b5cf6;
             color: white;
             margin-top: 8px;
@@ -102,175 +104,256 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn-share-url:active { background: #7c3aed; transform: scale(0.98); }
+        .btn-share-poster:active { background: #7c3aed; transform: scale(0.97); }
         
-        .btn-share-report svg, .btn-share-url svg {
+        .btn-icon-svg {
             width: 18px;
             height: 18px;
             fill: white;
         }
 
-        .question-number {
-            text-align: center;
-            font-size: 14px;
-            color: #10b981;
-            font-weight: 600;
-            margin-bottom: 8px;
+        /* 进度区域 */
+        .quiz-header {
+            margin-bottom: 24px;
         }
-
+        .question-counter {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f6e3f;
+            background: #e6f7ef;
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 40px;
+            margin-bottom: 12px;
+            width: auto;
+        }
         .progress-bar {
             width: 100%;
-            height: 4px;
+            height: 6px;
             background: #e2e8f0;
-            border-radius: 4px;
-            margin-bottom: 32px;
+            border-radius: 10px;
+            margin: 12px 0 8px;
             overflow: hidden;
         }
-
         .progress-fill {
             height: 100%;
-            background: #10b981;
-            border-radius: 4px;
+            background: #0f6e3f;
+            border-radius: 10px;
             transition: width 0.3s ease;
         }
 
         .question-text {
-            font-weight: 600;
-            font-size: 20px;
-            color: #000000;
-            margin-bottom: 32px;
+            font-weight: 700;
+            font-size: 22px;
+            color: #0f172a;
+            margin: 24px 0 28px;
             line-height: 1.4;
             text-align: center;
+            padding: 0 4px;
         }
 
         .options {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
-
         .option-btn {
-            padding: 14px 16px;
+            padding: 15px 18px;
             border: 1px solid #cbd5e1;
-            border-radius: 48px;
+            border-radius: 60px;
             background: white;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            color: #000000;
+            color: #1e293b;
             transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .option-btn .score-badge {
+            background: #f1f5f9;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
         }
         .option-btn.selected {
-            background: #10b981;
-            border-color: #10b981;
+            background: #0f6e3f;
+            border-color: #0f6e3f;
             color: white;
         }
-        .option-btn:active { transform: scale(0.98); background: #f1f5f9; }
-        .option-btn.selected:active { background: #0e9f6e; }
+        .option-btn.selected .score-badge {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+        .option-btn:active { transform: scale(0.98); background: #f8fafc; }
+        .option-btn.selected:active { background: #0a5833; }
 
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .nav-btn {
+            flex: 1;
+            background: #f1f5f9;
+            border: none;
+            padding: 12px;
+            border-radius: 44px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #334155;
+        }
+        .nav-btn:active { background: #e2e8f0; }
+
+        /* 结果页 */
         .score-circle {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             background: #f1f5f9;
-            margin: 0 auto 16px;
+            margin: 10px auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
         .score-number {
-            font-size: 36px;
-            font-weight: bold;
-            color: #000000;
+            font-size: 42px;
+            font-weight: 800;
+            color: #0f172a;
         }
-
         .risk-level {
             text-align: center;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
-
-        .risk-normal { color: #10b981; }
-        .risk-mild { color: #f59e0b; }
-        .risk-moderate { color: #f97316; }
+        .risk-low { color: #10b981; }
+        .risk-mid { color: #f59e0b; }
         .risk-high { color: #ef4444; }
-
         .result-desc {
-            text-align: center;
-            color: #000000;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .ai-box {
-            background: #ecfdf5;
+            background: #f8fafc;
             padding: 16px;
-            border-radius: 16px;
+            border-radius: 24px;
             margin: 20px 0;
-            border-left: 4px solid #10b981;
-        }
-
-        .ai-title {
-            font-weight: 600;
-            color: #000000;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .ai-text {
-            font-size: 14px;
-            color: #000000;
             line-height: 1.5;
+            color: #1e293b;
         }
-
-        /* 分享反馈toast提示 */
+        .suggest-box {
+            background: #eef2ff;
+            padding: 18px;
+            border-radius: 24px;
+            margin: 20px 0;
+            border-left: 5px solid #3b82f6;
+        }
+        .suggest-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .suggest-list {
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .suggest-list li {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
         .toast-msg {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%) scale(0.9);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             color: white;
             padding: 10px 20px;
-            border-radius: 40px;
+            border-radius: 50px;
             font-size: 14px;
-            font-weight: 500;
             opacity: 0;
-            transition: opacity 0.2s, transform 0.2s;
+            transition: 0.2s;
             pointer-events: none;
-            z-index: 1000;
+            z-index: 2000;
             white-space: nowrap;
-            max-width: 90%;
-            white-space: normal;
-            text-align: center;
         }
         .toast-msg.show {
             opacity: 1;
             transform: translateX(-50%) scale(1);
         }
-
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        /* 底部小字 */
         .footer-note {
+            font-size: 11px;
+            text-align: center;
+            color: #94a3b8;
             margin-top: 16px;
-            font-size: 12px;
-            text-align: center;
-            color: #aaa;
         }
-        
-        .divider-text {
+
+        /* 海报遮罩 */
+        .poster-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+        .poster-card {
+            background: white;
+            border-radius: 32px;
+            max-width: 340px;
+            width: 100%;
             text-align: center;
+            padding: 24px 20px 30px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .poster-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .poster-qr {
+            margin: 16px auto;
+            width: 140px;
+            height: 140px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
             font-size: 12px;
-            color: #bbb;
-            margin: 4px 0;
+            color: #475569;
+        }
+        .btn-download {
+            background: #0f6e3f;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            margin-top: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -278,27 +361,42 @@
 <div class="container" id="app"></div>
 
 <script>
-    // 当前页面的完整URL（用于分享）
-    const CURRENT_URL = window.location.href;
-    
+    // ---------- 20题问卷内容 ----------
     const questions = [
-        "你是否经常忘记刚发生的事情？",
-        "你是否会重复问同一个问题？",
-        "你是否会搞不清日期或时间？",
-        "你是否在熟悉地方迷路？",
-        "你是否容易分心？",
-        "你做简单计算是否困难？",
-        "你做日常事情是否变困难？",
-        "你是否做出不太合理的决定？"
+        "最近是否经常忘记刚说过的话？",
+        "是否常忘记东西放在哪里？",
+        "是否重复询问同一件事？",
+        "是否忘记约定或日期？",
+        "是否记不住最近发生的事？",
+        "是否常搞不清今天星期几？",
+        "是否分不清月份或季节？",
+        "是否去熟悉地方也容易迷路？",
+        "是否常叫不出熟悉物品名称？",
+        "说话时是否常卡住找词？",
+        "是否表达内容混乱？",
+        "是否听不懂复杂说明？",
+        "是否不会使用熟悉家电？",
+        "是否缴费、算账变困难？",
+        "是否做饭步骤容易混乱？",
+        "是否需要别人提醒洗澡吃药？",
+        "是否脾气变化明显？",
+        "是否变得多疑敏感？",
+        "是否兴趣明显下降？",
+        "是否社交意愿下降？"
     ];
-
-    const optionLabels = ["从不", "偶尔", "经常"];
-
-    let currentPage = 'home';
+    
+    const optionScores = [
+        { label: "无异常", value: 0 },
+        { label: "偶尔出现", value: 1 },
+        { label: "经常出现", value: 2 },
+        { label: "明显频繁", value: 3 }
+    ];
+    
+    let currentPage = 'home'; // home, quiz, result
     let currentIndex = 0;
-    let answers = new Array(8).fill(null);
-    let aiText = '';
-
+    let answers = new Array(20).fill(null);
+    
+    // 总分 & 风险
     function getTotalScore() {
         let sum = 0;
         for (let i = 0; i < answers.length; i++) {
@@ -306,324 +404,304 @@
         }
         return sum;
     }
-
-    function getLevel(score) {
-        if (score <= 3) return { name: '正常', class: 'risk-normal' };
-        if (score <= 7) return { name: '轻度风险', class: 'risk-mild' };
-        if (score <= 11) return { name: '中度风险', class: 'risk-moderate' };
-        return { name: '高风险', class: 'risk-high' };
-    }
-
-    function getResultText(score) {
-        if (score <= 3) return "认知功能正常，建议保持良好生活习惯。";
-        if (score <= 7) return "存在轻度风险，建议注意休息与观察。";
-        if (score <= 11) return "存在中度风险，建议进行专业评估。";
-        return "存在较高风险，建议尽快就医检查。";
-    }
-
-    function generateAIText(score) {
-        if (score <= 3) {
-            return "您的认知功能表现正常，各项指标均在健康范围内。请继续保持规律作息和适度锻炼，关爱大脑健康。";
-        } else if (score <= 7) {
-            return "您的测试结果提示存在轻度认知风险。建议您保证充足睡眠，减少压力，适当进行记忆训练，并定期观察。";
-        } else if (score <= 11) {
-            return "您的测试结果提示存在中度认知风险。建议您尽快咨询专业医生，进行进一步评估和干预。";
-        } else {
-            return "您的检查结果存在多项显著异常，提示健康风险较高。请务必携带完整报告，尽快至正规医院相关科室就诊，进行全面评估与干预。";
-        }
-    }
-
-    // ================= 独立分享功能 =================
-    // 1. 生成完整报告（包含分数、等级、解读、AI建议）不携带网址也可，但为了完整保留内容合理，让报告不含网址单独为报告分享；但是为了满足用户可能也希望报告里带链接？我们分开: 分享报告 = 详细报告文本（不含网址），分享网址 = 仅分享当前测试链接。
-    // 根据用户要求“分享网址可以点击直接分享，不要生成网址的形式”，意思是点击分享网址就直接分享当前页面链接(纯URL)，不需要再生成带文字的报告；分享报告则分享详细评估结果。
-    function generateFullReportText() {
-        const score = getTotalScore();
-        const level = getLevel(score);
-        const resultDesc = getResultText(score);
-        const aiFullText = aiText;
-        
-        const report = `📊 认知功能自测报告
-━━━━━━━━━━━━━━━━
-📈 总分：${score} 分
-⚠️ 风险等级：${level.name}
-📝 结果简述：${resultDesc}
-
-🧠 AI健康解读：
-${aiFullText}
-
-━━━━━━━━━━━━━━━━
-*本报告仅用于个人健康参考，不构成医疗诊断。`;
-        
-        return report;
+    
+    function getRiskLevel(score) {
+        if (score <= 15) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
+        if (score <= 30) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
+        return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
     }
     
-    // 显示提示小弹窗
-    function showToast(message, duration = 2000) {
-        let toastEl = document.getElementById('global-toast');
-        if (!toastEl) {
-            toastEl = document.createElement('div');
-            toastEl.id = 'global-toast';
-            toastEl.className = 'toast-msg';
-            document.body.appendChild(toastEl);
+    // 统一建议列表
+    const commonTips = [
+        "🏃 每周运动3次以上",
+        "😴 保持规律睡眠",
+        "❤️ 控制血压血糖血脂",
+        "👥 多社交、多交流",
+        "📚 每日阅读或记忆训练",
+        "🏥 若持续加重请及时就医"
+    ];
+    
+    // 当前页面URL
+    const CURRENT_URL = window.location.href;
+    
+    // 显示toast
+    function showToast(msg, duration = 2000) {
+        let toast = document.getElementById('global-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'global-toast';
+            toast.className = 'toast-msg';
+            document.body.appendChild(toast);
         }
-        toastEl.textContent = message;
-        toastEl.classList.add('show');
-        setTimeout(() => {
-            toastEl.classList.remove('show');
-        }, duration);
-    }
-
-    // 分享报告（完整评估结果，无网址）
-    async function handleShareReport() {
-        const fullReport = generateFullReportText();
-        
-        // 优先使用 Web Share API (移动端可以分享文本)
-        if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            try {
-                await navigator.share({
-                    title: '认知功能自测报告',
-                    text: fullReport,
-                });
-                showToast('报告分享成功 ✓', 1500);
-                return;
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.warn('分享失败:', err);
-                    fallbackCopyReportText(fullReport);
-                }
-                return;
-            }
-        }
-        
-        // 桌面端或不支持分享API: 复制报告内容
-        fallbackCopyReportText(fullReport);
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), duration);
     }
     
-    // 复制报告文本
-    async function fallbackCopyReportText(text) {
-        try {
-            await navigator.clipboard.writeText(text);
-            showToast('✅ 完整报告已复制，可粘贴分享', 2000);
-        } catch (err) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast('✅ 报告已复制到剪贴板', 1800);
-        }
-    }
-    
-    // 分享网址（直接分享当前测试页面的URL，不要生成额外描述文字的形式，但为了体验，若原生分享可携带纯链接，但系统分享通常还可以追加简短说明；为了符合“不要生成网址的形式”，指不要像以前生成一段带网址的长文本，而是只分享链接本身）
-    // 实现两个逻辑：移动端通过 share 分享 url 字段；桌面端点击复制纯链接到剪贴板。
-    async function handleShareUrl() {
-        // 移动端优先使用 Web Share API，分享纯URL
+    // 分享链接 (纯URL)
+    async function shareUrl() {
         if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             try {
                 await navigator.share({
                     title: '认知功能自测',
-                    text: '分享一个认知健康自测工具',
+                    text: '测一下认知健康状态',
                     url: CURRENT_URL,
                 });
-                showToast('链接分享成功 ✓', 1500);
+                showToast('分享成功 ✓');
                 return;
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    // 降级复制链接
-                    fallbackCopyUrl();
-                }
-                return;
-            }
+            } catch(e) { if(e.name !== 'AbortError') fallbackCopyUrl(); }
+        } else {
+            fallbackCopyUrl();
         }
-        // 桌面端或无分享api：复制纯链接到剪贴板
-        fallbackCopyUrl();
     }
-    
-    // 复制纯网址
     async function fallbackCopyUrl() {
         try {
             await navigator.clipboard.writeText(CURRENT_URL);
-            showToast('🔗 链接已复制，可发送给好友', 1800);
-        } catch (err) {
-            const textarea = document.createElement('textarea');
-            textarea.value = CURRENT_URL;
-            document.body.appendChild(textarea);
-            textarea.select();
+            showToast('🔗 链接已复制，可分享给好友');
+        } catch(e) {
+            let ta = document.createElement('textarea');
+            ta.value = CURRENT_URL;
+            document.body.appendChild(ta);
+            ta.select();
             document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast('🔗 链接已复制', 1500);
+            document.body.removeChild(ta);
+            showToast('🔗 链接已复制');
         }
     }
     
-    // 可选: 单独的“复制报告”备用接口
-    // ================= 分享功能结束 =================
-
-    function selectAnswer(value) {
-        answers[currentIndex] = value;
+    // 生成海报 (简单版模拟截图样式，使用html2canvas需要额外库？纯前端简易实现canvas生成图片)
+    // 为了满足可选海报功能，我们用html2canvas？为了稳定且不依赖外部，采用动态生成canvas绘制简单风格海报。为了高兼容，不使用外部库，手动绘制canvas海报。
+    async function generatePoster() {
+        const score = getTotalScore();
+        const level = getRiskLevel(score);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 500;
+        canvas.height = 700;
+        // 背景
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // 标题装饰
+        ctx.fillStyle = '#0f6e3f';
+        ctx.fillRect(0, 0, canvas.width, 12);
+        ctx.font = 'bold 26px "PingFang SC", "Segoe UI"';
+        ctx.fillStyle = '#1e293b';
+        ctx.fillText('认知功能自测报告', 40, 70);
+        ctx.font = '16px system-ui';
+        ctx.fillStyle = '#5b6e8c';
+        ctx.fillText('健康评估·早期关注', 40, 110);
         
-        if (currentIndex === questions.length - 1) {
-            const score = getTotalScore();
-            aiText = generateAIText(score);
-            currentPage = 'result';
+        // 分数圆
+        ctx.beginPath();
+        ctx.arc(250, 190, 55, 0, 2 * Math.PI);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 44px monospace';
+        ctx.fillText(score, 210, 208);
+        ctx.font = 'bold 18px system-ui';
+        ctx.fillStyle = level.class === 'risk-low' ? '#10b981' : (level.class === 'risk-mid' ? '#f59e0b' : '#ef4444');
+        ctx.fillText(level.name, 205, 250);
+        
+        // 描述
+        ctx.font = '15px system-ui';
+        ctx.fillStyle = '#334155';
+        ctx.fillText(level.desc.substring(0, 28)+'...', 50, 290);
+        
+        // 建议标题
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 18px system-ui';
+        ctx.fillText('📋 健康建议', 40, 340);
+        ctx.font = '14px system-ui';
+        ctx.fillStyle = '#475569';
+        let tipsY = 375;
+        commonTips.forEach((tip, idx) => {
+            ctx.fillText(`${idx+1}. ${tip}`, 45, tipsY + idx*26);
+        });
+        
+        // 底部网址
+        ctx.font = '12px monospace';
+        ctx.fillStyle = '#6c757d';
+        let urlShort = CURRENT_URL.length > 40 ? CURRENT_URL.substring(0, 38)+'...' : CURRENT_URL;
+        ctx.fillText(urlShort, 45, 630);
+        ctx.fillStyle = '#aaa';
+        ctx.fillText('扫码或访问链接自测', 45, 660);
+        
+        // 模拟二维码文字块
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(380, 590, 80, 80);
+        ctx.fillStyle = '#334155';
+        ctx.font = '12px system-ui';
+        ctx.fillText('测一测', 410, 635);
+        
+        return canvas.toDataURL('image/png');
+    }
+    
+    async function showPosterModal() {
+        const imageData = await generatePoster();
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'poster-overlay';
+        modalDiv.innerHTML = `
+            <div class="poster-card">
+                <span class="poster-close" onclick="this.closest('.poster-overlay').remove()">&times;</span>
+                <div style="font-weight:bold; margin-bottom:8px;">📸 结果分享海报</div>
+                <img id="posterImg" src="${imageData}" style="width:100%; border-radius:20px; margin: 8px 0;" />
+                <button class="btn-download" id="downloadPosterBtn">保存图片 / 分享</button>
+                <div style="font-size:11px; margin-top:10px; color:#aaa;">长按或保存图片即可分享</div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        document.getElementById('downloadPosterBtn')?.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'cognitive_report.png';
+            link.href = imageData;
+            link.click();
+            showToast('海报已保存');
+        });
+    }
+    
+    // 问卷逻辑：选择答案
+    function selectAnswer(scoreVal) {
+        if (currentPage !== 'quiz') return;
+        answers[currentIndex] = scoreVal;
+        // 自动跳下一题
+        if (currentIndex + 1 < questions.length) {
+            currentIndex++;
             render();
         } else {
-            currentIndex++;
+            // 最后已完成所有题
+            currentPage = 'result';
             render();
         }
     }
-
+    
     function prevQuestion() {
         if (currentIndex > 0) {
             currentIndex--;
             render();
         }
     }
-
     function resetTest() {
-        answers = new Array(8).fill(null);
-        aiText = '';
+        answers = new Array(20).fill(null);
         currentIndex = 0;
         currentPage = 'home';
         render();
     }
-
     function startTest() {
+        answers = new Array(20).fill(null);
         currentIndex = 0;
-        answers = new Array(8).fill(null);
         currentPage = 'quiz';
         render();
     }
-
+    
+    // 渲染各页面
     function renderHome() {
         return `
             <div class="card">
-                <h1>🧠 认知功能自测</h1>
-                <div class="subtitle">关爱大脑健康 · 快速自评</div>
-                <button class="btn btn-primary" onclick="startTest()">开始测试</button>
-                <div class="footer-note">本测评仅参考，不代表最终诊断</div>
+                <h1>🧠 认知功能专业评估</h1>
+                <div class="subtitle">20题自测 · 关注脑健康</div>
+                <button class="btn btn-primary" onclick="startTest()">开始评估</button>
+                <div class="footer-note">每题请根据近3个月真实感受选择</div>
             </div>
         `;
     }
-
+    
     function renderQuiz() {
         const total = questions.length;
-        const current = currentIndex + 1;
-        const progressPercent = (currentIndex / total) * 100;
-        const currentQuestion = questions[currentIndex];
+        const currentQNumber = currentIndex + 1;
+        const progressPercent = ((currentIndex) / total) * 100;
+        const question = questions[currentIndex];
         const selectedVal = answers[currentIndex];
         
         let optionsHtml = '';
-        for (let i = 0; i < optionLabels.length; i++) {
-            const isSelected = (selectedVal === i);
+        for (let opt of optionScores) {
+            const isSelected = (selectedVal === opt.value);
             optionsHtml += `
-                <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${i})">
-                    ${optionLabels[i]}
+                <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">
+                    <span>${opt.label}</span>
+                    <span class="score-badge">${opt.value}分</span>
                 </button>
             `;
         }
         
-        const prevButton = currentIndex > 0 ? 
-            `<button class="btn btn-outline" onclick="prevQuestion()">← 上一题</button>` : '';
-        
+        const prevDisabled = currentIndex === 0 ? 'disabled style="opacity:0.5;"' : '';
         return `
             <div class="card">
-                <div class="question-number">第 ${current} / ${total} 题</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                <div class="quiz-header">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span class="question-counter">第 ${currentQNumber} / ${total} 题</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                    </div>
                 </div>
-                <div class="question-text">${escapeHtml(currentQuestion)}</div>
+                <div class="question-text">${escapeHtml(question)}</div>
                 <div class="options">
                     ${optionsHtml}
                 </div>
-                ${prevButton}
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="prevQuestion()" ${prevDisabled}>← 上一题</button>
+                </div>
+                <div class="footer-note" style="margin-top:20px;">请选择最符合的选项（单选）</div>
             </div>
         `;
     }
-
-    // 简单的防XSS
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    
     function renderResult() {
         const score = getTotalScore();
-        const level = getLevel(score);
-        const resultText = getResultText(score);
-        
+        const risk = getRiskLevel(score);
+        const tipsHtml = commonTips.map(t => `<li>${t}</li>`).join('');
         return `
             <div class="card">
-                <h1>📋 测试结果</h1>
-                
+                <h1>📋 评估结果</h1>
                 <div class="score-circle">
                     <div class="score-number">${score}</div>
+                    <div style="font-size:12px; color:#64748b;">总分 (0-60)</div>
                 </div>
+                <div class="risk-level ${risk.class}">${risk.name}</div>
+                <div class="result-desc">${risk.desc}</div>
                 
-                <div class="risk-level ${level.class}">
-                    风险等级：${level.name}
-                </div>
-                
-                <div class="result-desc">
-                    ${escapeHtml(resultText)}
-                </div>
-                
-                <div class="ai-box">
-                    <div class="ai-title">🩺 AI 医生解读：</div>
-                    <div class="ai-text">${escapeHtml(aiText)}</div>
+                <div class="suggest-box">
+                    <div class="suggest-title">💡 通用健康建议</div>
+                    <ul class="suggest-list">${tipsHtml}</ul>
                 </div>
                 
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
-                    
-                    <button class="btn btn-share-report" onclick="handleShareReport()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.05 4.11c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/>
-                        </svg>
-                        分享完整报告
-                    </button>
-                    
-                    <button class="btn btn-share-url" onclick="handleShareUrl()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-                            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
-                        </svg>
+                    <button class="btn btn-share-link" onclick="shareUrl()">
+                        <svg class="btn-icon-svg" viewBox="0 0 24 24" width="18" height="18"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.71-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
                         分享测评链接
                     </button>
+                    <button class="btn btn-share-poster" onclick="showPosterModal()">
+                        <svg class="btn-icon-svg" viewBox="0 0 24 24" width="18" height="18"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 8h-4v4h-4v-4H6V9h4V5h4v4h4v2z"/></svg>
+                        生成分享海报
+                    </button>
                 </div>
-                <div class="footer-note">点击「分享完整报告」可复制详细结果；点击「分享测评链接」直接分享本测试页面</div>
+                <div class="footer-note">自测结果仅供参考，请遵专业医师诊断</div>
             </div>
         `;
     }
-
+    
     function render() {
-        const appDiv = document.getElementById('app');
-        if (!appDiv) return;
-        
+        const app = document.getElementById('app');
+        if (!app) return;
         let html = '';
-        if (currentPage === 'home') {
-            html = renderHome();
-        } else if (currentPage === 'quiz') {
-            html = renderQuiz();
-        } else if (currentPage === 'result') {
-            html = renderResult();
-        }
-        
-        appDiv.innerHTML = html;
+        if (currentPage === 'home') html = renderHome();
+        else if (currentPage === 'quiz') html = renderQuiz();
+        else if (currentPage === 'result') html = renderResult();
+        app.innerHTML = html;
     }
-
-    // 将全局函数挂载到window，使onclick可调用
+    
+    // 全局函数挂载
     window.selectAnswer = selectAnswer;
     window.prevQuestion = prevQuestion;
     window.resetTest = resetTest;
     window.startTest = startTest;
-    window.handleShareReport = handleShareReport;
-    window.handleShareUrl = handleShareUrl;
-
+    window.shareUrl = shareUrl;
+    window.showPosterModal = showPosterModal;
+    
     render();
 </script>
 </body>
