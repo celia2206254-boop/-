@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>认知功能自测 - 仁智学校</title>
+    <title>认知功能自测</title>
     <style>
         * {
             margin: 0;
@@ -58,23 +58,44 @@
             font-weight: 600;
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s ease;
         }
 
         .btn-primary {
             background: #10b981;
             color: white;
         }
+        .btn-primary:active { background: #0e9f6e; transform: scale(0.98); }
 
         .btn-secondary {
             background: #64748b;
             color: white;
         }
+        .btn-secondary:active { background: #556579; transform: scale(0.98); }
 
         .btn-outline {
             background: white;
             color: #10b981;
             border: 1px solid #10b981;
             margin-top: 12px;
+        }
+        .btn-outline:active { background: #eef9f2; transform: scale(0.98); }
+
+        /* 分享按钮特有样式 */
+        .btn-share {
+            background: #3b82f6;
+            color: white;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-share:active { background: #2563eb; transform: scale(0.98); }
+        .btn-share svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
         }
 
         .question-number {
@@ -127,12 +148,13 @@
             color: #000000;
             transition: all 0.2s;
         }
-
         .option-btn.selected {
             background: #10b981;
             border-color: #10b981;
             color: white;
         }
+        .option-btn:active { transform: scale(0.98); background: #f1f5f9; }
+        .option-btn.selected:active { background: #0e9f6e; }
 
         .score-circle {
             width: 100px;
@@ -190,6 +212,36 @@
             font-size: 14px;
             color: #000000;
             line-height: 1.5;
+        }
+
+        /* 分享反馈toast提示 */
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
     </style>
 </head>
@@ -249,6 +301,80 @@
         }
     }
 
+    // ================= 分享功能核心实现 =================
+    // 显示提示小弹窗
+    function showToast(message, duration = 2000) {
+        let toastEl = document.getElementById('global-toast');
+        if (!toastEl) {
+            toastEl = document.createElement('div');
+            toastEl.id = 'global-toast';
+            toastEl.className = 'toast-msg';
+            document.body.appendChild(toastEl);
+        }
+        toastEl.textContent = message;
+        toastEl.classList.add('show');
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+        }, duration);
+    }
+
+    // 生成分享文本 (友好易读)
+    function generateShareText() {
+        const score = getTotalScore();
+        const level = getLevel(score);
+        const resultDesc = getResultText(score);
+        // 截取AI核心建议（取第一句）
+        let aiSummary = aiText.substring(0, aiText.indexOf('。') + 1);
+        if (aiSummary.length > 50) aiSummary = aiText.substring(0, 48) + '…';
+        
+        return `【仁智学校认知自测】我的认知功能评估：总分${score}分，风险等级：${level.name}。${resultDesc} ${aiSummary} (测试链接: 请访问仁智学校小程序或官网)`;
+    }
+
+    // 核心分享逻辑：优先使用 Web Share API，降级为复制文本
+    async function handleShareResult() {
+        const shareData = {
+            title: '认知功能自测结果 - 仁智学校',
+            text: generateShareText(),
+            url: window.location.href,   // 分享当前页面链接，方便他人打开测试
+        };
+        
+        // 检查是否支持 Web Share API (且是在安全上下文 HTTPS 或 localhost)
+        if (navigator.share && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            try {
+                await navigator.share(shareData);
+                showToast('分享成功 ✓', 1500);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.warn('分享取消或失败:', err);
+                    // 降级: 复制到剪贴板
+                    fallbackCopyResult();
+                }
+            }
+        } else {
+            // 桌面端或不支持分享API, 使用复制方案
+            fallbackCopyResult();
+        }
+    }
+
+    // 回退方案: 复制结果文本到剪贴板
+    async function fallbackCopyResult() {
+        const shareText = generateShareText();
+        try {
+            await navigator.clipboard.writeText(shareText);
+            showToast('结果已复制到剪贴板，可分享给好友 ✓', 2000);
+        } catch (err) {
+            // 降级: 使用旧方法
+            const textarea = document.createElement('textarea');
+            textarea.value = shareText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('结果已复制到剪贴板 ✓', 2000);
+        }
+    }
+    // ================= 分享功能结束 =================
+
     function selectAnswer(value) {
         answers[currentIndex] = value;
         
@@ -291,6 +417,7 @@
                 <h1>🧠 认知功能自测</h1>
                 <div class="subtitle">关爱大脑健康，从简单测试开始</div>
                 <button class="btn btn-primary" onclick="startTest()">开始测试</button>
+                <div style="margin-top: 20px; font-size: 12px; text-align: center; color: #888;">本测评仅参考，不代表最终诊断</div>
             </div>
         `;
     }
@@ -304,7 +431,6 @@
         
         let optionsHtml = '';
         for (let i = 0; i < optionLabels.length; i++) {
-            // 关键修复：只有当 selectedVal === i 时才添加 selected 类
             const isSelected = (selectedVal === i);
             optionsHtml += `
                 <button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${i})">
@@ -322,13 +448,25 @@
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: ${progressPercent}%;"></div>
                 </div>
-                <div class="question-text">${currentQuestion}</div>
+                <div class="question-text">${escapeHtml(currentQuestion)}</div>
                 <div class="options">
                     ${optionsHtml}
                 </div>
                 ${prevButton}
             </div>
         `;
+    }
+
+    // 简单的防XSS
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
     }
 
     function renderResult() {
@@ -349,15 +487,24 @@
                 </div>
                 
                 <div class="result-desc">
-                    ${resultText}
+                    ${escapeHtml(resultText)}
                 </div>
                 
                 <div class="ai-box">
                     <div class="ai-title">🩺 AI 医生解读：</div>
-                    <div class="ai-text">${aiText}</div>
+                    <div class="ai-text">${escapeHtml(aiText)}</div>
                 </div>
                 
-                <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="resetTest()">重新测试</button>
+                    <button class="btn btn-share" onclick="handleShareResult()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.05 4.11c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                        分享结果
+                    </button>
+                </div>
+                <div style="margin-top: 16px; font-size: 12px; text-align: center; color: #aaa;">分享结果仅用于个人健康提醒，不构成医疗诊断</div>
             </div>
         `;
     }
@@ -377,6 +524,13 @@
         
         appDiv.innerHTML = html;
     }
+
+    // 确保全局函数可以被 onclick 调用
+    window.selectAnswer = selectAnswer;
+    window.prevQuestion = prevQuestion;
+    window.resetTest = resetTest;
+    window.startTest = startTest;
+    window.handleShareResult = handleShareResult;
 
     render();
 </script>
