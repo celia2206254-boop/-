@@ -50,7 +50,6 @@
             justify-content: space-around;
             align-items: center;
             padding: 10px 16px 20px;
-            border-radius: 28px 28px 0 0;
             z-index: 100;
         }
         .nav-item {
@@ -75,15 +74,6 @@
             width: 24px;
             height: 24px;
             fill: currentColor;
-        }
-        
-        /* 通用卡片 */
-        .card {
-            background: white;
-            border-radius: 28px;
-            padding: 22px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         
         /* Hero区 */
@@ -178,7 +168,7 @@
             padding: 20px 14px;
             text-align: center;
             box-shadow: 0 6px 14px rgba(0,0,0,0.03);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
         .entry-card:active { transform: scale(0.98); }
         .entry-icon {
@@ -402,7 +392,6 @@
             border-color: #0f6e3f;
             color: white;
         }
-        .option-btn:active { transform: scale(0.98); }
         .nav-buttons {
             display: flex;
             gap: 12px;
@@ -558,6 +547,13 @@
             color: #1e3a8a;
             cursor: pointer;
         }
+        .footer-links {
+            border-top: none;
+            padding: 12px 0 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body>
@@ -600,7 +596,7 @@
             <div class="device-showcase">
                 <div class="device-img">⌚️📡</div>
                 <div class="device-info">
-                    <div class="device-name">家庭认知守护仪 (示例)</div>
+                    <div class="device-name">家庭认知守护仪</div>
                     <ul class="feature-list">
                         <li>💤 睡眠监测</li>
                         <li>🚶 活动轨迹异常提醒</li>
@@ -611,7 +607,6 @@
                     </div>
                 </div>
             </div>
-            <!-- 用户案例滚动区 -->
             <div class="cases-carousel">
                 <div class="carousel-header">
                     <span class="carousel-title">📢 真实用户案例</span>
@@ -622,9 +617,7 @@
                 </div>
                 <div class="carousel-wrapper" id="caseCarouselWrapper"></div>
             </div>
-            <div class="footer-links" style="border-top: none; padding: 12px 0 24px; text-align:center; font-size:12px; color:#94a3b8;">
-                免责声明 | 隐私政策 | 📧 celia2206254@gmail.com
-            </div>
+            <div class="footer-links">免责声明 | 隐私政策 | 📧 celia2206254@gmail.com</div>
         </div>
 
         <!-- 智能设备页面 -->
@@ -654,44 +647,22 @@
                     </div>
                 </div>
                 <div class="menu-item contact-us-btn">
-                    <div class="menu-left">
-                        <span class="menu-icon">📧</span>
-                        <span>联系我们</span>
-                    </div>
+                    <div class="menu-left"><span class="menu-icon">📧</span><span>联系我们</span></div>
                     <span>→</span>
                 </div>
                 <div class="menu-item my-reports-btn">
-                    <div class="menu-left">
-                        <span class="menu-icon">📋</span>
-                        <span>历史评估报告</span>
-                    </div>
+                    <div class="menu-left"><span class="menu-icon">📋</span><span>历史评估报告</span></div>
                     <span>→</span>
                 </div>
             </div>
-            
             <div class="faq-section">
                 <div style="font-weight: 700; margin: 0 0 12px 8px; font-size: 16px;">📌 常见问题</div>
-                <div class="faq-item">
-                    <div class="faq-question">📋 问卷准吗？<span>▼</span></div>
-                    <div class="faq-answer">本问卷基于临床验证量表开发，用于风险初筛，准确率较高，最终诊断请以医院评估为准。</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">🔧 设备怎么安装？<span>▼</span></div>
-                    <div class="faq-answer">设备即插即用，通过手机app配网，放置在客厅或卧室即可，无需复杂布线。</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">👵 老人会用吗？<span>▼</span></div>
-                    <div class="faq-answer">设备全自动工作，无需老人操作。家属通过小程序远程查看数据，非常便捷。</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">💎 是否需要会员？<span>▼</span></div>
-                    <div class="faq-answer">基础评估和部分监测功能免费，高级分析服务可选订阅，不强制。</div>
-                </div>
+                <div class="faq-item"><div class="faq-question">📋 问卷准吗？<span>▼</span></div><div class="faq-answer">本问卷基于临床验证量表开发，用于风险初筛，准确率较高，最终诊断请以医院评估为准。</div></div>
+                <div class="faq-item"><div class="faq-question">🔧 设备怎么安装？<span>▼</span></div><div class="faq-answer">设备即插即用，通过手机app配网，放置在客厅或卧室即可，无需复杂布线。</div></div>
+                <div class="faq-item"><div class="faq-question">👵 老人会用吗？<span>▼</span></div><div class="faq-answer">设备全自动工作，无需老人操作。家属通过小程序远程查看数据，非常便捷。</div></div>
+                <div class="faq-item"><div class="faq-question">💎 是否需要会员？<span>▼</span></div><div class="faq-answer">基础评估和部分监测功能免费，高级分析服务可选订阅，不强制。</div></div>
             </div>
-            <div class="contact-email-badge email-contact-btn">
-                📧 联系邮箱：celia2206254@gmail.com
-                <span style="font-size: 18px;">✉️</span>
-            </div>
+            <div class="contact-email-badge email-contact-btn">📧 联系邮箱：celia2206254@gmail.com <span style="font-size: 18px;">✉️</span></div>
         </div>
 
         <!-- 问卷页面 -->
@@ -706,7 +677,7 @@
 </div>
 
 <script>
-    // ==================== 初始化案例数据 ====================
+    // 初始化案例数据 (10个真实用户反馈)
     const casesList = [
         { name: "👩 张女士", text: "通过评估发现风险，及时带父亲检查，干预后状态改善明显。" },
         { name: "👨 李先生", text: "使用设备后，能远程关注母亲睡眠和活动状态，安心多了。" },
@@ -730,30 +701,30 @@
         });
     }
 
-    // ==================== 页面导航 ====================
+    // 左右滚动功能
+    const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+    const scrollRightBtn = document.getElementById('scrollRightBtn');
+    if(scrollLeftBtn && wrapper) {
+        scrollLeftBtn.onclick = () => wrapper.scrollBy({ left: -280, behavior: 'smooth' });
+        scrollRightBtn.onclick = () => wrapper.scrollBy({ left: 280, behavior: 'smooth' });
+    }
+
+    // 页面导航
     function navigateTo(pageId) {
-        const pages = ['home', 'device', 'profile', 'quiz'];
-        pages.forEach(id => {
-            const pageEl = document.getElementById(id + 'Page');
-            if(pageEl) pageEl.classList.remove('active-page');
-        });
-        const targetPage = document.getElementById(pageId + 'Page');
-        if(targetPage) targetPage.classList.add('active-page');
-        
-        // 更新底部导航active状态
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(pageId + 'Page').classList.add('active-page');
         document.querySelectorAll('.nav-item').forEach(btn => {
             const page = btn.getAttribute('data-page');
-            if(page === pageId) btn.classList.add('active');
-            else btn.classList.remove('active');
+            btn.classList.toggle('active', page === pageId);
         });
     }
 
-    // ==================== 邮件功能 ====================
+    // 邮件发送
     function sendEmail() {
         window.location.href = 'mailto:celia2206254@gmail.com?subject=咨询认知健康服务&body=您好，我想咨询以下问题：';
     }
 
-    // ==================== 20题认知问卷 ====================
+    // ==================== 20题认知问卷核心逻辑 ====================
     const questions = [
         "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？", "是否忘记约定或日期？", "是否记不住最近发生的事？",
         "是否常搞不清今天星期几？", "是否分不清月份或季节？", "是否去熟悉地方也容易迷路？", "是否常叫不出熟悉物品名称？", "说话时是否常卡住找词？",
@@ -761,23 +732,20 @@
         "是否需要别人提醒洗澡吃药？", "是否脾气变化明显？", "是否变得多疑敏感？", "是否兴趣明显下降？", "是否社交意愿下降？"
     ];
     const optionItems = [
-        { label: "无异常", value: 0 }, { label: "偶尔出现", value: 1 }, { label: "经常出现", value: 2 }, { label: "明显频繁", value: 3 }
+        { label: "无异常", value: 0 }, { label: "偶尔出现", value: 1 }, 
+        { label: "经常出现", value: 2 }, { label: "明显频繁", value: 3 }
     ];
-    let currentIndex = 0;
-    let answers = new Array(20).fill(null);
-    let autoTimer = null;
+    let currentIndex = 0, answers = new Array(20).fill(null), autoTimer = null;
 
     function getPercentageScore() {
-        const raw = answers.reduce((s,v)=> s + (v !== null ? v : 0), 0);
+        const raw = answers.reduce((s,v) => s + (v !== null ? v : 0), 0);
         return Math.round((raw / 60) * 100);
     }
-    
     function getRiskLevel(score100) {
         if(score100 <= 25) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
         if(score100 <= 50) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
         return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
     }
-    
     function generateAIText(percent) {
         if(percent <= 25) return "根据AI分析，您的认知功能整体处于良好水平。各项指标未见明显异常，大脑健康状态稳定。继续保持健康生活方式。";
         if(percent <= 50) return "AI提示轻度认知下降迹象。建议增加脑力活动，保证充足睡眠，3-6个月后复查。";
@@ -788,56 +756,23 @@
         if(autoTimer) clearTimeout(autoTimer);
         answers[currentIndex] = value;
         renderQuizPage();
-        
         if(currentIndex + 1 < questions.length) {
-            autoTimer = setTimeout(() => {
-                currentIndex++;
-                renderQuizPage();
-                autoTimer = null;
-            }, 1000);
+            autoTimer = setTimeout(() => { currentIndex++; renderQuizPage(); autoTimer = null; }, 1000);
         } else {
-            autoTimer = setTimeout(() => {
-                currentIndex++; // 设为20，表示完成
-                renderQuizPage();
-                autoTimer = null;
-            }, 1000);
+            autoTimer = setTimeout(() => { currentIndex++; renderQuizPage(); autoTimer = null; }, 1000);
         }
     }
-    
-    function prevQuestion() {
-        if(currentIndex > 0) {
-            if(autoTimer) clearTimeout(autoTimer);
-            currentIndex--;
-            renderQuizPage();
-        }
-    }
-    
-    function startQuiz() {
-        answers = new Array(20).fill(null);
-        currentIndex = 0;
-        if(autoTimer) clearTimeout(autoTimer);
-        navigateTo('quiz');
-        renderQuizPage();
-    }
-    
-    function resetToHome() {
-        if(autoTimer) clearTimeout(autoTimer);
-        navigateTo('home');
-    }
-    
+    function prevQuestion() { if(currentIndex > 0) { if(autoTimer) clearTimeout(autoTimer); currentIndex--; renderQuizPage(); } }
+    function startQuiz() { answers = new Array(20).fill(null); currentIndex = 0; if(autoTimer) clearTimeout(autoTimer); navigateTo('quiz'); renderQuizPage(); }
+    function resetToHome() { if(autoTimer) clearTimeout(autoTimer); navigateTo('home'); }
+
     function renderQuizPage() {
         const quizDiv = document.getElementById('quizPage');
         if(!quizDiv) return;
-        
         if(currentIndex < questions.length) {
-            const total = questions.length;
-            const currentQ = currentIndex + 1;
-            const progress = (currentIndex / total) * 100;
-            const selectedVal = answers[currentIndex];
-            let optionsHtml = '';
-            optionItems.forEach(opt => {
-                const isSelected = (selectedVal === opt.value);
-                optionsHtml += `<button class="option-btn ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">${opt.label}</button>`;
-            });
-            quizDiv.innerHTML = `
-                <div class="quiz-card">
+            const total = questions.length, currentQ = currentIndex + 1, progress = (currentIndex / total) * 100, selectedVal = answers[currentIndex];
+            let optionsHtml = optionItems.map(opt => `<button class="option-btn ${selectedVal === opt.value ? 'selected' : ''}" onclick="selectAnswer(${opt.value})">${opt.label}</button>`).join('');
+            quizDiv.innerHTML = `<div class="quiz-card"><div class="question-counter">第 ${currentQ} / ${total} 题</div><div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div><div class="question-text">${questions[currentIndex]}</div><div>${optionsHtml}</div><div class="nav-buttons"><button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled style="opacity:0.5"' : ''}>← 上一题</button></div><div class="footer-note">点击选项后自动进入下一题</div></div>`;
+        } else {
+            const percent = getPercentageScore(), risk = getRiskLevel(percent), ai = generateAIText(percent);
+            quizDiv.innerHTML = `<div class="quiz-card result-area"><h2>📋 评估结果</h2><div class="score-circle">${percent}</div><div class="risk-level ${risk.class}" style="
