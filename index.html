@@ -7,473 +7,79 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #f5f7fa;
-            color: #1e293b;
-            line-height: 1.4;
-        }
-        .app-wrapper {
-            max-width: 500px;
-            margin: 0 auto;
-            background: #f5f7fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        .main-content {
-            flex: 1;
-            padding: 16px 16px 85px 16px;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 500px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 8px 20px 24px;
-            border-top: 0.5px solid rgba(0, 0, 0, 0.06);
-            z-index: 1000;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 48px;
-            opacity: 0.55;
-            color: #64748b;
-        }
-        .nav-item.active {
-            opacity: 1;
-            color: #0f6e3f;
-            background: rgba(15, 110, 63, 0.1);
-        }
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-        }
-        .nav-label {
-            font-size: 11px;
-            font-weight: 500;
-        }
-        .card {
-            background: white;
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-        }
-        .welcome-card {
-            background: linear-gradient(135deg, #0f6e3f 0%, #1a8a4e 100%);
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: white;
-        }
-        .welcome-text {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .welcome-email {
-            font-size: 13px;
-            opacity: 0.85;
-            margin-bottom: 16px;
-            word-break: break-all;
-        }
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .hero-card {
-            background: linear-gradient(135deg, #f0f9f3 0%, #ffffff 100%);
-            border-radius: 32px;
-            padding: 28px 24px;
-            margin-bottom: 20px;
-            border: 0.5px solid rgba(15, 110, 63, 0.15);
-        }
-        .hero-tag {
-            font-size: 12px;
-            color: #0f6e3f;
-            font-weight: 600;
-            background: rgba(15, 110, 63, 0.12);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 40px;
-            margin-bottom: 20px;
-        }
-        .hero-title {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 12px;
-            color: #0a2e1e;
-        }
-        .hero-sub {
-            font-size: 16px;
-            color: #475569;
-            margin-bottom: 28px;
-            padding-left: 12px;
-            border-left: 3px solid #0f6e3f;
-        }
-        .btn-primary {
-            background: #0f6e3f;
-            color: white;
-            width: 100%;
-            padding: 16px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 60px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-primary:active {
-            background: #0a5833;
-            transform: scale(0.97);
-        }
-        .btn-outline {
-            background: white;
-            border: 1.5px solid #0f6e3f;
-            color: #0f6e3f;
-            font-weight: 600;
-            padding: 14px 18px;
-            border-radius: 60px;
-            width: 100%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .device-card {
-            background: white;
-            border-radius: 28px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        .device-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-        .device-title {
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .device-desc {
-            font-size: 14px;
-            color: #475569;
-            margin: 12px 0;
-        }
-        .feature-badge {
-            background: #eef2ff;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .quiz-card {
-            background: white;
-            border-radius: 32px;
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-        .progress-bar {
-            background: #e2e8f0;
-            border-radius: 20px;
-            height: 6px;
-            margin: 16px 0;
-        }
-        .progress-fill {
-            background: #0f6e3f;
-            height: 6px;
-            border-radius: 20px;
-            width: 0%;
-        }
-        .question-text {
-            font-weight: 650;
-            font-size: 22px;
-            margin: 24px 0 28px;
-            text-align: center;
-            line-height: 1.35;
-            color: #0a2e1e;
-        }
-        .option-btn {
-            padding: 14px 18px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 60px;
-            background: white;
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 10px;
-            width: 100%;
-            cursor: pointer;
-        }
-        .option-btn.selected {
-            background: #0f6e3f;
-            border-color: #0f6e3f;
-            color: white;
-        }
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            background: #f0f5fe;
-            border-radius: 50%;
-            margin: 16px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #1e293b; }
+        .app-wrapper { max-width: 500px; margin: 0 auto; background: #f5f7fa; min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1; padding: 16px 16px 85px 16px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; background: rgba(255,255,255,0.96); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 8px 20px 24px; border-top: 0.5px solid rgba(0,0,0,0.06); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 48px; opacity: 0.55; color: #64748b; }
+        .nav-item.active { opacity: 1; color: #0f6e3f; background: rgba(15,110,63,0.1); }
+        .nav-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+        .nav-label { font-size: 11px; font-weight: 500; }
+        .card { background: white; border-radius: 28px; padding: 20px; margin-bottom: 16px; }
+        .welcome-card { background: linear-gradient(135deg, #0f6e3f 0%, #1a8a4e 100%); border-radius: 28px; padding: 20px; margin-bottom: 20px; color: white; }
+        .welcome-text { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .welcome-email { font-size: 13px; opacity: 0.85; margin-bottom: 16px; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 16px; border-radius: 40px; color: white; font-size: 13px; cursor: pointer; }
+        .hero-card { background: linear-gradient(135deg, #f0f9f3 0%, #ffffff 100%); border-radius: 32px; padding: 28px 24px; margin-bottom: 20px; }
+        .hero-tag { font-size: 12px; color: #0f6e3f; font-weight: 600; background: rgba(15,110,63,0.12); display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 40px; margin-bottom: 20px; }
+        .hero-title { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; color: #0a2e1e; }
+        .hero-sub { font-size: 16px; color: #475569; margin-bottom: 28px; padding-left: 12px; border-left: 3px solid #0f6e3f; }
+        .btn-primary { background: #0f6e3f; color: white; width: 100%; padding: 16px 20px; font-size: 16px; font-weight: 600; border-radius: 60px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary:active { background: #0a5833; transform: scale(0.97); }
+        .btn-outline { background: white; border: 1.5px solid #0f6e3f; color: #0f6e3f; font-weight: 600; padding: 14px 18px; border-radius: 60px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .device-card { background: white; border-radius: 28px; padding: 20px; margin-bottom: 16px; }
+        .device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .device-title { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .device-desc { font-size: 14px; color: #475569; margin: 12px 0; }
+        .feature-badge { background: #eef2ff; padding: 6px 14px; border-radius: 40px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
+        .quiz-card { background: white; border-radius: 32px; padding: 24px; margin-bottom: 16px; }
+        .progress-bar { background: #e2e8f0; border-radius: 20px; height: 6px; margin: 16px 0; }
+        .progress-fill { background: #0f6e3f; height: 6px; border-radius: 20px; width: 0%; }
+        .question-text { font-weight: 650; font-size: 22px; margin: 24px 0 28px; text-align: center; color: #0a2e1e; }
+        .option-btn { padding: 14px 18px; border: 1.5px solid #e2e8f0; border-radius: 60px; background: white; font-size: 15px; margin-bottom: 10px; width: 100%; cursor: pointer; }
+        .option-btn.selected { background: #0f6e3f; border-color: #0f6e3f; color: white; }
+        .score-circle { width: 120px; height: 120px; background: #f0f5fe; border-radius: 50%; margin: 16px auto; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .risk-low { color: #10b981; }
         .risk-mid { color: #f59e0b; }
         .risk-high { color: #ef4444; }
-        .risk-level {
-            font-size: 26px;
-            font-weight: 700;
-            margin: 12px 0;
-            text-align: center;
-        }
-        .ai-assessment {
-            background: #f0f5fe;
-            padding: 16px;
-            border-radius: 24px;
-            margin: 16px 0 0 0;
-            font-size: 14px;
-        }
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .auth-input, .profile-input, .profile-select {
-            padding: 14px 18px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 60px;
-            font-size: 15px;
-            width: 100%;
-            background: white;
-        }
-        .auth-input:focus {
-            outline: none;
-            border-color: #0f6e3f;
-        }
-        .auth-switch {
-            text-align: center;
-            margin-top: 16px;
-            color: #0f6e3f;
-            cursor: pointer;
-        }
-        .footer-links {
-            text-align: center;
-            font-size: 12px;
-            color: #94a3b8;
-            padding: 20px 16px 32px;
-            border-top: 0.5px solid #e2e8f0;
-            margin-top: 16px;
-        }
-        .footer-links a {
-            text-decoration: none;
-            color: #0f6e3f;
-            margin: 0 8px;
-        }
-        .history-item {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-        .history-score {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0f6e3f;
-        }
-        .history-date {
-            font-size: 12px;
-            color: #64748b;
-        }
-        .history-time {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 2px;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eef2f7;
-        }
-        .info-label {
-            font-weight: 500;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .detail-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2001;
-        }
-        .detail-card {
-            background: white;
-            border-radius: 32px;
-            padding: 28px;
-            max-width: 300px;
-            width: 80%;
-            text-align: center;
-        }
-        .detail-close {
-            margin-top: 20px;
-            background: #0f6e3f;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 12px;
-            width: 100%;
-            cursor: pointer;
-        }
-        .toast-msg {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 13px;
-            opacity: 0;
-            transition: 0.18s;
-            pointer-events: none;
-            z-index: 2000;
-            white-space: nowrap;
-        }
-        .banner-container {
-            position: relative;
-            margin-bottom: 20px;
-            border-radius: 28px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .banner-slider {
-            display: flex;
-            transition: transform 0.5s ease;
-        }
-        .banner-item {
-            min-width: 100%;
-            padding: 32px 20px;
-            text-align: center;
-        }
-        .banner-dots {
-            position: absolute;
-            bottom: 12px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-        .banner-dots .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: white;
-            opacity: 0.5;
-        }
-        .banner-dots .dot.active {
-            opacity: 1;
-            width: 18px;
-            border-radius: 4px;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .text-center {
-            text-align: center;
-        }
+        .risk-level { font-size: 26px; font-weight: 700; margin: 12px 0; text-align: center; }
+        .ai-assessment { background: #f0f5fe; padding: 16px; border-radius: 24px; margin-top: 16px; font-size: 14px; }
+        .auth-form { display: flex; flex-direction: column; gap: 14px; }
+        .auth-input, .profile-input, .profile-select { padding: 14px 18px; border: 1.5px solid #e2e8f0; border-radius: 60px; font-size: 15px; width: 100%; background: white; }
+        .auth-input:focus { outline: none; border-color: #0f6e3f; }
+        .auth-switch { text-align: center; margin-top: 16px; color: #0f6e3f; cursor: pointer; }
+        .footer-links { text-align: center; font-size: 12px; color: #94a3b8; padding: 20px 16px 32px; border-top: 0.5px solid #e2e8f0; margin-top: 16px; }
+        .footer-links a { text-decoration: none; color: #0f6e3f; margin: 0 8px; }
+        .history-item { background: #f8fafc; border-radius: 20px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .history-score { font-size: 22px; font-weight: 700; color: #0f6e3f; }
+        .history-date { font-size: 12px; color: #64748b; }
+        .history-time { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eef2f7; }
+        .info-label { font-weight: 500; color: #475569; display: flex; align-items: center; gap: 8px; }
+        .detail-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2001; }
+        .detail-card { background: white; border-radius: 32px; padding: 28px; max-width: 300px; width: 80%; text-align: center; }
+        .detail-close { margin-top: 20px; background: #0f6e3f; color: white; border: none; border-radius: 40px; padding: 12px; width: 100%; cursor: pointer; }
+        .toast-msg { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; opacity: 0; transition: 0.18s; pointer-events: none; z-index: 2000; white-space: nowrap; }
+        .banner-container { position: relative; margin-bottom: 20px; border-radius: 28px; overflow: hidden; cursor: pointer; }
+        .banner-slider { display: flex; transition: transform 0.5s ease; }
+        .banner-item { min-width: 100%; padding: 32px 20px; text-align: center; }
+        .banner-dots { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
+        .banner-dots .dot { width: 6px; height: 6px; border-radius: 50%; background: white; opacity: 0.5; }
+        .banner-dots .dot.active { opacity: 1; width: 18px; border-radius: 4px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-center { text-align: center; }
+        .share-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .btn-share { flex: 1; background: #0f6e3f; color: white; border: none; border-radius: 60px; padding: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="app-wrapper">
     <div class="main-content" id="mainContent"></div>
     <div class="bottom-nav">
-        <div class="nav-item" data-tab="home">
-            <svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none">
-                <path d="M3 9.5L12 3L21 9.5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V9.5Z" stroke="currentColor" fill="none"/>
-                <path d="M9 21V12H15V21" stroke="currentColor" fill="none"/>
-            </svg>
-            <span class="nav-label">评估</span>
-        </div>
-        <div class="nav-item" data-tab="device">
-            <svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none">
-                <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" fill="none"/>
-                <path d="M8 6V4H16V6" stroke="currentColor" fill="none"/>
-                <path d="M12 18V22" stroke="currentColor"/>
-                <path d="M8 22H16" stroke="currentColor"/>
-                <circle cx="12" cy="14" r="2" fill="currentColor"/>
-            </svg>
-            <span class="nav-label">设备</span>
-        </div>
-        <div class="nav-item" data-tab="profile">
-            <svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none">
-                <path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21" stroke="currentColor" fill="none"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" fill="none"/>
-            </svg>
-            <span class="nav-label">我的</span>
-        </div>
+        <div class="nav-item" data-tab="home"><svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9.5L12 3L21 9.5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V9.5Z" stroke="currentColor" fill="none"/><path d="M9 21V12H15V21" stroke="currentColor" fill="none"/></svg><span class="nav-label">评估</span></div>
+        <div class="nav-item" data-tab="device"><svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M8 6V4H16V6" stroke="currentColor" fill="none"/><path d="M12 18V22" stroke="currentColor"/><path d="M8 22H16" stroke="currentColor"/><circle cx="12" cy="14" r="2" fill="currentColor"/></svg><span class="nav-label">设备</span></div>
+        <div class="nav-item" data-tab="profile"><svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21" stroke="currentColor" fill="none"/><circle cx="12" cy="7" r="4" stroke="currentColor" fill="none"/></svg><span class="nav-label">我的</span></div>
     </div>
 </div>
 <div id="toastMsg" class="toast-msg"></div>
@@ -537,7 +143,7 @@
         return '高风险';
     }
     function formatDateTime(date) {
-        return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+        return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0') + ' ' + String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0');
     }
 
     async function loadUserProfile() {
@@ -654,4 +260,34 @@
     function renderResult() {
         let score = getPercentScore();
         let risk = getRiskLevel(score);
-        return '<div class="card"><div id="captureArea" style="text-align:center;"><h2>📋 评估报告</h2><div class="score-circle"><span style="font-size:48px;font-weight:800;">' + score + '</span><span>/100</span></div><div class="risk-level ' + risk.class + '">' + risk.name + '</div><div class="ai-assessment">🤖 ' + risk.desc + '</div></div><div class="share-buttons" style="display:flex; gap:12px; margin-top:20px;"><button class="btn-share" id="shareImgBtn" style="flex:1; background:#0f6e3f; color:white; border:none; border-radius:60px; padding:12px;">📸 生成图片</button><button class="btn-share" id="shareUrlBtn" style="flex:1; background:#0f6e3f; color:white; border:n
+        return '<div class="card"><div id="captureArea" style="text-align:center;"><h2>📋 评估报告</h2><div class="score-circle"><span style="font-size:48px;font-weight:800;">' + score + '</span><span>/100</span></div><div class="risk-level ' + risk.class + '">' + risk.name + '</div><div class="ai-assessment">🤖 ' + risk.desc + '</div></div><div class="share-buttons"><button class="btn-share" id="shareImgBtn">📸 生成图片</button><button class="btn-share" id="shareUrlBtn">🔗 分享网址</button></div><button class="btn-outline" id="restartBtn" style="margin-top:16px;">重新测试</button></div>';
+    }
+
+    function renderHistoryDetail(history) {
+        let d = new Date(history.created_at);
+        return '<div class="detail-modal" id="detailModal"><div class="detail-card"><h3 style="margin-bottom:16px;">📋 评估详情</h3><div class="score-circle" style="width:100px;height:100px;"><span style="font-size:32px;font-weight:800;">' + history.score + '</span><span>/100</span></div><div class="risk-level" style="color:' + (history.score <= 25 ? '#10b981' : (history.score <= 50 ? '#f59e0b' : '#ef4444')) + '">' + history.risk_level + '</div><p style="margin:12px 0;color:#64748b;">评估时间：' + formatDateTime(d) + '</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>';
+    }
+
+    async function render() {
+        let container = document.getElementById('mainContent');
+        if(!container) return;
+        
+        if(selectedHistory) {
+            container.innerHTML = renderHistoryDetail(selectedHistory);
+            document.getElementById('closeDetailBtn')?.addEventListener('click', () => { selectedHistory = null; render(); });
+            return;
+        }
+        
+        let html = '';
+        if(quizActive) html = renderQuiz();
+        else if(currentTab === 'home') html = renderHome();
+        else if(currentTab === 'device') html = renderDevice();
+        else if(currentTab === 'profile') html = await renderProfile();
+        else if(currentTab === 'result') html = renderResult();
+        else html = renderHome();
+        container.innerHTML = html;
+        
+        document.querySelectorAll('.nav-item').forEach(nav => {
+            let tab = nav.getAttribute('data-tab');
+            if(currentTab === tab || (currentTab === 'result' && tab === 'home')) nav.classList.add('active');
+            else nav.classList.remove('active
