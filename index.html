@@ -10,3 +10,124 @@
         <h2 id="title">加载中...</h2>
         <div id="content"></div>
     </div>
+
+    <script>
+        (function() {
+            // Supabase 配置
+            const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
+            
+            // 创建客户端（用不同的变量名避免冲突）
+            const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            let _currentUser = null;
+
+            // 显示界面
+            function render() {
+                const titleEl = document.getElementById('title');
+                const contentEl = document.getElementById('content');
+                
+                if (!titleEl || !contentEl) return;
+                
+                if (_currentUser) {
+                    titleEl.innerText = '✅ 已登录：' + _currentUser.email;
+                    contentEl.innerHTML = `
+                        <button onclick="window.logout()">退出登录</button>
+                        <hr>
+                        <h3>保存测试分数</h3>
+                        <input type="number" id="score" placeholder="输入分数 0-100">
+                        <button onclick="window.saveScore()">保存分数</button>
+                        <button onclick="window.loadScore()">读取上次分数</button>
+                        <p id="result"></p>
+                    `;
+                } else {
+                    titleEl.innerText = '📝 登录 / 注册';
+                    contentEl.innerHTML = `
+                        <input type="email" id="email" placeholder="邮箱"><br><br>
+                        <input type="password" id="password" placeholder="密码（至少6位）"><br><br>
+                        <button onclick="window.login()">登录</button>
+                        <button onclick="window.register()">注册</button>
+                        <p id="msg"></p>
+                    `;
+                }
+            }
+
+            // 注册
+            window.register = async function() {
+                const email = document.getElementById('email').value;
+                const pwd = document.getElementById('password').value;
+                const { data, error } = await _supabase.auth.signUp({ email, password: pwd });
+                const msgEl = document.getElementById('msg');
+                if (error) {
+                    if (msgEl) msgEl.innerText = '注册失败：' + error.message;
+                } else {
+                    if (msgEl) msgEl.innerText = '注册成功！请查收验证邮件';
+                }
+            };
+
+            // 登录
+            window.login = async function() {
+                const email = document.getElementById('email').value;
+                const pwd = document.getElementById('password').value;
+                const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pwd });
+                const msgEl = document.getElementById('msg');
+                if (error) {
+                    if (msgEl) msgEl.innerText = '登录失败：' + error.message;
+                } else {
+                    _currentUser = data.user;
+                    render();
+                }
+            };
+
+            // 退出
+            window.logout = async function() {
+                await _supabase.auth.signOut();
+                _currentUser = null;
+                render();
+            };
+
+            // 保存分数
+            window.saveScore = async function() {
+                const scoreInput = document.getElementById('score');
+                const score = scoreInput ? scoreInput.value : '';
+                if (!score) return;
+                const resultEl = document.getElementById('result');
+                const { error } = await _supabase
+                    .from('profiles')
+                    .upsert({ id: _currentUser.id, email: _currentUser.email, cognitive_score: parseInt(score) });
+                if (error) {
+                    if (resultEl) resultEl.innerText = '保存失败：' + error.message;
+                } else {
+                    if (resultEl) resultEl.innerText = '保存成功！';
+                }
+            };
+
+            // 读取分数
+            window.loadScore = async function() {
+                const resultEl = document.getElementById('result');
+                const { data, error } = await _supabase
+                    .from('profiles')
+                    .select('cognitive_score')
+                    .eq('id', _currentUser.id)
+                    .single();
+                if (error && error.code !== 'PGRST116') {
+                    if (resultEl) resultEl.innerText = '读取失败：' + error.message;
+                } else {
+                    const score = (data && data.cognitive_score !== undefined) ? data.cognitive_score : '暂无';
+                    if (resultEl) resultEl.innerText = '上次评估分数：' + score;
+                }
+            };
+
+            // 检查登录状态
+            async function checkUser() {
+                const { data: { user } } = await _supabase.auth.getUser();
+                if (user) _currentUser = user;
+                render();
+            }
+            
+            // 启动
+            checkUser();
+        })();
+    </script>
+</body>
+</html>
