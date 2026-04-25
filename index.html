@@ -16,7 +16,7 @@
         .nav-item.active{opacity:1;color:#0f6e3f;background:rgba(15,110,63,0.1);}
         .nav-icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;}
         .nav-label{font-size:11px;font-weight:500;}
-        .card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;}
+        .card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;position:relative;}
         .device-card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;}
         .device-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
         .device-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px;}
@@ -33,7 +33,7 @@
         .risk-mid{color:#f59e0b;}
         .risk-high{color:#ef4444;}
         .risk-level{font-size:26px;font-weight:700;margin:12px 0;text-align:center;}
-        .ai-assessment{background:#f0f5fe;padding:16px;border-radius:24px;margin-top:16px;font-size:14px;}
+        .ai-assessment{background:#f0f5fe;padding:16px;border-radius:24px;margin-top:16px;font-size:14px;line-height:1.5;}
         .auth-form{display:flex;flex-direction:column;gap:14px;}
         .auth-input,.profile-input,.profile-select{padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:60px;font-size:15px;width:100%;background:white;}
         .auth-input:focus{outline:none;border-color:#0f6e3f;}
@@ -64,6 +64,27 @@
         .login-hint{background:#eef6f1;border-radius:28px;padding:12px;text-align:center;margin-bottom:16px;cursor:pointer;color:#0f6e3f;font-weight:500;}
         .btn-primary{background:#0f6e3f;color:white;width:100%;padding:16px 20px;font-size:16px;font-weight:600;border-radius:60px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
         .btn-outline{background:white;border:1.5px solid #0f6e3f;color:#0f6e3f;font-weight:600;padding:14px 18px;border-radius:60px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+        /* 回到首页按钮 */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #eef2f7;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #0f6e3f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .home-btn:active { background: #e2e8f0; transform: scale(0.96); }
+        .result-card { position: relative; padding-top: 50px; }
     </style>
 </head>
 <body>
@@ -96,7 +117,32 @@
     function showToast(msg) { let t = document.getElementById('toastMsg'); if(t){ t.textContent = msg; t.style.opacity = '1'; setTimeout(()=>{ t.style.opacity = '0'; },2000); } }
     function getTotalRaw() { let s=0; for(let v of answers) if(v!==null) s+=v; return s; }
     function getPercentScore() { return Math.round((getTotalRaw()/MAX_RAW)*100); }
-    function getRiskLevel(s) { if(s<=25) return {name:'低风险',class:'risk-low',desc:'当前认知状态总体稳定，保持健康生活习惯即可。'}; if(s<=50) return {name:'中风险',class:'risk-mid',desc:'存在一定认知下降倾向，建议加强脑力活动并定期复查。'}; return {name:'高风险',class:'risk-high',desc:'认知功能需引起关注，建议加强日常监测。'}; }
+    function getRiskLevel(s) { 
+        if(s<=25) return {name:'低风险',class:'risk-low',desc:'当前认知状态总体稳定，保持健康生活习惯即可。'}; 
+        if(s<=50) return {name:'中风险',class:'risk-mid',desc:'存在一定认知下降倾向，建议加强脑力活动并定期复查。'}; 
+        return {name:'高风险',class:'risk-high',desc:'认知功能需引起关注，建议加强日常监测。'}; 
+    }
+    
+    // AI 详细评估文字生成
+    function getAIDetail(score, userAge, userGender) {
+        let ageText = '';
+        if(userAge) {
+            if(userAge < 50) ageText = `，您年龄${userAge}岁，处于认知功能相对稳定的阶段`;
+            else if(userAge < 70) ageText = `，您年龄${userAge}岁，属于认知功能需要关注的人群`;
+            else ageText = `，您年龄${userAge}岁，建议更加重视认知健康管理`;
+        }
+        let genderText = userGender === '男' ? '男性' : (userGender === '女' ? '女性' : '');
+        if(genderText) genderText = `，${genderText}`;
+        
+        if(score <= 25) {
+            return `根据您的评估结果（${score}分），认知功能整体表现良好。${ageText}${genderText}。建议保持规律作息、适度运动和社交活动，继续维持健康的生活方式。每半年可进行一次跟踪评估。`;
+        } else if(score <= 50) {
+            return `根据您的评估结果（${score}分），存在轻度认知功能波动。${ageText}${genderText}。建议：1）增加脑力活动，如阅读、数独、记忆训练；2）保持每日30分钟有氧运动；3）保证充足睡眠；4）定期进行认知健康监测。建议3个月后复查。`;
+        } else {
+            return `根据您的评估结果（${score}分），认知功能下降风险较高。${ageText}${genderText}。强烈建议：1）尽快咨询专业医生进行评估；2）进行全面的认知功能检查；3）加强日常认知训练；4）建议家人关注日常生活状态。建议1-2个月后复查。`;
+        }
+    }
+    
     function getRiskText(s) { if(s<=25) return '低风险'; if(s<=50) return '中风险'; return '高风险'; }
     function formatDateTime(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 
@@ -126,7 +172,6 @@
         if(!currentUser) {
             loginHint = '<div class="login-hint" id="gotoAuthBtn">📝 登录/注册 查看历史记录</div>';
         }
-        // 只有banner轮播和设备卡片，没有Hero区域
         let bannerHtml = '<div class="banner-container"><div class="banner-slider">' +
             '<div class="banner-item" id="bannerFirst"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
             '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
@@ -152,7 +197,19 @@
 
     function renderQuiz() { let opts=''; for(let o of OPTIONS) opts+='<button class="option-btn '+(answers[currentIndex]===o.rawScore?'selected':'')+'" onclick="selectAnswer('+o.rawScore+')">'+o.label+'</button>'; return '<div class="quiz-card"><div class="progress-bar"><div class="progress-fill" style="width:'+((currentIndex/QUESTIONS.length)*100)+'%;"></div></div><div class="flex-between" style="margin-bottom:16px;"><span>第'+(currentIndex+1)+'/'+QUESTIONS.length+'题</span><span style="color:#0f6e3f;">认知自测</span></div><div class="question-text">'+QUESTIONS[currentIndex]+'</div>'+opts+'<button class="btn-outline" id="prevBtn" '+(currentIndex===0?'disabled style="opacity:0.5"':'')+'>← 上一题</button></div>'; }
 
-    function renderResult() { let s=getPercentScore(), r=getRiskLevel(s); return '<div class="card"><div id="captureArea" style="text-align:center;"><h2>📋 评估报告</h2><div class="score-circle"><span style="font-size:48px;font-weight:800;">'+s+'</span><span>/100</span></div><div class="risk-level '+r.class+'">'+r.name+'</div><div class="ai-assessment">🤖 '+r.desc+'</div></div><div class="share-buttons"><button class="btn-share" id="shareImgBtn">📸 生成图片</button><button class="btn-share" id="shareUrlBtn">🔗 分享网址</button></div><button class="btn-outline" id="restartBtn" style="margin-top:16px;">重新测试</button></div>'; }
+    function renderResult() { 
+        let score = getPercentScore(); 
+        let risk = getRiskLevel(score);
+        let aiDetail = getAIDetail(score, userProfile.age, userProfile.gender);
+        return '<div class="card result-card">' +
+            '<button class="home-btn" id="backHomeBtn">🏠 返回首页</button>' +
+            '<div id="captureArea" style="text-align:center;"><h2 style="margin-top:8px;">📋 评估报告</h2>' +
+            '<div class="score-circle"><span style="font-size:48px;font-weight:800;">' + score + '</span><span>/100</span></div>' +
+            '<div class="risk-level ' + risk.class + '">' + risk.name + '</div>' +
+            '<div class="ai-assessment">🤖 <strong>AI 评估建议</strong><br><br>' + aiDetail + '</div></div>' +
+            '<div class="share-buttons"><button class="btn-share" id="shareImgBtn">📸 生成图片</button><button class="btn-share" id="shareUrlBtn">🔗 分享网址</button></div>' +
+            '<button class="btn-outline" id="restartBtn" style="margin-top:16px;">重新测试</button></div>'; 
+    }
 
     function renderHistoryDetail(h) { let d=new Date(h.created_at); return '<div class="detail-modal" id="detailModal"><div class="detail-card"><h3 style="margin-bottom:16px;">📋 评估详情</h3><div class="score-circle" style="width:100px;height:100px;"><span style="font-size:32px;font-weight:800;">'+h.score+'</span><span>/100</span></div><div class="risk-level" style="color:'+(h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'))+'">'+h.risk_level+'</div><p style="margin:12px 0;color:#64748b;">评估时间：'+formatDateTime(d)+'</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>'; }
 
@@ -162,6 +219,7 @@
         let html=''; if(quizActive) html=renderQuiz(); else if(currentTab==='home') html=renderHome(); else if(currentTab==='device') html=renderDevice(); else if(currentTab==='profile') html=await renderProfile(); else if(currentTab==='result') html=renderResult(); else html=renderHome();
         c.innerHTML = html;
         document.querySelectorAll('.nav-item').forEach(n=>{ let t=n.getAttribute('data-tab'); if(currentTab===t||(currentTab==='result'&&t==='home')) n.classList.add('active'); else n.classList.remove('active'); });
+        
         if(currentTab==='home' && document.querySelector('.banner-container')) { 
             startBannerLoop(); 
             const firstBanner = document.getElementById('bannerFirst');
@@ -181,6 +239,17 @@
                 else if(currentBannerIndex===1) showToast("华为手环详情可邮件咨询");
             });
         } else { if(bannerInterval) clearInterval(bannerInterval); }
+        
+        // 回到首页按钮
+        const backHomeBtn = document.getElementById('backHomeBtn');
+        if(backHomeBtn) {
+            backHomeBtn.addEventListener('click', () => {
+                currentTab = 'home';
+                quizActive = false;
+                render();
+            });
+        }
+        
         document.getElementById('gotoDeviceBtn')?.addEventListener('click',()=>{ currentTab='device'; render(); });
         document.getElementById('historyTestBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
         document.getElementById('restartBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
