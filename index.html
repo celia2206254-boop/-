@@ -24,7 +24,6 @@
         .btn-primary { background: #0f6e3f; color: white; width: 100%; padding: 18px 16px; font-size: 17px; font-weight: 700; border-radius: 60px; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(15,110,63,0.28); }
         .btn-primary:active { background: #0a5833; transform: scale(0.97);}
         .btn-outline { background: white; border: 1.5px solid #0f6e3f; color: #0f6e3f; font-weight: 600; padding: 14px 18px; border-radius: 60px; width: 100%; cursor: pointer; font-size: 15px; }
-        .btn-secondary { background: #eef2f7; color: #1e293b; font-weight: 600; padding: 12px 18px; border-radius: 40px; width: 100%; cursor: pointer; font-size: 14px; border: none; margin-top: 12px; }
         .device-showcase { background: linear-gradient(110deg, #ffffff 0%, #f8fdf9 100%); border-radius: 36px; margin: 16px; padding: 24px 22px; border: 0.5px solid #dde9e2; }
         .device-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .device-title { font-size: 22px; font-weight: 720; display: flex; align-items: center; gap: 10px; }
@@ -46,7 +45,7 @@
         .share-buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn-share { flex: 1; background: #0f6e3f; color: white; border: none; border-radius: 60px; padding: 12px; font-weight: 600; cursor: pointer; }
         .auth-form { display: flex; flex-direction: column; gap: 16px; }
-        .auth-input, .profile-input, .profile-select { padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 60px; font-size: 16px; width: 100%; background: white; }
+        .auth-input, .profile-input { padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 60px; font-size: 16px; width: 100%; background: white; }
         .auth-switch { text-align: center; margin-top: 16px; color: #0f6e3f; cursor: pointer; }
         .footer-links { text-align: center; font-size: 12px; color: #7a98b5; padding: 24px 16px 32px; border-top: 0.5px solid #e6edf4; margin-top: 20px; }
         .faq-item { border-bottom: 1px solid #edf2f7; padding: 18px 0; }
@@ -60,6 +59,7 @@
         .info-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eef2f7; }
         .info-label { font-weight: 600; color: #475569; }
         .info-value { color: #1e293b; }
+        .btn-secondary { background: #eef2f7; color: #1e293b; font-weight: 600; padding: 12px 18px; border-radius: 40px; width: 100%; cursor: pointer; font-size: 14px; border: none; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -75,12 +75,10 @@
 
 <script>
     (function() {
-        // Supabase 配置
         const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // 全局状态
         let _currentUser = null;
         let _currentTab = "home";
         let _quizActive = false;
@@ -90,7 +88,6 @@
         let _isEditing = false;
         let _userProfile = { gender: '', age: null };
         
-        // 问卷数据
         const QUESTIONS = [
             "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？",
             "是否忘记约定或日期？", "是否记不住最近发生的事？", "是否常搞不清今天星期几？",
@@ -141,7 +138,6 @@
             return "🤖 AI预警：认知功能下降风险显著，多个维度出现异常信号。";
         }
         
-        // 数据库操作
         async function loadUserProfile() {
             if (!_currentUser) return;
             try {
@@ -206,7 +202,6 @@
             } catch(e) { return []; }
         }
         
-        // 页面渲染
         function renderAuth() {
             return `<div class="card" style="margin-top:40px;"><h2 style="text-align:center; margin-bottom:28px;">${_authMode === 'login' ? '登录' : '注册'}</h2>
             <div class="auth-form"><input type="email" id="authEmail" class="auth-input" placeholder="邮箱"><input type="password" id="authPassword" class="auth-input" placeholder="密码（至少6位）"><button class="btn-primary" id="authSubmitBtn">${_authMode === 'login' ? '登录' : '注册'}</button></div>
@@ -397,4 +392,40 @@
             const authSwitch = document.getElementById('authSwitchBtn');
             if(authSwitch) authSwitch.onclick = () => { _authMode = _authMode === 'login' ? 'register' : 'login'; render(); };
             
-            document.querySelectorAll('.faq-question').forEach(q =>
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.onclick = () => { q.nextElementSibling?.classList.toggle('show'); };
+            });
+        }
+        
+        window.selectAnswer = (score) => {
+            if(!_quizActive) return;
+            _answers[_currentIndex] = score;
+            if(_currentIndex + 1 < QUESTIONS.length) {
+                _currentIndex++;
+                render();
+            } else {
+                const finalScore = getPercentScore();
+                _quizActive = false;
+                _currentTab = 'result';
+                if(_currentUser) saveScoreToSupabase(finalScore);
+                render();
+            }
+        };
+        
+        window.logout = async function() {
+            await _supabase.auth.signOut();
+            _currentUser = null;
+            render();
+        };
+        
+        async function init() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (user) _currentUser = user;
+            render();
+            
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.addEventListener('click', () => {
+                    const tab = nav.getAttribute('data-tab');
+                    if(tab === 'home') { _quizActive = false; _currentTab = 'home'; render(); }
+                    else if(tab === 'device') { _quizActive = false; _currentTab = 'device'; render(); }
+                    else if(tab === 'profile') { _quizActive = false; _current
