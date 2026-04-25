@@ -86,7 +86,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         
-        /* Hero区 + 新图片 */
+        /* Hero区 */
         .hero {
             background: linear-gradient(135deg, #eef6f0 0%, #d9e8e0 100%);
             border-radius: 32px;
@@ -103,9 +103,6 @@
             color: #1e4620;
             line-height: 1.25;
             margin-bottom: 10px;
-        }
-        .hero-left h1 span {
-            display: block;
         }
         .hero-left p {
             font-size: 14px;
@@ -709,7 +706,7 @@
 </div>
 
 <script>
-    // 10个案例数据
+    // ==================== 初始化案例数据 ====================
     const casesList = [
         { name: "👩 张女士", text: "通过评估发现风险，及时带父亲检查，干预后状态改善明显。" },
         { name: "👨 李先生", text: "使用设备后，能远程关注母亲睡眠和活动状态，安心多了。" },
@@ -732,32 +729,31 @@
             wrapper.appendChild(div);
         });
     }
-    
-    // 左右滚动
-    const scrollLeftBtn = document.getElementById('scrollLeftBtn');
-    const scrollRightBtn = document.getElementById('scrollRightBtn');
-    if(scrollLeftBtn && wrapper) {
-        scrollLeftBtn.onclick = () => wrapper.scrollBy({ left: -280, behavior: 'smooth' });
-        scrollRightBtn.onclick = () => wrapper.scrollBy({ left: 280, behavior: 'smooth' });
-    }
 
-    // 页面导航函数
+    // ==================== 页面导航 ====================
     function navigateTo(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        document.getElementById(pageId + 'Page').classList.add('active-page');
+        const pages = ['home', 'device', 'profile', 'quiz'];
+        pages.forEach(id => {
+            const pageEl = document.getElementById(id + 'Page');
+            if(pageEl) pageEl.classList.remove('active-page');
+        });
+        const targetPage = document.getElementById(pageId + 'Page');
+        if(targetPage) targetPage.classList.add('active-page');
+        
+        // 更新底部导航active状态
         document.querySelectorAll('.nav-item').forEach(btn => {
             const page = btn.getAttribute('data-page');
             if(page === pageId) btn.classList.add('active');
             else btn.classList.remove('active');
         });
     }
-    
-    // 发送邮件函数
+
+    // ==================== 邮件功能 ====================
     function sendEmail() {
         window.location.href = 'mailto:celia2206254@gmail.com?subject=咨询认知健康服务&body=您好，我想咨询以下问题：';
     }
-    
-    // 20题认知问卷
+
+    // ==================== 20题认知问卷 ====================
     const questions = [
         "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？", "是否忘记约定或日期？", "是否记不住最近发生的事？",
         "是否常搞不清今天星期几？", "是否分不清月份或季节？", "是否去熟悉地方也容易迷路？", "是否常叫不出熟悉物品名称？", "说话时是否常卡住找词？",
@@ -775,17 +771,60 @@
         const raw = answers.reduce((s,v)=> s + (v !== null ? v : 0), 0);
         return Math.round((raw / 60) * 100);
     }
+    
     function getRiskLevel(score100) {
         if(score100 <= 25) return { name: '低风险', class: 'risk-low', desc: '当前认知状态总体稳定，建议持续保持健康生活习惯。' };
         if(score100 <= 50) return { name: '中风险', class: 'risk-mid', desc: '存在一定认知下降倾向，建议增加观察，并进行专业筛查。' };
         return { name: '高风险', class: 'risk-high', desc: '认知下降风险较高，建议尽快前往医院神经内科或记忆门诊进一步评估。' };
     }
+    
     function generateAIText(percent) {
         if(percent <= 25) return "根据AI分析，您的认知功能整体处于良好水平。各项指标未见明显异常，大脑健康状态稳定。继续保持健康生活方式。";
         if(percent <= 50) return "AI提示轻度认知下降迹象。建议增加脑力活动，保证充足睡眠，3-6个月后复查。";
         return "AI评估提示认知功能存在显著下降风险，建议尽快前往医院神经内科进行专业评估，早期干预至关重要。";
     }
 
+    function selectAnswer(value) {
+        if(autoTimer) clearTimeout(autoTimer);
+        answers[currentIndex] = value;
+        renderQuizPage();
+        
+        if(currentIndex + 1 < questions.length) {
+            autoTimer = setTimeout(() => {
+                currentIndex++;
+                renderQuizPage();
+                autoTimer = null;
+            }, 1000);
+        } else {
+            autoTimer = setTimeout(() => {
+                currentIndex++; // 设为20，表示完成
+                renderQuizPage();
+                autoTimer = null;
+            }, 1000);
+        }
+    }
+    
+    function prevQuestion() {
+        if(currentIndex > 0) {
+            if(autoTimer) clearTimeout(autoTimer);
+            currentIndex--;
+            renderQuizPage();
+        }
+    }
+    
+    function startQuiz() {
+        answers = new Array(20).fill(null);
+        currentIndex = 0;
+        if(autoTimer) clearTimeout(autoTimer);
+        navigateTo('quiz');
+        renderQuizPage();
+    }
+    
+    function resetToHome() {
+        if(autoTimer) clearTimeout(autoTimer);
+        navigateTo('home');
+    }
+    
     function renderQuizPage() {
         const quizDiv = document.getElementById('quizPage');
         if(!quizDiv) return;
@@ -802,20 +841,3 @@
             });
             quizDiv.innerHTML = `
                 <div class="quiz-card">
-                    <div class="question-counter">第 ${currentQ} / ${total} 题</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div>
-                    <div class="question-text">${questions[currentIndex]}</div>
-                    <div>${optionsHtml}</div>
-                    <div class="nav-buttons">
-                        <button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled style="opacity:0.5"' : ''}>← 上一题</button>
-                    </div>
-                    <div class="footer-note">点击选项后自动进入下一题</div>
-                </div>
-            `;
-        } else {
-            const percent = getPercentageScore();
-            const risk = getRiskLevel(percent);
-            const ai = generateAIText(percent);
-            quizDiv.innerHTML = `
-                <div class="quiz-card result-area">
-                    <h2>📋 评估结果</
