@@ -64,27 +64,9 @@
         .login-hint{background:#eef6f1;border-radius:28px;padding:12px;text-align:center;margin-bottom:16px;cursor:pointer;color:#0f6e3f;font-weight:500;}
         .btn-primary{background:#0f6e3f;color:white;width:100%;padding:16px 20px;font-size:16px;font-weight:600;border-radius:60px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
         .btn-outline{background:white;border:1.5px solid #0f6e3f;color:#0f6e3f;font-weight:600;padding:14px 18px;border-radius:60px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
-        /* 回到首页按钮 */
-        .home-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #eef2f7;
-            border: none;
-            border-radius: 40px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #0f6e3f;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: 0.2s;
-            z-index: 10;
-        }
-        .home-btn:active { background: #e2e8f0; transform: scale(0.96); }
-        .result-card { position: relative; padding-top: 50px; }
+        .home-btn{position:absolute;top:20px;left:20px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;font-size:14px;font-weight:500;color:#0f6e3f;cursor:pointer;display:flex;align-items:center;gap:6px;z-index:10;}
+        .home-btn:active{background:#e2e8f0;transform:scale(0.96);}
+        .result-card{position:relative;padding-top:50px;}
     </style>
 </head>
 <body>
@@ -109,6 +91,7 @@
     let answers = new Array(20).fill(null), currentIndex = 0, authMode = "login";
     let isEditing = false, userProfile = { gender: '', age: null };
     let selectedHistory = null, bannerInterval = null, currentBannerIndex = 0;
+    let showAllHistory = false;  // 控制历史报告显示全部还是收起
 
     const QUESTIONS = ["最近是否经常忘记刚说过的话？","是否常忘记东西放在哪里？","是否重复询问同一件事？","是否忘记约定或日期？","是否记不住最近发生的事？","是否常搞不清今天星期几？","是否分不清月份或季节？","是否去熟悉地方也容易迷路？","是否常叫不出熟悉物品名称？","说话时是否常卡住找词？","是否表达内容混乱？","是否听不懂复杂说明？","是否不会使用熟悉家电？","是否缴费、算账变困难？","是否做饭步骤容易混乱？","是否需要别人提醒洗澡吃药？","是否脾气变化明显？","是否变得多疑敏感？","是否兴趣明显下降？","是否社交意愿下降？"];
     const OPTIONS = [{label:"无异常",rawScore:0},{label:"偶尔出现",rawScore:1},{label:"经常出现",rawScore:2},{label:"明显频繁",rawScore:3}];
@@ -123,7 +106,6 @@
         return {name:'高风险',class:'risk-high',desc:'认知功能需引起关注，建议加强日常监测。'}; 
     }
     
-    // AI 详细评估文字生成
     function getAIDetail(score, userAge, userGender) {
         let ageText = '';
         if(userAge) {
@@ -184,15 +166,38 @@
 
     async function renderProfile() {
         if(!currentUser) return '<div class="card"><h2 style="text-align:center;margin-bottom:24px;">'+(authMode==='login'?'登录':'注册')+'</h2><div class="auth-form"><input type="email" id="authEmail" class="auth-input" placeholder="邮箱"><input type="password" id="authPassword" class="auth-input" placeholder="密码（至少6位）"><button class="btn-primary" id="authSubmitBtn">'+(authMode==='login'?'登录':'注册')+'</button></div><div class="auth-switch" id="authSwitchBtn">'+(authMode==='login'?'没有账号？点击注册':'已有账号？点击登录')+'</div><div class="footer-links" style="margin-top:24px;"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系客服</a></div></div>';
+        
         await loadUserProfile();
         let latestScore = await loadUserScore();
         let historyList = await loadHistory();
-        let historyHtml = '<h3 style="margin-bottom:16px;">📊 历史评估报告</h3>';
-        if(historyList.length===0) historyHtml += '<div class="text-center" style="color:#94a3b8;padding:24px;">暂无评估记录，去做一次测试吧~</div>';
-        else for(let h of historyList) { let d=new Date(h.created_at); let dateStr=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); let timeStr=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); let rc=h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'); historyHtml+='<div class="history-item" data-id="'+h.id+'"><div><div class="history-score">'+h.score+' 分</div><div class="history-date">'+dateStr+'</div><div class="history-time">'+timeStr+'</div></div><div style="color:'+rc+';font-weight:600;">'+h.risk_level+'</div></div>'; }
-        if(isEditing) return '<div class="card"><h3 style="margin-bottom:16px;">✏️ 编辑个人资料</h3><select id="editGender" class="profile-select"><option value="">请选择性别</option><option value="男"'+(userProfile.gender==='男'?' selected':'')+'>男</option><option value="女"'+(userProfile.gender==='女'?' selected':'')+'>女</option></select><input type="number" id="editAge" class="profile-input" placeholder="年龄" value="'+(userProfile.age||'')+'" style="margin-top:12px;"><button class="btn-primary" id="saveProfileBtn" style="margin-top:16px;">保存修改</button><button class="btn-outline" id="cancelEditBtn" style="margin-top:10px;">取消</button></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
+        
+        let displayList = showAllHistory ? historyList : historyList.slice(0, 4);
+        let historyHtml = '<div class="flex-between" style="margin-bottom:16px;"><h3>📊 历史评估报告</h3><span style="font-size:13px; color:#64748b;">共 ' + historyList.length + ' 条记录</span></div>';
+        
+        if(historyList.length === 0) {
+            historyHtml += '<div class="text-center" style="color:#94a3b8;padding:24px;">暂无评估记录，去做一次测试吧~</div>';
+        } else {
+            for(let h of displayList) { 
+                let d = new Date(h.created_at); 
+                let dateStr = d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); 
+                let timeStr = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); 
+                let rc = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'); 
+                historyHtml += '<div class="history-item" data-id="'+h.id+'"><div><div class="history-score">'+h.score+' 分</div><div class="history-date">'+dateStr+'</div><div class="history-time">'+timeStr+'</div></div><div style="color:'+rc+';font-weight:600;">'+h.risk_level+'</div></div>'; 
+            }
+            if(historyList.length > 4 && !showAllHistory) {
+                historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:12px;">📋 查看全部 ' + historyList.length + ' 条历史报告</button>';
+            }
+            if(showAllHistory) {
+                historyHtml += '<button class="btn-outline" id="hideAllHistoryBtn" style="margin-top:12px;">⬆️ 收起</button>';
+            }
+        }
+        
+        if(isEditing) {
+            return '<div class="card"><h3 style="margin-bottom:16px;">✏️ 编辑个人资料</h3><select id="editGender" class="profile-select"><option value="">请选择性别</option><option value="男"'+(userProfile.gender==='男'?' selected':'')+'>男</option><option value="女"'+(userProfile.gender==='女'?' selected':'')+'>女</option></select><input type="number" id="editAge" class="profile-input" placeholder="年龄" value="'+(userProfile.age||'')+'" style="margin-top:12px;"><button class="btn-primary" id="saveProfileBtn" style="margin-top:16px;">保存修改</button><button class="btn-outline" id="cancelEditBtn" style="margin-top:10px;">取消</button></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
+        }
+        
         let gd = userProfile.gender||'未设置', ad = userProfile.age?userProfile.age+' 岁':'未设置';
-        return '<div class="card"><div class="flex-between" style="margin-bottom:16px;"><div><h3>我的健康档案</h3><p style="color:#64748b;font-size:13px;">'+currentUser.email+'</p></div><div><button id="logoutProfileBtn" class="logout-btn" style="background:#e2e8f0;color:#1e293b;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">退出</button><button id="editProfileBtn" style="margin-left:8px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">✏️ 编辑</button></div></div><div class="info-row"><span class="info-label"><span>👤</span> 性别</span><span>'+gd+'</span></div><div class="info-row"><span class="info-label"><span>🎂</span> 年龄</span><span>'+ad+'</span></div><div class="info-row"><span class="info-label"><span>📊</span> 最近评估分数</span><span style="font-weight:800;color:#0f6e3f;">'+(latestScore!==null?latestScore+' 分':'暂无')+'</span></div></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
+        return '<div class="card"><div class="flex-between" style="margin-bottom:16px;"><div><h3>我的健康档案</h3><p style="color:#64748b;font-size:13px;">'+currentUser.email+'</p></div><div><button id="logoutProfileBtn" class="logout-btn" style="background:#e2e8f0;color:#1e293b;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">退出</button><button id="editProfileBtn" style="margin-left:8px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">✏️ 编辑</button></div></div><div class="info-row"><span class="info-label"><span>👤</span> 性别</span><span>'+gd+'</span></div><div class="info-row"><span class="info-label"><span>🎂</span> 年龄</span><span>'+ad+'</span></div><div class="info-row"><span class="info-label"><span>📊</span> 最近评估分数</span><span style="font-weight:800;color:#0f6e3f;">'+(latestScore!==null?latestScore+' 分':'暂无')+'</span></div></div><div class="card" id="historyCard">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
     }
 
     function renderQuiz() { let opts=''; for(let o of OPTIONS) opts+='<button class="option-btn '+(answers[currentIndex]===o.rawScore?'selected':'')+'" onclick="selectAnswer('+o.rawScore+')">'+o.label+'</button>'; return '<div class="quiz-card"><div class="progress-bar"><div class="progress-fill" style="width:'+((currentIndex/QUESTIONS.length)*100)+'%;"></div></div><div class="flex-between" style="margin-bottom:16px;"><span>第'+(currentIndex+1)+'/'+QUESTIONS.length+'题</span><span style="color:#0f6e3f;">认知自测</span></div><div class="question-text">'+QUESTIONS[currentIndex]+'</div>'+opts+'<button class="btn-outline" id="prevBtn" '+(currentIndex===0?'disabled style="opacity:0.5"':'')+'>← 上一题</button></div>'; }
@@ -242,13 +247,13 @@
         
         // 回到首页按钮
         const backHomeBtn = document.getElementById('backHomeBtn');
-        if(backHomeBtn) {
-            backHomeBtn.addEventListener('click', () => {
-                currentTab = 'home';
-                quizActive = false;
-                render();
-            });
-        }
+        if(backHomeBtn) backHomeBtn.addEventListener('click', () => { currentTab = 'home'; quizActive = false; render(); });
+        
+        // 历史报告展开/收起按钮
+        const showAllBtn = document.getElementById('showAllHistoryBtn');
+        if(showAllBtn) showAllBtn.addEventListener('click', () => { showAllHistory = true; render(); });
+        const hideAllBtn = document.getElementById('hideAllHistoryBtn');
+        if(hideAllBtn) hideAllBtn.addEventListener('click', () => { showAllHistory = false; render(); });
         
         document.getElementById('gotoDeviceBtn')?.addEventListener('click',()=>{ currentTab='device'; render(); });
         document.getElementById('historyTestBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
