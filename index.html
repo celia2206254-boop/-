@@ -2,8 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>认知健康管理中心 | 专业自测+智能方案</title>
+    <!-- html2canvas 库用于生成图片 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,23 +18,23 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: #f4f7fc;
             color: #1e293b;
+            min-height: 100vh;
         }
 
-        /* 主容器 */
         .app-wrapper {
-            max-width: 550px;
+            max-width: 500px;
             margin: 0 auto;
             background: #f4f7fc;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.03);
+            box-shadow: 0 0 25px rgba(0,0,0,0.02);
         }
 
         .main-content {
             flex: 1;
-            padding-bottom: 80px;
+            padding-bottom: 85px;
         }
 
         /* 底部导航 */
@@ -41,143 +43,149 @@
             bottom: 0;
             left: 0;
             right: 0;
-            max-width: 550px;
+            max-width: 500px;
             margin: 0 auto;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 20px 22px;
-            border-top: 1px solid #e9edf2;
-            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+            padding: 10px 20px 28px;
+            border-top: 0.5px solid rgba(0,0,0,0.08);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
             z-index: 1000;
+            padding-bottom: calc(28px + env(safe-area-inset-bottom, 20px));
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             cursor: pointer;
-            transition: 0.2s;
-            padding: 4px 12px;
+            transition: 0.2s ease;
+            padding: 6px 14px;
             border-radius: 40px;
             opacity: 0.55;
             color: #5b6e8c;
+            background: transparent;
         }
         .nav-item.active {
             opacity: 1;
             color: #0f6e3f;
-            font-weight: 500;
+            font-weight: 510;
+            background: rgba(15,110,63,0.08);
         }
         .nav-icon {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             fill: currentColor;
         }
         .nav-label {
             font-size: 11px;
             font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
-        /* 通用卡片样式 */
         .card {
             background: white;
-            border-radius: 32px;
-            padding: 24px 20px;
+            border-radius: 36px;
+            padding: 24px 22px;
             margin: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0,0,0,0.03);
         }
 
-        /* Hero区 —— 完全匹配图片文案和风格 */
         .hero-card {
-            background: linear-gradient(145deg, #eef6f1 0%, #ffffff 100%);
-            border-radius: 40px;
+            background: linear-gradient(135deg, #f0f9f3 0%, #ffffff 100%);
+            border-radius: 44px;
             margin: 20px 16px;
-            padding: 28px 24px;
-            box-shadow: 0 12px 28px rgba(15, 110, 63, 0.08);
-            border: 1px solid rgba(15,110,63,0.15);
+            padding: 32px 26px;
+            box-shadow: 0 16px 32px -12px rgba(15, 110, 63, 0.12);
+            border: 0.5px solid rgba(15,110,63,0.2);
         }
         .hero-tag {
-            font-size: 14px;
+            font-size: 13px;
             color: #0f6e3f;
             font-weight: 600;
             background: rgba(15,110,63,0.12);
             display: inline-block;
             padding: 6px 14px;
             border-radius: 40px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(2px);
         }
         .hero-title {
-            font-size: 34px;
+            font-size: 38px;
             font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 12px;
-            color: #1e2f3d;
+            line-height: 1.15;
+            margin-bottom: 14px;
+            color: #1a2c3e;
+            letter-spacing: -0.5px;
         }
         .hero-sub {
             font-size: 18px;
             font-weight: 500;
-            color: #3b5c7a;
-            margin-bottom: 28px;
+            color: #2c5a7a;
+            margin-bottom: 32px;
             border-left: 4px solid #0f6e3f;
-            padding-left: 12px;
+            padding-left: 14px;
         }
         .btn-primary {
             background: #0f6e3f;
             color: white;
             width: 100%;
-            padding: 16px;
+            padding: 18px 16px;
             font-size: 17px;
             font-weight: 700;
             border-radius: 60px;
             border: none;
             cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 6px 14px rgba(15,110,63,0.3);
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 8px 20px rgba(15,110,63,0.28);
         }
-        .btn-primary:active { background: #0a5833; transform: scale(0.98);}
+        .btn-primary:active { background: #0a5833; transform: scale(0.97);}
         .btn-outline {
             background: white;
             border: 1.5px solid #0f6e3f;
             color: #0f6e3f;
             font-weight: 600;
-            padding: 12px 18px;
+            padding: 14px 18px;
             border-radius: 60px;
             width: 100%;
             cursor: pointer;
             transition: 0.2s;
+            font-size: 15px;
         }
-        .btn-outline:active { background: #eef6f1; transform: scale(0.98);}
+        .btn-outline:active { background: #eef6f1; transform: scale(0.97);}
         
-        /* 智能设备区域 */
         .device-showcase {
-            background: linear-gradient(115deg, #f0f9ff 0%, #ffffff 100%);
-            border-radius: 32px;
+            background: linear-gradient(110deg, #ffffff 0%, #f8fdf9 100%);
+            border-radius: 36px;
             margin: 16px;
-            padding: 20px;
-            border: 1px solid #cbdde9;
+            padding: 24px 22px;
+            border: 0.5px solid #dde9e2;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.03);
         }
         .device-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             flex-wrap: wrap;
         }
         .device-title {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 720;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .device-desc {
-            font-size: 14px;
-            color: #4b6b8a;
-            margin: 12px 0;
+            font-size: 15px;
+            color: #3c6485;
+            margin: 16px 0;
+            line-height: 1.4;
         }
         .btn-small {
-            background: #0f6e3f10;
+            background: rgba(15,110,63,0.1);
             border: 1px solid #0f6e3f;
             padding: 10px 20px;
             border-radius: 40px;
@@ -185,32 +193,36 @@
             font-weight: 600;
             color: #0f6e3f;
             cursor: pointer;
+            transition: 0.15s;
         }
+        .btn-small:active { background: #0f6e3f20; transform: scale(0.96);}
 
-        /* 问卷模块 */
         .quiz-card {
             background: white;
-            border-radius: 36px;
-            margin: 16px;
-            padding: 20px;
+            border-radius: 40px;
+            margin: 20px 16px;
+            padding: 28px 22px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
         }
         .question-text {
-            font-weight: 700;
-            font-size: 22px;
-            margin: 20px 0 28px;
+            font-weight: 720;
+            font-size: 24px;
+            margin: 20px 0 32px;
             text-align: center;
+            line-height: 1.35;
         }
         .option-btn {
-            padding: 14px;
-            border: 1.5px solid #cbd5e1;
+            padding: 16px;
+            border: 1.5px solid #e2e8f0;
             border-radius: 60px;
             background: white;
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 510;
+            margin-bottom: 12px;
             width: 100%;
             text-align: center;
             cursor: pointer;
+            transition: all 0.15s;
         }
         .option-btn.selected {
             background: #0f6e3f;
@@ -218,34 +230,34 @@
             color: white;
         }
         .progress-bar {
-            background: #e2e8f0;
-            border-radius: 10px;
-            height: 6px;
-            margin: 8px 0;
+            background: #eef2f7;
+            border-radius: 20px;
+            height: 7px;
+            margin: 10px 0 12px;
         }
         .progress-fill {
             background: #0f6e3f;
-            height: 6px;
-            border-radius: 10px;
+            height: 7px;
+            border-radius: 20px;
             width: 0%;
         }
 
-        /* FAQ 区域 */
         .faq-item {
-            border-bottom: 1px solid #eef2f6;
-            padding: 16px 0;
+            border-bottom: 1px solid #edf2f7;
+            padding: 18px 0;
         }
         .faq-question {
-            font-weight: 700;
+            font-weight: 680;
             display: flex;
             justify-content: space-between;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 17px;
+            color: #1f3a4c;
         }
         .faq-answer {
-            font-size: 14px;
-            color: #4a5b7a;
-            padding-top: 10px;
+            font-size: 15px;
+            color: #557da5;
+            padding-top: 12px;
             line-height: 1.45;
             display: none;
         }
@@ -255,49 +267,110 @@
         .footer-links {
             text-align: center;
             font-size: 12px;
-            color: #7291b0;
-            padding: 20px 16px 28px;
-            border-top: 1px solid #e2e8f0;
-            margin-top: 24px;
+            color: #7a98b5;
+            padding: 24px 16px 32px;
+            border-top: 0.5px solid #e6edf4;
+            margin-top: 20px;
+        }
+        .footer-links a {
+            text-decoration: none;
+            color: #2f6b47;
+            margin: 0 6px;
         }
 
-        /* 结果页样式 */
         .score-circle {
-            width: 120px;
-            height: 120px;
-            background: #eef2ff;
+            width: 130px;
+            height: 130px;
+            background: #eef5ff;
             border-radius: 50%;
-            margin: 10px auto;
+            margin: 12px auto;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            box-shadow: inset 0 0 0 4px white, 0 8px 20px rgba(0,0,0,0.05);
         }
         .risk-low { color: #10b981; }
         .risk-mid { color: #f59e0b; }
         .risk-high { color: #ef4444; }
         .ai-assessment {
-            background: #eef2ff;
-            padding: 16px;
-            border-radius: 24px;
-            margin: 16px 0;
+            background: #f0f5fe;
+            padding: 18px;
+            border-radius: 28px;
+            margin: 20px 0 0 0;
+            font-size: 15px;
+            line-height: 1.45;
         }
-
+        .ai-assessment .risk-desc-inline {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(100, 116, 139, 0.2);
+            font-size: 14px;
+            color: #2c5a7a;
+        }
         .toast-msg {
             position: fixed;
-            bottom: 90px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: #1e293b;
+            background: #1e2b3c;
             color: white;
-            padding: 8px 18px;
-            border-radius: 40px;
-            font-size: 13px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
             opacity: 0;
-            transition: 0.2s;
+            transition: 0.18s;
             pointer-events: none;
             z-index: 2000;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            max-width: 85vw;
         }
+        .risk-level {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 12px 0;
+        }
+        .feature-badge {
+            background: #eef2ff;
+            padding: 8px 16px;
+            border-radius: 80px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .report-capture-area {
+            background: white;
+            border-radius: 36px;
+            padding: 20px;
+        }
+        .share-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+        .btn-share {
+            flex: 1;
+            background: #0f6e3f;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-share-outline {
+            background: white;
+            border: 1.5px solid #0f6e3f;
+            color: #0f6e3f;
+        }
+        .btn-share:active { transform: scale(0.97);}
     </style>
 </head>
 <body>
@@ -305,15 +378,15 @@
     <div class="main-content" id="mainContent"></div>
     <div class="bottom-nav" id="bottomNav">
         <div class="nav-item" data-tab="home">
-            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 3L2 9l10 6 10-6-10-6zM2 18l10 6 10-6M2 12l10 6 10-6"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 3L2 9l10 6 10-6-10-6zM2 18l10 6 10-6M2 12l10 6 10-6"/></svg>
             <span class="nav-label">认知评估</span>
         </div>
         <div class="nav-item" data-tab="device">
-            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2h6v2h-6V6zm0 4h6v2h-6v-2zm-6 0h4v2H6v-2zm0 4h4v2H6v-2zm10 0h2v2h-2v-2zm-6 0h4v2h-4v-2z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2h6v2h-6V6zm0 4h6v2h-6v-2zm-6 0h4v2H6v-2zm0 4h4v2H6v-2zm10 0h2v2h-2v-2zm-6 0h4v2h-4v-2z"/></svg>
             <span class="nav-label">智能设备</span>
         </div>
         <div class="nav-item" data-tab="profile">
-            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             <span class="nav-label">我的页面</span>
         </div>
     </div>
@@ -321,7 +394,7 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // ---------- 认知问卷20题（原始可靠题库）----------
+    // 认知问卷20题
     const QUESTIONS = [
         "最近是否经常忘记刚说过的话？", "是否常忘记东西放在哪里？", "是否重复询问同一件事？",
         "是否忘记约定或日期？", "是否记不住最近发生的事？", "是否常搞不清今天星期几？",
@@ -339,17 +412,19 @@
     ];
     const MAX_RAW = 60;
 
-    let currentTab = "home";      // home, device, profile
-    let quizActive = false;        // 是否在答题模式
+    let currentTab = "home";      
+    let quizActive = false;        
     let answers = new Array(20).fill(null);
     let currentIndex = 0;
 
-    // 辅助函数
+    // 固定的分享链接地址 (根据用户要求)
+    const SHARE_URL = "https://www.renzhiceshi.online/";
+
     function showToast(msg) {
         const toast = document.getElementById('toastMsg');
         toast.textContent = msg;
         toast.style.opacity = '1';
-        setTimeout(() => toast.style.opacity = '0', 2000);
+        setTimeout(() => { if(toast) toast.style.opacity = '0'; }, 2200);
     }
 
     function getTotalRaw() {
@@ -363,27 +438,21 @@
     function getRiskLevel(score) {
         if(score <= 25) return { name:'低风险', class:'risk-low', desc:'当前认知状态总体稳定，保持健康生活习惯即可。' };
         if(score <= 50) return { name:'中风险', class:'risk-mid', desc:'存在一定认知下降倾向，建议加强脑力活动并定期复查。' };
-        return { name:'高风险', class:'risk-high', desc:'认知下降风险较高，请尽快前往记忆门诊或神经内科评估。' };
+        return { name:'高风险', class:'risk-high', desc:'认知功能需引起关注，建议加强日常监测，保持积极生活方式。' };
     }
     function generateAI(percent, raw) {
         if(percent <= 25) return "🤖 AI分析：您的认知功能整体表现良好，记忆与执行能力未见明显异常。继续保持社交与脑力活动。";
         if(percent <= 50) return "🤖 AI提示：存在轻度认知功能波动，尤其是在近期记忆或定向方面。建议每日健脑训练、规律作息，并监测变化。";
-        return "🤖 AI预警：认知功能下降风险显著，多个维度出现异常信号。强烈建议尽快就医进行专业神经心理学评估，早期干预至关重要。";
+        return "🤖 AI预警：认知功能下降风险显著，多个维度出现异常信号。建议进行更详细的健康管理及医学咨询。";
     }
 
-    // 重置问卷
     function startNewQuiz() {
         answers = new Array(20).fill(null);
         currentIndex = 0;
         quizActive = true;
         render();
     }
-    function resetAndGoHome() {
-        quizActive = false;
-        currentTab = "home";
-        answers = new Array(20).fill(null);
-        render();
-    }
+    
     function selectAnswer(score) {
         if(!quizActive) return;
         answers[currentIndex] = score;
@@ -391,10 +460,8 @@
             currentIndex++;
             render();
         } else {
-            // 完成问卷 -> 展示结果
             quizActive = false;
-            render(); // 将会展示结果视图 (基于currentTab=result)
-            currentTab = "result";  // 结果页
+            currentTab = "result";
             render();
         }
     }
@@ -405,7 +472,51 @@
         }
     }
 
-    // 渲染不同页面
+    // 生成图片功能
+    async function shareAsImage() {
+        const reportElement = document.getElementById('reportCaptureArea');
+        if (!reportElement) {
+            showToast("暂无法生成图片，请重试");
+            return;
+        }
+        try {
+            showToast("生成报告中...");
+            const canvas = await html2canvas(reportElement, {
+                scale: 2.5,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: false
+            });
+            const imageData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `认知评估报告_${new Date().toISOString().slice(0,19)}.png`;
+            link.href = imageData;
+            link.click();
+            showToast("报告图片已保存");
+        } catch (err) {
+            console.error(err);
+            showToast("生成失败，可刷新重试");
+        }
+    }
+
+    // 分享网址：复制固定的 SHARE_URL (https://www.renzhiceshi.online/)
+    async function copyFixedUrl() {
+        try {
+            await navigator.clipboard.writeText(SHARE_URL);
+            showToast("网址已复制，可分享给好友");
+        } catch (err) {
+            // 降级方案
+            const textarea = document.createElement('textarea');
+            textarea.value = SHARE_URL;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast("网址已复制");
+        }
+    }
+
+    // 首页渲染
     function renderHome() {
         return `
             <div class="hero-card">
@@ -416,40 +527,35 @@
             </div>
             <div class="device-showcase" id="devicePreviewCard">
                 <div class="device-header">
-                    <div class="device-title"><span>📡 智能健康设备</span></div>
-                    <button class="btn-small" id="gotoDeviceFromHome">查看设备 →</button>
+                    <div class="device-title"><span>⌚ 华为手环</span></div>
+                    <button class="btn-small" id="gotoDeviceFromHome">点击查看 →</button>
                 </div>
-                <div class="device-desc">🏠 居家监测记忆与行为变化 · 毫米波雷达无接触式守护，异常行为自动告警。</div>
-                <div style="display: flex; gap: 12px; margin-top: 12px;">
-                    <span style="background:#eef2ff; padding:6px 12px; border-radius:50px;">📊 睡眠分析</span>
-                    <span style="background:#eef2ff; padding:6px 12px; border-radius:50px;">🚶 活动轨迹</span>
-                    <span style="background:#eef2ff; padding:6px 12px; border-radius:50px;">⏰ 用药提醒</span>
+                <div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div>
+                <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap:wrap;">
+                    <span class="feature-badge">💤 睡眠监测</span>
+                    <span class="feature-badge">🚶 活动轨迹异常提醒</span>
                 </div>
             </div>
         `;
     }
 
+    // 设备页
     function renderDevice() {
         return `
             <div class="card" style="margin-top:20px;">
-                <h2 style="font-size:26px; margin-bottom:8px;">📟 认知护航·智能硬件</h2>
-                <p style="color:#4b6b8a;">专为长者设计，无感监测认知相关行为变化</p>
-                <div style="background:#eef6f1; border-radius:32px; margin-top:24px; padding:20px;">
-                    <div style="font-weight:800; font-size:20px;">🧩 记忆守护终端</div>
-                    <ul style="margin: 16px 0 16px 20px; list-style:disc;">
-                        <li>日常行为节律分析</li>
-                        <li>异常徘徊 / 迷路预警</li>
-                        <li>服药依从性记录</li>
-                        <li>亲属端周报推送</li>
-                    </ul>
-                    <button class="btn-outline" id="deviceContactBtn">了解安装方式 →</button>
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+                    <span style="font-size:48px;">⌚</span>
+                    <h2 style="font-size:30px; letter-spacing:-0.5px;">华为手环</h2>
                 </div>
-                <div class="device-desc" style="margin-top:20px; background:#fafcff; padding:16px; border-radius:28px;">
-                    <strong>🔧 设备安装指导</strong><br>
-                    1. 插电即用，无需穿戴<br>
-                    2. 绑定APP，家人共享数据<br>
-                    3. 客服在线支持，适配各类户型<br>
-                    <span style="display:inline-block; margin-top:12px; color:#0f6e3f;">📞 咨询专线: 400-882-6625</span>
+                <p style="color:#2b6e4e; font-weight:500; margin-bottom:20px;">专为认知健康及长者安全设计的智能可穿戴设备</p>
+                <div style="background:#f0f9f4; border-radius:32px; padding:24px; margin-bottom:20px;">
+                    <div style="font-weight:800; font-size:20px; margin-bottom:18px;">🎯 核心认知守护功能</div>
+                    <ul style="margin-left: 20px; list-style:disc; color:#285e41; display:flex; flex-direction:column; gap:12px;">
+                        <li><strong>💤 睡眠监测</strong> – 精准记录深睡/浅睡/REM，分析睡眠规律与认知健康关联性，异常睡眠模式及时推送亲属端。</li>
+                        <li><strong>🚶 活动轨迹异常提醒</strong> – 基于AI行为模型，识别久坐、夜间离床、异常徘徊等轨迹变化，预防跌倒与走失风险。</li>
+                        <li><strong>📅 认知健康周报</strong> – 结合日常活动与睡眠数据生成认知趋势分析，辅助家人远程掌握状态。</li>
+                    </ul>
+                    <button class="btn-primary" id="deviceContactBtn" style="margin-top:28px; background:#0f6e3f;">点击查看 购买/安装详情 →</button>
                 </div>
             </div>
         `;
@@ -458,30 +564,30 @@
     function renderProfile() {
         return `
             <div class="card" style="margin-top:20px;">
-                <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
-                    <div style="background:#c7e9d0; width:64px; height:64px; border-radius:40px; display:flex; align-items:center; justify-content:center; font-size:32px;">👤</div>
-                    <div><h3>我的健康档案</h3><p style="color:#6c84a3;">历史评估记录可在此查看</p></div>
+                <div style="display:flex; align-items:center; gap:18px; margin-bottom:28px;">
+                    <div style="background:#d4f0df; width:70px; height:70px; border-radius:50px; display:flex; align-items:center; justify-content:center; font-size:34px;">👤</div>
+                    <div><h3 style="font-size:22px;">我的健康档案</h3><p style="color:#6286a8;">历史评估记录可在此查看</p></div>
                 </div>
-                <button class="btn-outline" id="historyTestBtn" style="margin-bottom:20px;">📋 重新认知评估</button>
+                <button class="btn-outline" id="historyTestBtn" style="margin-bottom:18px;">📋 重新认知评估</button>
             </div>
             <div class="card">
-                <h3 style="font-size:20px;">❓ 常见问题 (FAQ)</h3>
+                <h3 style="font-size:22px; margin-bottom:12px;">❓ 常见问题 (FAQ)</h3>
                 <div id="faqContainer">
                     <div class="faq-item">
                         <div class="faq-question">📋 问卷准吗？<span>▼</span></div>
                         <div class="faq-answer">本问卷基于临床常用认知筛查量表改编，具有较高信效度，可作为家庭自测参考，但不能替代医院诊断。</div>
                     </div>
                     <div class="faq-item">
-                        <div class="faq-question">🖥️ 设备怎么安装？<span>▼</span></div>
-                        <div class="faq-answer">设备即插即用，无网络也可本地记录，连接WiFi后数据同步至家属端。支持墙壁/桌面放置，提供视频指导。</div>
+                        <div class="faq-question">⌚ 华为手环如何辅助认知监测？<span>▼</span></div>
+                        <div class="faq-answer">手环通过连续睡眠监测和活动轨迹分析，捕捉睡眠碎片化、夜间活动频率等与认知下降相关的行为模式，并生成每周认知趋势报告给家人。</div>
                     </div>
                     <div class="faq-item">
-                        <div class="faq-question">👵 老人会用吗？<span>▼</span></div>
-                        <div class="faq-answer">全自动无需老人操作，毫米波雷达无接触感应，不会增加老人负担，子女远程即可掌握情况。</div>
+                        <div class="faq-question">👵 老人操作复杂吗？<span>▼</span></div>
+                        <div class="faq-answer">手环佩戴后自动监测，无需主动操作。数据通过App同步，方便家人远程了解健康动态。</div>
                     </div>
                     <div class="faq-item">
-                        <div class="faq-question">💎 是否需要会员？<span>▼</span></div>
-                        <div class="faq-answer">基础监测永久免费，高级分析报告及专家解读服务可选订阅（首年免费体验）。</div>
+                        <div class="faq-question">💎 是否需要额外订阅？<span>▼</span></div>
+                        <div class="faq-answer">基础睡眠/活动监测永久免费，高级认知分析与周报推送功能首年免费体验，后续可选用基础会员（可选）。</div>
                     </div>
                 </div>
             </div>
@@ -503,36 +609,43 @@
         return `
             <div class="quiz-card">
                 <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%;"></div></div>
-                <div style="display:flex; justify-content:space-between; margin:12px 0 0;"><span>第${currentIndex+1}/${QUESTIONS.length}题</span><span style="color:#0f6e3f;">认知自测</span></div>
+                <div style="display:flex; justify-content:space-between; margin:15px 0 6px;"><span style="font-weight:500;">第${currentIndex+1}/${QUESTIONS.length}题</span><span style="color:#0f6e3f; font-weight:600;">认知自测</span></div>
                 <div class="question-text">${escapeHtml(question)}</div>
                 <div class="options">${optsHtml}</div>
-                <div style="display:flex; gap:12px; margin-top:24px;">
-                    <button class="btn-outline" style="flex:1;" id="quizPrevBtn" ${currentIndex===0 ? 'disabled style="opacity:0.4"' : ''}>← 上一题</button>
+                <div style="display:flex; gap:14px; margin-top:32px;">
+                    <button class="btn-outline" style="flex:1;" id="quizPrevBtn" ${currentIndex===0 ? 'disabled style="opacity:0.5"' : ''}>← 上一题</button>
                 </div>
-                <div class="footer-links" style="margin-top:20px;">根据近3个月真实感受作答</div>
+                <div class="footer-links" style="margin-top:28px;">根据近3个月真实感受作答</div>
             </div>
         `;
     }
 
+    // 结果页：风险描述在AI框内，分享网址按钮复制固定链接
     function renderResult() {
         const percent = getPercentScore();
         const risk = getRiskLevel(percent);
         const aiText = generateAI(percent, getTotalRaw());
         return `
             <div class="card" style="text-align:center;">
-                <h2>📋 评估报告</h2>
-                <div class="score-circle"><span style="font-size:44px; font-weight:800;">${percent}</span><span>/100</span></div>
-                <div class="risk-level ${risk.class}" style="font-size:26px; font-weight:bold;">${risk.name}</div>
-                <div class="ai-assessment">${aiText}</div>
-                <p>${risk.desc}</p>
-                <div class="device-showcase" style="margin:20px 0; background:#f8fafc;">
-                    <div style="font-weight:bold;">🏠 智能设备居家监测方案</div>
-                    <div style="font-size:13px;">持续追踪行为变化，防走失、异常警报，守护记忆健康</div>
-                    <button class="btn-small" id="deviceFromResult" style="margin-top:10px;">了解设备详情</button>
+                <div id="reportCaptureArea" class="report-capture-area" style="background:white; border-radius:36px; padding:8px 4px;">
+                    <h2 style="font-size:28px;">📋 评估报告</h2>
+                    <div class="score-circle"><span style="font-size:48px; font-weight:800;">${percent}</span><span style="font-size:16px;">/100</span></div>
+                    <div class="risk-level ${risk.class}">${risk.name}</div>
+                    <div class="ai-assessment">
+                        ${aiText}
+                        <div class="risk-desc-inline">💡 ${risk.desc}</div>
+                    </div>
+                    <div class="device-showcase" style="margin:20px 0 8px; background:#fafefe; text-align:left;">
+                        <div style="font-weight:720; font-size:17px;">⌚ 华为手环 · 居家监测方案</div>
+                        <div style="font-size:14px; margin:8px 0;">睡眠监测 + 活动轨迹异常提醒，全天候认知健康守护</div>
+                    </div>
                 </div>
-                <div style="display:flex; gap:12px; margin-top:16px;">
+                <div class="share-buttons">
+                    <button class="btn-share" id="shareImageBtn">📸 生成图片</button>
+                    <button class="btn-share btn-share-outline" id="shareUrlBtn">🔗 分享网址</button>
+                </div>
+                <div style="margin-top:20px;">
                     <button class="btn-outline" id="restartQuizBtn">重新测试</button>
-                    <button class="btn-primary" id="goHomeFromResult">首页</button>
                 </div>
             </div>
         `;
@@ -540,12 +653,10 @@
 
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); }
 
-    // 主渲染调度
     function render() {
         const container = document.getElementById('mainContent');
         if (!container) return;
         let content = "";
-        // 如果 quizActive 为true 且不是在结果页覆盖状态，则展示问卷
         if (quizActive) {
             content = renderQuiz();
         } else {
@@ -565,35 +676,30 @@
                 item.classList.remove('active');
             }
         });
-        // 绑定动态按钮
         bindDynamicEvents();
     }
 
     function bindDynamicEvents() {
-        // 开始评估按钮
         const startBtn = document.getElementById('startFreeEvalBtn');
         if(startBtn) startBtn.onclick = () => { startNewQuiz(); };
-        // 首页中的 “查看设备”
         const gotoDevice = document.getElementById('gotoDeviceFromHome');
         if(gotoDevice) gotoDevice.onclick = () => { quizActive=false; currentTab='device'; render(); };
-        // 智能设备页联系 / 查看安装
         const deviceContact = document.getElementById('deviceContactBtn');
-        if(deviceContact) deviceContact.onclick = () => { showToast("安装指导已发送至邮箱 celia2206254@gmail.com 或联系客服"); };
-        // 我的页面重新评估
+        if(deviceContact) deviceContact.onclick = () => { showToast("华为手环购买链接/详细安装说明已发送至邮箱 celia2206254@gmail.com，或咨询官方客服 400-882-6625"); };
         const historyBtn = document.getElementById('historyTestBtn');
         if(historyBtn) historyBtn.onclick = () => { startNewQuiz(); };
-        // result 相关
         const restartBtn = document.getElementById('restartQuizBtn');
         if(restartBtn) restartBtn.onclick = () => { startNewQuiz(); };
-        const goHomeResult = document.getElementById('goHomeFromResult');
-        if(goHomeResult) goHomeResult.onclick = () => { quizActive=false; currentTab='home'; render(); };
-        const deviceFromResult = document.getElementById('deviceFromResult');
-        if(deviceFromResult) deviceFromResult.onclick = () => { quizActive=false; currentTab='device'; render(); };
-        // 问卷中上一题
         const prevBtn = document.getElementById('quizPrevBtn');
         if(prevBtn) prevBtn.onclick = () => { prevQuestion(); };
-        // 处理FAQ折叠
-        document.querySelectorAll('.faq-item').forEach((item, idx) => {
+        
+        const shareImageBtn = document.getElementById('shareImageBtn');
+        if(shareImageBtn) shareImageBtn.onclick = () => { shareAsImage(); };
+        const shareUrlBtn = document.getElementById('shareUrlBtn');
+        if(shareUrlBtn) shareUrlBtn.onclick = () => { copyFixedUrl(); };
+        
+        // FAQ折叠
+        document.querySelectorAll('.faq-item').forEach((item) => {
             const qDiv = item.querySelector('.faq-question');
             const answerDiv = item.querySelector('.faq-answer');
             if(qDiv && answerDiv) {
@@ -604,19 +710,14 @@
                     const arrow = qDiv.querySelector('span');
                     if(arrow) arrow.innerHTML = answerDiv.classList.contains('show') ? '▲' : '▼';
                 };
-                // 初始化箭头
                 const arrowSpan = qDiv.querySelector('span');
-                if(arrowSpan) arrowSpan.innerHTML = '▼';
+                if(arrowSpan && (!arrowSpan.innerHTML.trim() || arrowSpan.innerHTML === '▼')) arrowSpan.innerHTML = '▼';
             }
         });
     }
 
-    // 全局注册答题选择器
-    window.selectAnswerHandler = (score) => {
-        selectAnswer(score);
-    };
-    
-    // 底部导航切换
+    window.selectAnswerHandler = (score) => { selectAnswer(score); };
+
     function initNav() {
         const navs = document.querySelectorAll('.nav-item');
         navs.forEach(nav => {
@@ -629,7 +730,6 @@
         });
     }
     
-    // 初次渲染
     function init() {
         render();
         initNav();
