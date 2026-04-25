@@ -171,7 +171,8 @@
         let latestScore = await loadUserScore();
         let historyList = await loadHistory();
         
-        let displayList = showAllHistory ? historyList : historyList.slice(0, 4);
+        // 默认显示3条，点击「查看全部」后显示所有
+        let displayList = showAllHistory ? historyList : historyList.slice(0, 3);
         let historyHtml = '<div class="flex-between" style="margin-bottom:16px;"><h3>📊 历史评估报告</h3><span style="font-size:13px; color:#64748b;">共 ' + historyList.length + ' 条记录</span></div>';
         
         if(historyList.length === 0) {
@@ -184,7 +185,8 @@
                 let rc = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'); 
                 historyHtml += '<div class="history-item" data-id="'+h.id+'"><div><div class="history-score">'+h.score+' 分</div><div class="history-date">'+dateStr+'</div><div class="history-time">'+timeStr+'</div></div><div style="color:'+rc+';font-weight:600;">'+h.risk_level+'</div></div>'; 
             }
-            if(historyList.length > 4 && !showAllHistory) {
+            // 如果记录超过3条且不是全部显示状态，显示「查看全部」按钮
+            if(historyList.length > 3 && !showAllHistory) {
                 historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:12px;">📋 查看全部 ' + historyList.length + ' 条历史报告</button>';
             }
             if(showAllHistory) {
