@@ -166,10 +166,10 @@
         if(!currentUser) {
             loginHint = '<div class="login-hint" id="gotoAuthBtn">📝 登录/注册 查看历史记录</div>';
         }
-        // Banner 图片使用 HTTP 协议（又拍云测试域名暂不支持 HTTPS）
+        // 使用 GitHub Raw 地址
         let bannerHtml = '<div class="banner-container"><div class="banner-slider">' +
-            '<div class="banner-item" id="bannerFirst"><img src="http://celia2206254banner.test.upcdn.net/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
-            '<div class="banner-item"><img src="http://celia2206254banner.test.upcdn.net/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
+            '<div class="banner-item" id="bannerFirst"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
+            '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
             '</div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span></div></div>';
         
         return loginHint + bannerHtml + '<div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
