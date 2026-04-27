@@ -691,6 +691,11 @@
             color: #94a3b8;
             margin-top: 2px;
         }
+        
+        .history-risk {
+            font-size: 11px;
+            font-weight: 500;
+        }
 
         .edit-btn {
             background: #eef2f7;
@@ -1082,6 +1087,14 @@
             return { name: "人类顶级模范", desc: "这种人通常是行业的领袖或宗师，其存在本身就是一种稀缺资源。", advice: "建议：持续迭代认知，赋能生态，警惕精英傲慢，传承生命智慧。" };
         }
 
+        function getTraitRiskText(score) {
+            if (score <= 25) return "原生态生存者";
+            if (score <= 50) return "秩序觉醒者";
+            if (score <= 75) return "高标准践行者";
+            if (score <= 90) return "高质量人类";
+            return "人类顶级模范";
+        }
+
         function getTraitDimensionDetails() {
             let dimRaw = { "外在管理": 0, "经济底气": 0, "言行智慧": 0, "生活秩序": 0, "心理韧性": 0 };
             let dimMax = { "外在管理": 24, "经济底气": 20, "言行智慧": 26, "生活秩序": 18, "心理韧性": 12 };
@@ -1130,7 +1143,13 @@
 
         async function saveScoreToSupabase(score, type) { 
             if(!currentUser) return; 
-            let riskText = score<=25?'低风险':(score<=50?'中风险':'高风险');
+            let riskText;
+            if (type === 'memory') {
+                riskText = score<=25?'低风险':(score<=50?'中风险':'高风险');
+                await supabase.from('profiles').upsert({id:currentUser.id, email:currentUser.email, cognitive_score:score}); 
+            } else {
+                riskText = getTraitRiskText(score);
+            }
             await supabase.from('assessment_history').insert({
                 user_id: currentUser.id, 
                 score: score, 
@@ -1218,14 +1237,14 @@
                 for(let h of displayList) {
                     let d = new Date(h.created_at);
                     let dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-                    let riskColor = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444');
                     let typeName = h.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评';
+                    let riskColor = h.type === 'memory' ? (h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444')) : '#0f6e3f';
                     historyHtml += `<div class="history-item" data-id="${h.id}">
                         <div>
                             <div class="history-score">${h.score} 分</div>
                             <div class="history-type">${typeName}</div>
                         </div>
-                        <div style="color:${riskColor}; font-weight:600;">${h.risk_level}</div>
+                        <div class="history-risk" style="color:${riskColor}; font-weight:500;">${h.risk_level}</div>
                         <div class="history-date">${dateStr}</div>
                     </div>`;
                 }
@@ -1350,7 +1369,7 @@
             if (selectedHistory) {
                 let d = new Date(selectedHistory.created_at);
                 let typeName = selectedHistory.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评';
-                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>${typeName}</p><p style="margin-top:8px;">评估时间：${formatDateTime(d)}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
+                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>${typeName}</p><p style="margin-top:8px;">评估时间：${formatDateTime(d)}</p><p style="margin-top:4px;">${selectedHistory.risk_level}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
                 container.innerHTML = html;
                 document.getElementById('closeDetailBtn')?.addEventListener('click', () => { selectedHistory = null; render(); });
                 return;
