@@ -1131,14 +1131,12 @@
         async function saveScoreToSupabase(score, type) { 
             if(!currentUser) return; 
             let riskText = score<=25?'低风险':(score<=50?'中风险':'高风险');
-            if (type === 'memory') {
-                await supabase.from('profiles').upsert({id:currentUser.id, email:currentUser.email, cognitive_score:score}); 
-            }
             await supabase.from('assessment_history').insert({
                 user_id: currentUser.id, 
                 score: score, 
                 risk_level: riskText, 
-                type: type
+                type: type,
+                created_at: new Date().toISOString()
             }); 
         }
 
@@ -1216,7 +1214,7 @@
             if(historyList.length === 0) {
                 historyHtml += '<div class="text-center" style="color:#94a3b8;padding:20px;">暂无测评记录，去做一次测试吧~</div>';
             } else {
-                let displayList = showAllHistory ? historyList : historyList.slice(0, 3);
+                let displayList = showAllHistory ? historyList : historyList.slice(0, 5);
                 for(let h of displayList) {
                     let d = new Date(h.created_at);
                     let dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
@@ -1231,7 +1229,7 @@
                         <div class="history-date">${dateStr}</div>
                     </div>`;
                 }
-                if(historyList.length > 3 && !showAllHistory) {
+                if(historyList.length > 5 && !showAllHistory) {
                     historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:10px;">📋 查看全部历史报告</button>';
                 }
                 if(showAllHistory) {
@@ -1352,7 +1350,7 @@
             if (selectedHistory) {
                 let d = new Date(selectedHistory.created_at);
                 let typeName = selectedHistory.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评';
-                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p style="margin:8px 0;">${typeName}</p><p>评估时间：${formatDateTime(d)}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
+                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>${typeName}</p><p style="margin-top:8px;">评估时间：${formatDateTime(d)}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
                 container.innerHTML = html;
                 document.getElementById('closeDetailBtn')?.addEventListener('click', () => { selectedHistory = null; render(); });
                 return;
@@ -1362,7 +1360,7 @@
                 const allAnswered = answers.every(v => v !== null);
                 if (allAnswered) {
                     html = await renderResult();
-                    if (currentUser) saveScoreToSupabase(getScore(), activeQuiz);
+                    if (currentUser && activeQuiz) saveScoreToSupabase(getScore(), activeQuiz);
                 } else {
                     html = renderQuiz();
                 }
@@ -1430,7 +1428,7 @@
                             showToast("报告已保存");
                         }
                     });
-                    if (currentUser) saveScoreToSupabase(getScore(), activeQuiz);
+                    if (currentUser && activeQuiz) saveScoreToSupabase(getScore(), activeQuiz);
                 } else {
                     let missingCount = answers.filter(v => v === null).length;
                     showToast(`还有 ${missingCount} 道题未作答，请完成所有题目后再生成报告`);
