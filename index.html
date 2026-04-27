@@ -36,7 +36,6 @@
             padding: 12px 16px 85px 16px;
         }
 
-        /* 底部导航 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -87,7 +86,6 @@
             font-weight: 500;
         }
 
-        /* 卡片通用样式 */
         .card {
             background: white;
             border-radius: 28px;
@@ -96,7 +94,6 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
         }
 
-        /* Banner 区域 */
         .banner-container {
             position: relative;
             margin-bottom: 16px;
@@ -146,7 +143,6 @@
             border-radius: 4px;
         }
 
-        /* 双卡片入口布局 */
         .row-2cols {
             display: flex;
             gap: 12px;
@@ -248,7 +244,6 @@
             width: fit-content;
         }
 
-        /* 每日心灵鸡汤卡片 */
         .wisdom-card {
             background: linear-gradient(135deg, #e8f4f8, #d4eaf0);
             border-radius: 28px;
@@ -361,7 +356,6 @@
             gap: 8px;
         }
 
-        /* 问卷样式 */
         .quiz-card {
             background: white;
             border-radius: 40px;
@@ -497,7 +491,6 @@
             background: #1f542c;
         }
 
-        /* 结果样式 */
         .result-container {
             max-width: 430px;
             width: 100%;
@@ -576,7 +569,6 @@
             color: #95ad88;
         }
 
-        /* 我的页面样式 */
         .profile-card {
             background: white;
             border-radius: 28px;
@@ -587,23 +579,11 @@
 
         .profile-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 14px;
             margin-bottom: 20px;
             padding-bottom: 14px;
             border-bottom: 1px solid #eef2f7;
-        }
-
-        .profile-avatar {
-            width: 55px;
-            height: 55px;
-            background: linear-gradient(135deg, #0f6e3f, #2a9d6e);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: white;
         }
 
         .profile-info {
@@ -648,7 +628,6 @@
             margin-top: 4px;
         }
 
-        /* 性别年龄卡片样式 */
         .info-card {
             background: #f8fafc;
             border-radius: 20px;
@@ -849,7 +828,6 @@
             text-align: center;
         }
 
-        /* 登录页面 */
         .login-container {
             background: white;
             border-radius: 40px;
@@ -978,7 +956,7 @@
             return wisdomQuotes[randomIndex];
         }
 
-        // 认知问卷 - 选项文字已修正
+        // 认知问卷
         const MEMORY_QUESTIONS = [
             "最近是否经常忘记刚说过的话？","是否常忘记东西放在哪里？","是否重复询问同一件事？",
             "是否忘记约定或日期？","是否记不住最近发生的事？","是否常搞不清今天星期几？",
@@ -1156,7 +1134,12 @@
             if (type === 'memory') {
                 await supabase.from('profiles').upsert({id:currentUser.id, email:currentUser.email, cognitive_score:score}); 
             }
-            await supabase.from('assessment_history').insert({user_id:currentUser.id, score:score, risk_level:riskText, type:type}); 
+            await supabase.from('assessment_history').insert({
+                user_id: currentUser.id, 
+                score: score, 
+                risk_level: riskText, 
+                type: type
+            }); 
         }
 
         function renderHome() {
@@ -1208,7 +1191,6 @@
             let historyList = await loadHistory();
             
             let userName = currentUser.email ? currentUser.email.split('@')[0] : '用户';
-            let avatarChar = userName.charAt(0).toUpperCase();
             
             let statsHtml = `<div class="stats-grid">
                 <div class="stat-item"><div class="stat-number">${latestScore !== null ? latestScore : '--'}</div><div class="stat-label">最近评估</div></div>
@@ -1262,7 +1244,7 @@
             }
             
             return `<div class="profile-card">
-                <div class="profile-header"><div class="profile-avatar">${avatarChar}</div><div class="profile-info"><div class="profile-name">${userName}</div><div class="profile-email">${currentUser.email}</div></div><div><button id="editProfileBtn" class="edit-btn">编辑</button></div></div>
+                <div class="profile-header"><div class="profile-info"><div class="profile-name">${userName}</div><div class="profile-email">${currentUser.email}</div></div><div><button id="editProfileBtn" class="edit-btn">编辑</button></div></div>
                 ${statsHtml}
                 ${infoHtml}
                 ${historyHtml}
@@ -1270,7 +1252,6 @@
             </div>`;
         }
 
-        // 记忆力测试选项使用修正后的文字
         function renderQuiz() {
             if (activeQuiz === 'memory') {
                 let opts = '';
@@ -1370,7 +1351,8 @@
             
             if (selectedHistory) {
                 let d = new Date(selectedHistory.created_at);
-                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>评估时间：${formatDateTime(d)}</p><p style="margin-top:8px;">${selectedHistory.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评'}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
+                let typeName = selectedHistory.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评';
+                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p style="margin:8px 0;">${typeName}</p><p>评估时间：${formatDateTime(d)}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
                 container.innerHTML = html;
                 document.getElementById('closeDetailBtn')?.addEventListener('click', () => { selectedHistory = null; render(); });
                 return;
