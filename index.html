@@ -248,7 +248,7 @@
             width: fit-content;
         }
 
-        /* 每日心灵鸡汤卡片 - 优雅风格 */
+        /* 每日心灵鸡汤卡片 */
         .wisdom-card {
             background: linear-gradient(135deg, #e8f4f8, #d4eaf0);
             border-radius: 28px;
@@ -648,6 +648,37 @@
             margin-top: 4px;
         }
 
+        /* 性别年龄卡片样式 */
+        .info-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .info-item {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-item-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .info-item-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a2c15;
+        }
+
         .history-item {
             background: #f8fafc;
             border-radius: 18px;
@@ -870,7 +901,6 @@
             margin: 0 8px;
         }
         
-        /* 说明文字样式 */
         .info-note {
             font-size: 11px;
             color: #64748b;
@@ -1196,6 +1226,20 @@
                 <div class="stat-item"><div class="stat-number">${userProfile.age ? userProfile.age : '--'}</div><div class="stat-label">年龄</div></div>
             </div>`;
             
+            let genderDisplay = userProfile.gender || '未设置';
+            let ageDisplay = userProfile.age ? userProfile.age + '岁' : '未设置';
+            
+            let infoHtml = `<div class="info-card">
+                <div class="info-item">
+                    <span class="info-item-label">👤 性别</span>
+                    <span class="info-item-value">${genderDisplay}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-item-label">🎂 年龄</span>
+                    <span class="info-item-value">${ageDisplay}</span>
+                </div>
+            </div>`;
+            
             let historyHtml = '<h3 style="margin:18px 0 10px; font-size:17px;">📋 历史测评</h3>';
             if(historyList.length === 0) {
                 historyHtml += '<div class="text-center" style="color:#94a3b8;padding:20px;">暂无测评记录，去做一次测试吧~</div>';
@@ -1222,7 +1266,7 @@
             return `<div class="profile-card">
                 <div class="profile-header"><div class="profile-avatar">${avatarChar}</div><div class="profile-info"><div class="profile-name">${userName}</div><div class="profile-email">${currentUser.email}</div></div><div><button id="editProfileBtn" class="edit-btn">编辑</button></div></div>
                 ${statsHtml}
-                <div class="flex-between" style="margin:12px 0;"><div class="info-row" style="flex:1; border-bottom:none; padding:6px 0;"><span class="info-label">👤 性别</span><span>${userProfile.gender || '未设置'}</span></div><div class="info-row" style="flex:1; border-bottom:none; padding:6px 0;"><span class="info-label">🎂 年龄</span><span>${userProfile.age ? userProfile.age+'岁' : '未设置'}</span></div></div>
+                ${infoHtml}
                 ${historyHtml}
                 <button id="logoutProfileBtn" class="logout-btn">退出登录</button>
             </div>`;
