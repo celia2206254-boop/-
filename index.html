@@ -706,21 +706,11 @@
             font-size: 11px;
             color: #64748b;
         }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eef2f7;
-        }
-
-        .info-label {
-            font-weight: 500;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
+        
+        .history-type {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 2px;
         }
 
         .edit-btn {
@@ -1155,7 +1145,7 @@
         async function loadHistory() { 
             if(!currentUser) return []; 
             try { 
-                const {data} = await supabase.from('assessment_history').select('id,score,risk_level,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}); 
+                const {data} = await supabase.from('assessment_history').select('id,score,risk_level,created_at,type').eq('user_id',currentUser.id).order('created_at',{ascending:false}); 
                 return data||[]; 
             } catch(e){ return []; } 
         }
@@ -1249,7 +1239,15 @@
                     let d = new Date(h.created_at);
                     let dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
                     let riskColor = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444');
-                    historyHtml += `<div class="history-item" data-id="${h.id}"><div><div class="history-score">${h.score} 分</div><div class="history-date">${dateStr}</div></div><div style="color:${riskColor}; font-weight:600;">${h.risk_level}</div></div>`;
+                    let typeName = h.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评';
+                    historyHtml += `<div class="history-item" data-id="${h.id}">
+                        <div>
+                            <div class="history-score">${h.score} 分</div>
+                            <div class="history-type">${typeName}</div>
+                        </div>
+                        <div style="color:${riskColor}; font-weight:600;">${h.risk_level}</div>
+                        <div class="history-date">${dateStr}</div>
+                    </div>`;
                 }
                 if(historyList.length > 3 && !showAllHistory) {
                     historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:10px;">📋 查看全部历史报告</button>';
@@ -1372,7 +1370,7 @@
             
             if (selectedHistory) {
                 let d = new Date(selectedHistory.created_at);
-                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>评估时间：${formatDateTime(d)}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
+                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>评估时间：${formatDateTime(d)}</p><p style="margin-top:8px;">${selectedHistory.type === 'memory' ? '🧠 记忆力测试' : '🌟 高质量人类特质测评'}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
                 container.innerHTML = html;
                 document.getElementById('closeDetailBtn')?.addEventListener('click', () => { selectedHistory = null; render(); });
                 return;
