@@ -3,81 +3,886 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>认知健康管理中心 | 专业自测+智能方案</title>
+    <title>认知健康与特质测评中心</title>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f7fa;color:#1e293b;}
-        .app-wrapper{max-width:500px;margin:0 auto;background:#f5f7fa;min-height:100vh;display:flex;flex-direction:column;}
-        .main-content{flex:1;padding:16px 16px 85px 16px;}
-        .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:500px;margin:0 auto;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);display:flex;justify-content:space-around;padding:8px 20px 24px;border-top:0.5px solid rgba(0,0,0,0.06);z-index:1000;}
-        .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 16px;border-radius:48px;opacity:0.55;color:#64748b;}
-        .nav-item.active{opacity:1;color:#0f6e3f;background:rgba(15,110,63,0.1);}
-        .nav-icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;}
-        .nav-label{font-size:11px;font-weight:500;}
-        .card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;position:relative;}
-        .device-card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;}
-        .device-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-        .device-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px;}
-        .device-desc{font-size:14px;color:#475569;margin:12px 0;}
-        .feature-badge{background:#eef2ff;padding:6px 14px;border-radius:40px;font-size:12px;display:inline-flex;align-items:center;gap:6px;}
-        .quiz-card{background:white;border-radius:32px;padding:24px;margin-bottom:16px;}
-        .progress-bar{background:#e2e8f0;border-radius:20px;height:6px;margin:16px 0;}
-        .progress-fill{background:#0f6e3f;height:6px;border-radius:20px;width:0%;}
-        .question-text{font-weight:650;font-size:22px;margin:24px 0 28px;text-align:center;color:#0a2e1e;}
-        .option-btn{padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:60px;background:white;font-size:15px;margin-bottom:10px;width:100%;cursor:pointer;}
-        .option-btn.selected{background:#0f6e3f;border-color:#0f6e3f;color:white;}
-        .score-circle{width:120px;height:120px;background:#f0f5fe;border-radius:50%;margin:16px auto;display:flex;align-items:center;justify-content:center;flex-direction:column;}
-        .risk-low{color:#10b981;}
-        .risk-mid{color:#f59e0b;}
-        .risk-high{color:#ef4444;}
-        .risk-level{font-size:26px;font-weight:700;margin:12px 0;text-align:center;}
-        .ai-assessment{background:#f0f5fe;padding:16px;border-radius:24px;margin-top:16px;font-size:14px;line-height:1.5;}
-        .auth-form{display:flex;flex-direction:column;gap:14px;}
-        .auth-input,.profile-input,.profile-select{padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:60px;font-size:15px;width:100%;background:white;}
-        .auth-input:focus{outline:none;border-color:#0f6e3f;}
-        .auth-switch{text-align:center;margin-top:16px;color:#0f6e3f;cursor:pointer;}
-        .footer-links{text-align:center;font-size:12px;color:#94a3b8;padding:20px 16px 32px;border-top:0.5px solid #e2e8f0;margin-top:16px;}
-        .footer-links a{text-decoration:none;color:#0f6e3f;margin:0 8px;}
-        .history-item{background:#f8fafc;border-radius:20px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
-        .history-score{font-size:22px;font-weight:700;color:#0f6e3f;}
-        .history-date{font-size:12px;color:#64748b;}
-        .history-time{font-size:11px;color:#94a3b8;margin-top:2px;}
-        .info-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eef2f7;}
-        .info-label{font-weight:500;color:#475569;display:flex;align-items:center;gap:8px;}
-        .detail-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2001;}
-        .detail-card{background:white;border-radius:32px;padding:28px;max-width:300px;width:80%;text-align:center;}
-        .detail-close{margin-top:20px;background:#0f6e3f;color:white;border:none;border-radius:40px;padding:12px;width:100%;cursor:pointer;}
-        .toast-msg{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:50px;font-size:13px;opacity:0;transition:0.18s;pointer-events:none;z-index:2000;white-space:nowrap;}
-        .banner-container{position:relative;margin-bottom:20px;border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
-        .banner-slider{display:flex;transition:transform 0.5s ease;}
-        .banner-item{min-width:100%;}
-        .banner-item img{width:100%;height:auto;display:block;}
-        .banner-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:8px;}
-        .banner-dots .dot{width:6px;height:6px;border-radius:50%;background:white;opacity:0.5;}
-        .banner-dots .dot.active{opacity:1;width:18px;border-radius:4px;}
-        .flex-between{display:flex;justify-content:space-between;align-items:center;}
-        .text-center{text-align:center;}
-        .share-buttons{display:flex;gap:12px;margin-top:20px;}
-        .btn-share{flex:1;background:#0f6e3f;color:white;border:none;border-radius:60px;padding:12px;cursor:pointer;}
-        .login-hint{background:#eef6f1;border-radius:28px;padding:12px;text-align:center;margin-bottom:16px;cursor:pointer;color:#0f6e3f;font-weight:500;}
-        .btn-primary{background:#0f6e3f;color:white;width:100%;padding:16px 20px;font-size:16px;font-weight:600;border-radius:60px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
-        .btn-outline{background:white;border:1.5px solid #0f6e3f;color:#0f6e3f;font-weight:600;padding:14px 18px;border-radius:60px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
-        .home-btn{position:absolute;top:20px;left:20px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;font-size:14px;font-weight:500;color:#0f6e3f;cursor:pointer;display:flex;align-items:center;gap:6px;z-index:10;}
-        .home-btn:active{background:#e2e8f0;transform:scale(0.96);}
-        .result-card{position:relative;padding-top:50px;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f7fc;
+            color: #1e2a3e;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .app-wrapper {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f5f7fc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 12px 16px 85px 16px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 430px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 20px 28px;
+            border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            padding-bottom: calc(28px + env(safe-area-inset-bottom, 20px));
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 48px;
+            transition: 0.2s ease;
+            opacity: 0.55;
+            color: #5b6e8c;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            color: #0f6e3f;
+            background: rgba(15, 110, 63, 0.08);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* 卡片通用样式 */
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Banner 区域 */
+        .banner-container {
+            position: relative;
+            margin-bottom: 16px;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .banner-slider {
+            display: flex;
+            transition: transform 0.4s ease;
+        }
+
+        .banner-item {
+            min-width: 100%;
+        }
+
+        .banner-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .banner-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .banner-dots .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+
+        .banner-dots .dot.active {
+            opacity: 1;
+            width: 18px;
+            border-radius: 4px;
+        }
+
+        /* 双卡片入口布局 */
+        .row-2cols {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .memory-card {
+            background: linear-gradient(135deg, #0f6e3f, #2a9d6e);
+            color: white;
+            border-radius: 24px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 6px 14px rgba(15, 110, 63, 0.15);
+        }
+
+        .memory-card:active {
+            transform: scale(0.97);
+        }
+
+        .memory-card .title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .memory-card .desc {
+            font-size: 11px;
+            opacity: 0.9;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            flex: 1;
+        }
+
+        .memory-card .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 10px;
+            width: fit-content;
+        }
+
+        .trait-card {
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            color: white;
+            border-radius: 24px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 6px 14px rgba(59, 130, 246, 0.15);
+        }
+
+        .trait-card:active {
+            transform: scale(0.97);
+        }
+
+        .trait-card .title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .trait-card .desc {
+            font-size: 11px;
+            opacity: 0.9;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            flex: 1;
+        }
+
+        .trait-card .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 10px;
+            width: fit-content;
+        }
+
+        /* 每日心灵鸡汤卡片 - 优雅风格 */
+        .wisdom-card {
+            background: linear-gradient(135deg, #e8f4f8, #d4eaf0);
+            border-radius: 28px;
+            padding: 24px 22px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .wisdom-card .quote-icon {
+            font-size: 48px;
+            opacity: 0.12;
+            position: absolute;
+            bottom: 5px;
+            right: 15px;
+            font-family: Georgia, serif;
+        }
+
+        .wisdom-card .wisdom-content {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            line-height: 1.55;
+            font-style: normal;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wisdom-card .wisdom-author {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 14px;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .device-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 0.5px solid #eef2f7;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .device-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .device-desc {
+            font-size: 12px;
+            color: #475569;
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+
+        .feature-badge {
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1.5px solid #0f6e3f;
+            color: #0f6e3f;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .btn-outline:active {
+            background: #eef6f1;
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #0f6e3f;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* 问卷样式 */
+        .quiz-card {
+            background: white;
+            border-radius: 40px;
+            padding: 28px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 20px 40px rgba(30, 60, 20, 0.06);
+        }
+
+        .progress-area {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            background: #e6f0e0;
+            border-radius: 20px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #2b6e3c;
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.25s ease;
+        }
+
+        .question-counter {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #5a7e48;
+            font-weight: 500;
+        }
+
+        .badge-dim {
+            background: #eef3e9;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #2c6e3a;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.35;
+            margin: 16px 0 24px;
+            color: #1a2c15;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0 20px;
+        }
+
+        .opt-btn {
+            background: #f6faf3;
+            border: 1.5px solid #deecce;
+            border-radius: 60px;
+            padding: 14px 18px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #2c5422;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .opt-btn .score-label {
+            font-weight: 600;
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            font-size: 15px;
+            color: inherit;
+        }
+
+        .opt-btn.selected {
+            background: #2b6e3c;
+            border-color: #2b6e3c;
+            color: white;
+            box-shadow: 0 4px 10px rgba(43, 110, 60, 0.2);
+        }
+
+        .opt-btn:active {
+            transform: scale(0.98);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0 0;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: #f2f8ed;
+            border: 1px solid #cde2be;
+            border-radius: 60px;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: #3e6b30;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn:active {
+            background: #e2ebd8;
+        }
+
+        .nav-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .generate-btn {
+            background: #2b6e3c;
+            color: white;
+            border: none;
+        }
+
+        .generate-btn:active {
+            background: #1f542c;
+        }
+
+        /* 结果样式 */
+        .result-container {
+            max-width: 430px;
+            width: 100%;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 48px;
+            padding: 28px 22px;
+            box-shadow: 0 20px 40px rgba(30, 60, 20, 0.12);
+            position: relative;
+        }
+
+        .score-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: #236b34;
+        }
+
+        .stage {
+            font-size: 26px;
+            font-weight: 700;
+            margin: 12px 0 8px;
+            color: #1f4529;
+        }
+
+        .diagnosis {
+            background: #eef6e7;
+            padding: 18px;
+            border-radius: 28px;
+            line-height: 1.45;
+            margin: 16px 0;
+        }
+
+        .dim-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+
+        .dim-item {
+            background: #eaf3e4;
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 24px;
+            font-size: 13px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-share {
+            flex: 1;
+            background: #2b6e3c;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 0;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-share:active {
+            transform: scale(0.98);
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #95ad88;
+        }
+
+        /* 我的页面样式 */
+        .profile-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .profile-avatar {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #0f6e3f, #2a9d6e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a2c15;
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .stats-grid {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f6e3f;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .history-item {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #eef2f7;
+        }
+
+        .history-item:active {
+            background: #eef6f1;
+        }
+
+        .history-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f6e3f;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            background: #eef2f7;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0f6e3f;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            background: #fee2e2;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #dc2626;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            opacity: 0;
+            transition: 0.18s;
+            pointer-events: none;
+            z-index: 2000;
+            white-space: nowrap;
+        }
+
+        .auth-input, .profile-input, .profile-select {
+            padding: 14px 18px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 15px;
+            width: 100%;
+            background: white;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 16px;
+            color: #0f6e3f;
+            cursor: pointer;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2001;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 300px;
+            width: 80%;
+            text-align: center;
+        }
+
+        .detail-close {
+            margin-top: 20px;
+            background: #0f6e3f;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .back-home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 110, 63, 0.1);
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #0f6e3f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+            transition: 0.2s;
+        }
+
+        .back-home-btn:active {
+            background: rgba(15, 110, 63, 0.2);
+            transform: scale(0.96);
+        }
+
+        .result-header {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 登录页面 */
+        .login-container {
+            background: white;
+            border-radius: 40px;
+            padding: 30px 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 32px;
+            padding: 24px 20px;
+            width: 100%;
+        }
+        
+        .login-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f6e3f;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .login-sub {
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .footer-links {
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+        
+        .footer-links a {
+            text-decoration: none;
+            color: #0f6e3f;
+            margin: 0 8px;
+        }
+        
+        /* 说明文字样式 */
         .info-note {
             font-size: 11px;
             color: #64748b;
             line-height: 1.5;
             text-align: left;
-            margin-top: 24px;
+            margin-top: 16px;
+            padding: 12px 0;
         }
         .info-note .ref {
             font-size: 10px;
             color: #94a3b8;
-            margin-top: 6px;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -85,221 +890,612 @@
 <div class="app-wrapper">
     <div class="main-content" id="mainContent"></div>
     <div class="bottom-nav">
-        <div class="nav-item" data-tab="home"><svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M3 9.5L12 3L21 9.5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V9.5Z" stroke="currentColor" fill="none"/><path d="M9 21V12H15V21" stroke="currentColor" fill="none"/></svg><span class="nav-label">评估</span></div>
-        <div class="nav-item" data-tab="device"><svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M8 6V4H16V6" stroke="currentColor" fill="none"/><path d="M12 18V22" stroke="currentColor"/><path d="M8 22H16" stroke="currentColor"/><circle cx="12" cy="14" r="2" fill="currentColor"/></svg><span class="nav-label">设备</span></div>
-        <div class="nav-item" data-tab="profile"><svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21" stroke="currentColor" fill="none"/><circle cx="12" cy="7" r="4" stroke="currentColor" fill="none"/></svg><span class="nav-label">我的</span></div>
+        <div class="nav-item" data-tab="home">
+            <svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
+                <path d="M3 9.5L12 3L21 9.5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V9.5Z" stroke="currentColor" fill="none"/>
+                <path d="M9 21V12H15V21" stroke="currentColor" fill="none"/>
+            </svg>
+            <span class="nav-label">首页</span>
+        </div>
+        <div class="nav-item" data-tab="device">
+            <svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
+                <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" fill="none"/>
+                <path d="M8 6V4H16V6" stroke="currentColor" fill="none"/>
+                <path d="M12 18V22" stroke="currentColor"/>
+                <path d="M8 22H16" stroke="currentColor"/>
+                <circle cx="12" cy="14" r="2" fill="currentColor"/>
+            </svg>
+            <span class="nav-label">设备</span>
+        </div>
+        <div class="nav-item" data-tab="profile">
+            <svg class="nav-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
+                <path d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21" stroke="currentColor" fill="none"/>
+                <circle cx="12" cy="7" r="4" stroke="currentColor" fill="none"/>
+            </svg>
+            <span class="nav-label">我的</span>
+        </div>
     </div>
 </div>
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-(function() {
-    const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const CONTACT_EMAIL = 'celia2206254@gmail.com';
+    (function() {
+        const SUPABASE_URL = 'https://odztrbmvxnrqqqfywrym.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_-YmD5UHc2TUtLpcR6KgTnw_kddcL5Lo';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const CONTACT_EMAIL = 'celia2206254@gmail.com';
 
-    let currentUser = null, currentTab = "home", quizActive = false;
-    let answers = new Array(20).fill(null), currentIndex = 0, authMode = "login";
-    let isEditing = false, userProfile = { gender: '', age: null };
-    let selectedHistory = null, bannerInterval = null, currentBannerIndex = 0;
-    let showAllHistory = false;
+        let currentUser = null;
+        let currentTab = "home";
+        let activeQuiz = null;
+        let answers = [];
+        let currentIndex = 0;
+        let authMode = "login";
+        let isEditing = false;
+        let userProfile = { gender: '', age: null };
+        let selectedHistory = null;
+        let bannerInterval = null;
+        let currentBannerIndex = 0;
+        let showAllHistory = false;
+        let autoTimer = null;
 
-    const QUESTIONS = ["最近是否经常忘记刚说过的话？","是否常忘记东西放在哪里？","是否重复询问同一件事？","是否忘记约定或日期？","是否记不住最近发生的事？","是否常搞不清今天星期几？","是否分不清月份或季节？","是否去熟悉地方也容易迷路？","是否常叫不出熟悉物品名称？","说话时是否常卡住找词？","是否表达内容混乱？","是否听不懂复杂说明？","是否不会使用熟悉家电？","是否缴费、算账变困难？","是否做饭步骤容易混乱？","是否需要别人提醒洗澡吃药？","是否脾气变化明显？","是否变得多疑敏感？","是否兴趣明显下降？","是否社交意愿下降？"];
-    const OPTIONS = [{label:"无异常",rawScore:0},{label:"偶尔出现",rawScore:1},{label:"经常出现",rawScore:2},{label:"明显频繁",rawScore:3}];
-    const MAX_RAW = 60, SHARE_URL = "https://www.renzhiceshi.online/";
-
-    function showToast(msg) { let t = document.getElementById('toastMsg'); if(t){ t.textContent = msg; t.style.opacity = '1'; setTimeout(()=>{ t.style.opacity = '0'; },2000); } }
-    function getTotalRaw() { let s=0; for(let v of answers) if(v!==null) s+=v; return s; }
-    function getPercentScore() { return Math.round((getTotalRaw()/MAX_RAW)*100); }
-    function getRiskLevel(s) { 
-        if(s<=25) return {name:'低风险',class:'risk-low',desc:'当前认知状态总体稳定，保持健康生活习惯即可。'}; 
-        if(s<=50) return {name:'中风险',class:'risk-mid',desc:'存在一定认知下降倾向，建议加强脑力活动并定期复查。'}; 
-        return {name:'高风险',class:'risk-high',desc:'认知功能需引起关注，建议加强日常监测。'}; 
-    }
-    
-    function getAIDetail(score, userAge, userGender) {
-        let ageText = '';
-        if(userAge) {
-            if(userAge < 50) ageText = `，您年龄${userAge}岁，处于认知功能相对稳定的阶段`;
-            else if(userAge < 70) ageText = `，您年龄${userAge}岁，属于认知功能需要关注的人群`;
-            else ageText = `，您年龄${userAge}岁，建议更加重视认知健康管理`;
+        // 每日心灵鸡汤句子库
+        const wisdomQuotes = [
+            { text: "每一天都是一个新的开始，带着希望和勇气前行。", author: "晨间寄语" },
+            { text: "你的认知健康，是你给自己最好的礼物。", author: "健康智语" },
+            { text: "小小的进步，日积月累，终将成就非凡。", author: "成长箴言" },
+            { text: "照顾好自己的身心，才能照顾好你在乎的人。", author: "生活智慧" },
+            { text: "年龄只是数字，保持学习让心灵永远年轻。", author: "心灵之声" },
+            { text: "今天的觉察，是明天更好的自己的起点。", author: "自我觉醒" },
+            { text: "健康不是一切，但没有健康就没有一切。", author: "健康箴言" },
+            { text: "用积极的心态迎接每一天，生活也会报以微笑。", author: "正能量" },
+            { text: "记住：你比你想象的要强大得多。", author: "鼓励时刻" },
+            { text: "持续的学习和锻炼，是延缓认知衰退的良药。", author: "科学智慧" }
+        ];
+        
+        function getRandomWisdom() {
+            const randomIndex = Math.floor(Math.random() * wisdomQuotes.length);
+            return wisdomQuotes[randomIndex];
         }
-        let genderText = userGender === '男' ? '男性' : (userGender === '女' ? '女性' : '');
-        if(genderText) genderText = `，${genderText}`;
-        
-        if(score <= 25) {
-            return `根据您的评估结果（${score}分），认知功能整体表现良好。${ageText}${genderText}。建议保持规律作息、适度运动和社交活动，继续维持健康的生活方式。每半年可进行一次跟踪评估。`;
-        } else if(score <= 50) {
-            return `根据您的评估结果（${score}分），存在轻度认知功能波动。${ageText}${genderText}。建议：1）增加脑力活动，如阅读、数独、记忆训练；2）保持每日30分钟有氧运动；3）保证充足睡眠；4）定期进行认知健康监测。建议3个月后复查。`;
-        } else {
-            return `根据您的评估结果（${score}分），认知功能下降风险较高。${ageText}${genderText}。强烈建议：1）尽快咨询专业医生进行评估；2）进行全面的认知功能检查；3）加强日常认知训练；4）建议家人关注日常生活状态。建议1-2个月后复查。`;
-        }
-    }
-    
-    function getRiskText(s) { if(s<=25) return '低风险'; if(s<=50) return '中风险'; return '高风险'; }
-    function formatDateTime(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 
-    async function loadUserProfile() { if(!currentUser) return; try { const {data} = await supabase.from('profiles').select('gender,age').eq('id',currentUser.id).single(); if(data){ userProfile.gender = data.gender||''; userProfile.age = data.age||null; } } catch(e){} }
-    async function updateUserProfile(g,a) { if(!currentUser) return; await supabase.from('profiles').upsert({id:currentUser.id,email:currentUser.email,gender:g,age:a?parseInt(a):null}); userProfile.gender=g; userProfile.age=a; showToast("资料已更新"); render(); }
-    async function saveScoreToSupabase(score) { if(!currentUser) return; await supabase.from('profiles').upsert({id:currentUser.id,email:currentUser.email,cognitive_score:score}); await supabase.from('assessment_history').insert({user_id:currentUser.id,score:score,risk_level:getRiskText(score)}); }
-    async function loadUserScore() { if(!currentUser) return null; try { const {data} = await supabase.from('profiles').select('cognitive_score').eq('id',currentUser.id).single(); return data?.cognitive_score||null; } catch(e){ return null; } }
-    async function loadHistory() { if(!currentUser) return []; try { const {data} = await supabase.from('assessment_history').select('id,score,risk_level,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}); return data||[]; } catch(e){ return []; } }
+        // 认知问卷 - 选项文字已修正
+        const MEMORY_QUESTIONS = [
+            "最近是否经常忘记刚说过的话？","是否常忘记东西放在哪里？","是否重复询问同一件事？",
+            "是否忘记约定或日期？","是否记不住最近发生的事？","是否常搞不清今天星期几？",
+            "是否分不清月份或季节？","是否去熟悉地方也容易迷路？","是否常叫不出熟悉物品名称？",
+            "说话时是否常卡住找词？","是否表达内容混乱？","是否听不懂复杂说明？",
+            "是否不会使用熟悉家电？","是否缴费、算账变困难？","是否做饭步骤容易混乱？",
+            "是否需要别人提醒洗澡吃药？","是否脾气变化明显？","是否变得多疑敏感？",
+            "是否兴趣明显下降？","是否社交意愿下降？"
+        ];
+        const MEMORY_OPTIONS = [
+            { label: "无异常", score: 0 },
+            { label: "偶尔出现", score: 1 },
+            { label: "经常出现", score: 2 },
+            { label: "明显频繁", score: 3 }
+        ];
+        const MEMORY_MAX_RAW = 60;
 
-    function startBannerLoop() { 
-        if(bannerInterval) clearInterval(bannerInterval); 
-        bannerInterval = setInterval(()=>{ 
-            let s = document.querySelector('.banner-slider'), d = document.querySelectorAll('.dot'); 
-            if(s && d.length){ 
-                currentBannerIndex = (currentBannerIndex + 1) % 2;
-                s.style.transform = 'translateX(-' + (currentBannerIndex * 100) + '%)'; 
-                d.forEach((dot,i)=>{ 
-                    if(i === currentBannerIndex) dot.classList.add('active'); 
-                    else dot.classList.remove('active'); 
-                }); 
-            } 
-        }, 4000); 
-    }
+        // 高质量人类现实特质测评（50题深度版）
+        const traitQuestionsData = [
+            { id: 1, text: "BMI水平：体质指数在18.5-24之间，且肉眼可见肌肉线条或力量感。", dimension: "外在管理" },
+            { id: 2, text: "体态自控：无论站立还是久坐，都能下意识保持脊柱挺直，不含胸驼背。", dimension: "外在管理" },
+            { id: 3, text: "视觉清爽：面部无油腻感，胡须/妆容精致，指甲缝隙干净无垢。", dimension: "外在管理" },
+            { id: 4, text: "眼神定力：谈话时眼神不游离，直视对方时不带有侵略性或猥琐感。", dimension: "外在管理" },
+            { id: 5, text: "穿搭逻辑：衣服质地（面料）好于款式，懂得根据场合选择合适的得体度。", dimension: "外在管理" },
+            { id: 6, text: "气味名片：呼吸清新，身上带有洗涤后的清爽感或极淡的高级香水味。", dimension: "外在管理" },
+            { id: 7, text: "发质状态：头发不油腻、无头屑，修剪频率固定且发型适合脸型。", dimension: "外在管理" },
+            { id: 8, text: "表情松弛：在大众场合不紧绷，微笑自然，不带有刻意讨好的谄媚。", dimension: "外在管理" },
+            { id: 9, text: "鞋履整洁：鞋面无明显污渍，鞋跟不磨损倾斜，体现细节掌控力。", dimension: "外在管理" },
+            { id: 10, text: "牙齿美观：牙齿洁净，无异味，注重口腔卫生。", dimension: "外在管理" },
+            { id: 11, text: "抗衰状态：看起来比实际年龄更具精气神，且无过度的医美人工感。", dimension: "外在管理" },
+            { id: 12, text: "动作韵律：走路步频稳定，动作不慌乱，动作幅度有掌控感。", dimension: "外在管理" },
+            { id: 13, text: "收入阶层：月综合收入稳定在当地同龄人群体的前10%。", dimension: "经济底气" },
+            { id: 14, text: "睡后收入：拥有不需要出卖体力/时间就能获取的被动收入来源。", dimension: "经济底气" },
+            { id: 15, text: "负债结构：除房贷等优质资产负债外，无任何消费贷或分期坏账。", dimension: "经济底气" },
+            { id: 16, text: "财务透明：清楚每一笔重大支出的去向，有记账或资产配置习惯。", dimension: "经济底气" },
+            { id: 17, text: "抗风险金：有一笔足以支撑不工作12个月也能维持现状的现金储备。", dimension: "经济底气" },
+            { id: 18, text: "消费逻辑：买单时果断，不纠结于小额差价，追求购买效率。", dimension: "经济底气" },
+            { id: 19, text: "自我增值金：每年固定拨出收入的10%用于学习、体检或认知升级。", dimension: "经济底气" },
+            { id: 20, text: "工具效率：愿意花钱购买高配置的办公或生活工具来节省时间。", dimension: "经济底气" },
+            { id: 21, text: "居住质量：居住环境即便不奢华，也一定位于安全、便利且体面的社区。", dimension: "经济底气" },
+            { id: 22, text: "契约精神：涉及金钱往来时清爽利落，不拖欠，不占小便宜。", dimension: "经济底气" },
+            { id: 23, text: "语速控制：说话从容，逻辑链条清晰，很少使用“那个、然后”等赘词。", dimension: "言行智慧" },
+            { id: 24, text: "情绪防火墙：在极端愤怒或委屈时，能忍住不发脾气，先处理事情。", dimension: "言行智慧" },
+            { id: 25, text: "守时边界：约会提前5分钟到达，且对迟到者保持礼貌但有态度的提醒。", dimension: "言行智慧" },
+            { id: 26, text: "幽默分寸：开玩笑不拿别人的缺陷或隐私取乐，自黑但不自卑。", dimension: "言行智慧" },
+            { id: 27, text: "礼貌社交：对服务员、保安、保洁等人员保持自然的尊重。", dimension: "言行智慧" },
+            { id: 28, text: "拒绝能力：能清晰、果断且不失礼貌地拒绝不合理的要求。", dimension: "言行智慧" },
+            { id: 29, text: "信息深度：能就某个专业领域或社会议题进行5分钟以上的深度表达。", dimension: "言行智慧" },
+            { id: 30, text: "倾听习惯：在别人说话时全神贯注，不频繁看手机，给出有效回应。", dimension: "言行智慧" },
+            { id: 31, text: "赞美诚实：能发现并真诚称赞他人的优点，而非虚伪的拍马屁。", dimension: "言行智慧" },
+            { id: 32, text: "守口如瓶：能消化秘密，绝不在背后评价第三方的私生活。", dimension: "言行智慧" },
+            { id: 33, text: "冲突处理：面对冲突时，采取“对事不对人”的方案，不搞人身攻击。", dimension: "言行智慧" },
+            { id: 34, text: "边界意识：不问收入、不问婚育、不强加自己的价值观。", dimension: "言行智慧" },
+            { id: 35, text: "言行一致：答应过的小事（如回电话）也一定会在承诺时间内完成。", dimension: "言行智慧" },
+            { id: 36, text: "睡眠节奏：每天在相对固定的时间入睡和起床，很少报复性熬夜。", dimension: "生活秩序" },
+            { id: 37, text: "运动硬核度：拥有至少一项长期坚持且达到一定水平的体育爱好。", dimension: "生活秩序" },
+            { id: 38, text: "饮食结构：能精准识别垃圾食品并克制欲望，享受食物原味。", dimension: "生活秩序" },
+            { id: 39, text: "居住秩序：房间内看不到堆积的杂物，地面、桌面常年保持清爽。", dimension: "生活秩序" },
+            { id: 40, text: "断舍离：定期清理冗余的社交圈、衣物和手机App。", dimension: "生活秩序" },
+            { id: 41, text: "阅读/输入：每天有至少30分钟的深度阅读或系统学习（非碎片刷短视频）。", dimension: "生活秩序" },
+            { id: 42, text: "健康监测：每年进行全面体检，并根据报告调整生活方式。", dimension: "生活秩序" },
+            { id: 43, text: "独处质量：一个人时不会感到焦虑，能静心完成复杂任务或自我消遣。", dimension: "生活秩序" },
+            { id: 44, text: "家政能力：具备基本的高品质生活常识（如识酒、熨烫、审美搭配）。", dimension: "生活秩序" },
+            { id: 45, text: "目标感：对未来3-5年有清晰的个人成长路线图，而非混日子。", dimension: "心理韧性" },
+            { id: 46, text: "抗压复原：遭遇挫折后，复原时间极短，能迅速复盘并投入战斗。", dimension: "心理韧性" },
+            { id: 47, text: "不抱怨心态：在遇到不公平或不如意时，很少向外界输出负能量。", dimension: "心理韧性" },
+            { id: 48, text: "自省能力：定期自我复盘，能坦然承认自己的错误并及时修正。", dimension: "心理韧性" },
+            { id: 49, text: "好奇心：对新事物、新技术保持敬畏和探索欲，不固步自封。", dimension: "心理韧性" },
+            { id: 50, text: "利他之心：在确保自己过得好的同时，有能力且愿意为他人提供价值。", dimension: "心理韧性" }
+        ];
+        const TRAIT_OPTIONS = [
+            { label: "不符合", score: 0 },
+            { label: "部分符合", score: 1 },
+            { label: "完全符合", score: 2 }
+        ];
+        const TRAIT_MAX_RAW = 100;
 
-    function renderHome() {
-        let loginHint = '';
-        if(!currentUser) {
-            loginHint = '<div class="login-hint" id="gotoAuthBtn">📝 登录/注册 查看历史记录</div>';
-        }
-        // 使用 GitHub Raw 地址
-        let bannerHtml = '<div class="banner-container"><div class="banner-slider">' +
-            '<div class="banner-item" id="bannerFirst"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
-            '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
-            '</div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span></div></div>';
-        
-        return loginHint + bannerHtml + '<div class="device-card"><div class="device-header"><div class="device-title"><span>⌚</span> 华为手环</div><button class="btn-outline" id="gotoDeviceBtn" style="width:auto;padding:8px 20px;">查看详情</button></div><div class="device-desc">🏠 专业认知辅助 · 无感监测长者睡眠与日常活动轨迹，异常行为及时提醒。</div><div style="display:flex;gap:10px;margin-top:12px;"><span class="feature-badge">💤 睡眠监测</span><span class="feature-badge">🚶 活动轨迹异常提醒</span></div></div>';
-    }
-
-    function renderDevice() { return '<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><span style="font-size:42px;">⌚</span><h2 style="font-size:24px;">华为手环</h2></div><p style="color:#2b6e4e;margin-bottom:20px;font-weight:500;">专为认知健康及长者安全设计的智能可穿戴设备</p><div style="background:#f0f9f4;border-radius:24px;padding:20px;"><div style="font-weight:700;font-size:18px;margin-bottom:16px;">🎯 核心认知守护功能</div><ul style="margin-left:20px;"><li style="margin-bottom:10px;"><strong>💤 睡眠监测</strong> – 分析睡眠规律与认知健康关联性</li><li style="margin-bottom:10px;"><strong>🚶 活动轨迹异常提醒</strong> – 识别久坐、夜间离床等行为</li><li><strong>📅 认知健康周报</strong> – 生成认知趋势分析</li></ul><button class="btn-primary" id="deviceContactBtn" style="margin-top:24px;">📧 咨询详情</button></div></div>'; }
-
-    async function renderProfile() {
-        if(!currentUser) return '<div class="card"><h2 style="text-align:center;margin-bottom:24px;">'+(authMode==='login'?'登录':'注册')+'</h2><div class="auth-form"><input type="email" id="authEmail" class="auth-input" placeholder="邮箱"><input type="password" id="authPassword" class="auth-input" placeholder="密码（至少6位）"><button class="btn-primary" id="authSubmitBtn">'+(authMode==='login'?'登录':'注册')+'</button></div><div class="auth-switch" id="authSwitchBtn">'+(authMode==='login'?'没有账号？点击注册':'已有账号？点击登录')+'</div><div class="footer-links" style="margin-top:24px;"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系客服</a></div></div>';
-        
-        await loadUserProfile();
-        let latestScore = await loadUserScore();
-        let historyList = await loadHistory();
-        
-        let displayList = showAllHistory ? historyList : historyList.slice(0, 3);
-        let historyHtml = '<div class="flex-between" style="margin-bottom:16px;"><h3>📊 历史评估报告</h3><span style="font-size:13px; color:#64748b;">共 ' + historyList.length + ' 条记录</span></div>';
-        
-        if(historyList.length === 0) {
-            historyHtml += '<div class="text-center" style="color:#94a3b8;padding:24px;">暂无评估记录，去做一次测试吧~</div>';
-        } else {
-            for(let h of displayList) { 
-                let d = new Date(h.created_at); 
-                let dateStr = d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0'); 
-                let timeStr = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); 
-                let rc = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'); 
-                historyHtml += '<div class="history-item" data-id="'+h.id+'"><div><div class="history-score">'+h.score+' 分</div><div class="history-date">'+dateStr+'</div><div class="history-time">'+timeStr+'</div></div><div style="color:'+rc+';font-weight:600;">'+h.risk_level+'</div></div>'; 
+        function showToast(msg) {
+            const t = document.getElementById('toastMsg');
+            if (t) {
+                t.textContent = msg;
+                t.style.opacity = '1';
+                setTimeout(() => { t.style.opacity = '0'; }, 2000);
             }
-            if(historyList.length > 3 && !showAllHistory) {
-                historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:12px;">📋 查看全部 ' + historyList.length + ' 条历史报告</button>';
-            }
-            if(showAllHistory) {
-                historyHtml += '<button class="btn-outline" id="hideAllHistoryBtn" style="margin-top:12px;">⬆️ 收起</button>';
+        }
+
+        function clearAutoTimer() {
+            if (autoTimer) {
+                clearTimeout(autoTimer);
+                autoTimer = null;
             }
         }
-        
-        if(isEditing) {
-            return '<div class="card"><h3 style="margin-bottom:16px;">✏️ 编辑个人资料</h3><select id="editGender" class="profile-select"><option value="">请选择性别</option><option value="男"'+(userProfile.gender==='男'?' selected':'')+'>男</option><option value="女"'+(userProfile.gender==='女'?' selected':'')+'>女</option></select><input type="number" id="editAge" class="profile-input" placeholder="年龄" value="'+(userProfile.age||'')+'" style="margin-top:12px;"><button class="btn-primary" id="saveProfileBtn" style="margin-top:16px;">保存修改</button><button class="btn-outline" id="cancelEditBtn" style="margin-top:10px;">取消</button></div><div class="card">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
+
+        function getScore() {
+            if (!activeQuiz) return 0;
+            let sum = 0;
+            for (let v of answers) if (v !== null) sum += v;
+            if (activeQuiz === 'memory') return Math.round((sum / MEMORY_MAX_RAW) * 100);
+            if (activeQuiz === 'trait') return Math.round(sum);
+            return 0;
+        }
+
+        async function generateAIReport(score, type) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (type === 'memory') {
+                if (score <= 25) return "认知功能整体表现良好，记忆与执行能力未见明显异常。建议保持规律作息、适度运动和社交活动，继续维持健康的生活方式。每半年可进行一次跟踪评估。";
+                if (score <= 50) return "存在轻度认知功能波动，尤其是在近期记忆或定向方面。建议每日健脑训练、规律作息，并监测变化。建议3个月后复查。";
+                return "认知功能下降风险显著，多个维度出现异常信号。建议进行更详细的健康管理及医学咨询。建议1-2个月后复查。";
+            } else {
+                if (score <= 25) return "您在现实认知方面可能还有较大成长空间。建议从微小习惯切入，先打造整洁空间和基础形象，逐步积累秩序感。";
+                if (score <= 50) return "您具备较好的现实适应能力，已经开始尝试自律。建议巩固现金流管理与情绪调节，建立底层习惯闭环，提升抗压韧性。";
+                if (score <= 75) return "您已经是人群中优秀的“中流砥柱”，生活有质感。建议增加长期主义项目投入，深化精神与身体的平衡。";
+                if (score <= 90) return "您是高质量人类代表，极度自律且富有，身心灵高度统一。建议向外输出价值，建立个人影响力，同时保持谦逊与向下兼容。";
+                return "您是人类的顶级模范，行业领袖或宗师。建议持续迭代认知，赋能生态，警惕精英傲慢，传承生命智慧。";
+            }
+        }
+
+        function getTraitMetaByPercent(score) {
+            if (score >= 0 && score <= 25) return { name: "原生态生存者", desc: "生活主要由本能驱动，尚未建立系统性的自我管理意识。", advice: "建议：从微小习惯切入，先打造整洁空间和基础形象，逐步积累秩序感。" };
+            if (score <= 50) return { name: "秩序觉醒者", desc: "开始尝试自律，在局部领域表现优秀，但稳定性不足。", advice: "建议：巩固现金流管理与情绪调节，建立底层习惯闭环，提升抗压韧性。" };
+            if (score <= 75) return { name: "高标准践行者", desc: "已经脱离了低级趣味，是人群中优秀的“中流砥柱”，生活有质感。", advice: "建议：增加长期主义项目投入，深化精神与身体的平衡，成为他人的榜样。" };
+            if (score <= 90) return { name: "高质量人类（现实版）", desc: "极度自律且富有，身心灵达到高度统一，具备强大的资源整合能力。", advice: "建议：向外输出价值，建立个人影响力，同时保持谦逊与向下兼容。" };
+            return { name: "人类顶级模范", desc: "这种人通常是行业的领袖或宗师，其存在本身就是一种稀缺资源。", advice: "建议：持续迭代认知，赋能生态，警惕精英傲慢，传承生命智慧。" };
+        }
+
+        function getTraitDimensionDetails() {
+            let dimRaw = { "外在管理": 0, "经济底气": 0, "言行智慧": 0, "生活秩序": 0, "心理韧性": 0 };
+            let dimMax = { "外在管理": 24, "经济底气": 20, "言行智慧": 26, "生活秩序": 18, "心理韧性": 12 };
+            for (let i = 0; i < traitQuestionsData.length; i++) {
+                const dim = traitQuestionsData[i].dimension;
+                const val = answers[i];
+                if (val !== null) dimRaw[dim] += val;
+            }
+            return { dimRaw, dimMax };
+        }
+
+        function startQuiz(type) {
+            activeQuiz = type;
+            if (type === 'memory') {
+                answers = new Array(MEMORY_QUESTIONS.length).fill(null);
+            } else {
+                answers = new Array(traitQuestionsData.length).fill(null);
+            }
+            currentIndex = 0;
+            render();
+        }
+
+        async function loadUserProfile() { 
+            if(!currentUser) return; 
+            try { 
+                const {data} = await supabase.from('profiles').select('gender,age').eq('id',currentUser.id).single(); 
+                if(data){ userProfile.gender = data.gender||''; userProfile.age = data.age||null; } 
+            } catch(e){} 
         }
         
-        let gd = userProfile.gender||'未设置', ad = userProfile.age?userProfile.age+' 岁':'未设置';
-        return '<div class="card"><div class="flex-between" style="margin-bottom:16px;"><div><h3>我的健康档案</h3><p style="color:#64748b;font-size:13px;">'+currentUser.email+'</p></div><div><button id="logoutProfileBtn" class="logout-btn" style="background:#e2e8f0;color:#1e293b;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">退出</button><button id="editProfileBtn" style="margin-left:8px;background:#eef2f7;border:none;border-radius:40px;padding:8px 16px;cursor:pointer;">✏️ 编辑</button></div></div><div class="info-row"><span class="info-label"><span>👤</span> 性别</span><span>'+gd+'</span></div><div class="info-row"><span class="info-label"><span>🎂</span> 年龄</span><span>'+ad+'</span></div><div class="info-row"><span class="info-label"><span>📊</span> 最近评估分数</span><span style="font-weight:800;color:#0f6e3f;">'+(latestScore!==null?latestScore+' 分':'暂无')+'</span></div></div><div class="card" id="historyCard">'+historyHtml+'<button class="btn-outline" id="historyTestBtn" style="margin-top:16px;">📋 开始新评估</button></div><div class="footer-links"><a href="mailto:'+CONTACT_EMAIL+'">📧 联系我们</a> | <a href="#">隐私政策</a></div>';
-    }
-
-    function renderQuiz() { 
-        let opts = ''; 
-        for(let o of OPTIONS) opts += '<button class="option-btn ' + (answers[currentIndex]===o.rawScore?'selected':'') + '" onclick="selectAnswer(' + o.rawScore + ')">' + o.label + '</button>'; 
+        async function loadUserScore() { 
+            if(!currentUser) return null; 
+            try { 
+                const {data} = await supabase.from('profiles').select('cognitive_score').eq('id',currentUser.id).single(); 
+                return data?.cognitive_score||null; 
+            } catch(e){ return null; } 
+        }
         
-        let infoNote = '<div class="info-note">' +
-            '📋 日常行为模式（如睡眠、活动轨迹）的长期、无感监测，可作为社区场景下认知功能减退的早期预警指标。异常活动轨迹与睡眠碎片化程度，能独立预测轻度认知损害向阿尔茨海默病转化的风险。' +
-            '<div class="ref">参考来源：中国阿尔茨海默病协会（2023）. 认知障碍早期筛查社区实施专家共识；Dodge, H. H., et al. (2019). JAMA Network Open, 2(12), e1917644.</div>' +
-            '</div>';
-        
-        return '<div class="quiz-card"><div class="progress-bar"><div class="progress-fill" style="width:' + ((currentIndex/QUESTIONS.length)*100) + '%;"></div></div><div class="flex-between" style="margin-bottom:16px;"><span>第' + (currentIndex+1) + '/' + QUESTIONS.length + '题</span><span style="color:#0f6e3f;">认知自测</span></div><div class="question-text">' + QUESTIONS[currentIndex] + '</div>' + opts + '<button class="btn-outline" id="prevBtn" ' + (currentIndex===0?'disabled style="opacity:0.5"':'') + '>← 上一题</button>' + infoNote + '</div>'; 
-    }
+        async function loadHistory() { 
+            if(!currentUser) return []; 
+            try { 
+                const {data} = await supabase.from('assessment_history').select('id,score,risk_level,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}); 
+                return data||[]; 
+            } catch(e){ return []; } 
+        }
 
-    function renderResult() { 
-        let score = getPercentScore(); 
-        let risk = getRiskLevel(score);
-        let aiDetail = getAIDetail(score, userProfile.age, userProfile.gender);
-        return '<div class="card result-card">' +
-            '<button class="home-btn" id="backHomeBtn">🏠 返回首页</button>' +
-            '<div id="captureArea" style="text-align:center;"><h2 style="margin-top:8px;">📋 评估报告</h2>' +
-            '<div class="score-circle"><span style="font-size:48px;font-weight:800;">' + score + '</span><span>/100</span></div>' +
-            '<div class="risk-level ' + risk.class + '">' + risk.name + '</div>' +
-            '<div class="ai-assessment">🤖 <strong>AI 评估建议</strong><br><br>' + aiDetail + '</div></div>' +
-            '<div class="share-buttons"><button class="btn-share" id="shareImgBtn">📸 生成图片</button><button class="btn-share" id="shareUrlBtn">🔗 分享网址</button></div>' +
-            '<button class="btn-outline" id="restartBtn" style="margin-top:16px;">重新测试</button></div>'; 
-    }
+        async function saveScoreToSupabase(score, type) { 
+            if(!currentUser) return; 
+            let riskText = score<=25?'低风险':(score<=50?'中风险':'高风险');
+            if (type === 'memory') {
+                await supabase.from('profiles').upsert({id:currentUser.id, email:currentUser.email, cognitive_score:score}); 
+            }
+            await supabase.from('assessment_history').insert({user_id:currentUser.id, score:score, risk_level:riskText, type:type}); 
+        }
 
-    function renderHistoryDetail(h) { let d=new Date(h.created_at); return '<div class="detail-modal" id="detailModal"><div class="detail-card"><h3 style="margin-bottom:16px;">📋 评估详情</h3><div class="score-circle" style="width:100px;height:100px;"><span style="font-size:32px;font-weight:800;">'+h.score+'</span><span>/100</span></div><div class="risk-level" style="color:'+(h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444'))+'">'+h.risk_level+'</div><p style="margin:12px 0;color:#64748b;">评估时间：'+formatDateTime(d)+'</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>'; }
+        function renderHome() {
+            let bannerHtml = '<div class="banner-container"><div class="banner-slider">' +
+                '<div class="banner-item" id="bannerFirst"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner1.jpg" alt="banner1" style="width:100%; height:auto; display:block;"></div>' +
+                '<div class="banner-item"><img src="https://raw.githubusercontent.com/celia2206254-boop/-/main/banner2.jpg" alt="banner2" style="width:100%; height:auto; display:block;"></div>' +
+                '</div><div class="banner-dots"><span class="dot active"></span><span class="dot"></span></div></div>';
+            
+            let doubleCard = `
+                <div class="row-2cols">
+                    <div class="col"><div class="memory-card" id="memoryTestBtn"><div class="title"><span>🧠</span> 记忆力测试</div><div class="desc">20题 · 认知健康自检</div><div class="badge"><span>专业量表</span><span>即时报告</span></div></div></div>
+                    <div class="col"><div class="trait-card" id="traitTestBtn"><div class="title"><span>🌟</span> 高质量人类现实特质测评</div><div class="desc">50题 · 深度认知与适应能力评估</div><div class="badge"><span>6大维度</span><span>成长指南</span></div></div></div>
+                </div>
+            `;
+            
+            const wisdom = getRandomWisdom();
+            let wisdomCard = `<div class="wisdom-card">
+                <div class="wisdom-content">“${wisdom.text}”</div>
+                <div class="wisdom-author">—— ${wisdom.author}</div>
+                <div class="quote-icon">“</div>
+            </div>`;
+            
+            return bannerHtml + doubleCard + wisdomCard;
+        }
 
-    async function render() {
-        let c = document.getElementById('mainContent'); if(!c) return;
-        if(selectedHistory) { c.innerHTML = renderHistoryDetail(selectedHistory); document.getElementById('closeDetailBtn')?.addEventListener('click',()=>{ selectedHistory=null; render(); }); return; }
-        let html=''; if(quizActive) html=renderQuiz(); else if(currentTab==='home') html=renderHome(); else if(currentTab==='device') html=renderDevice(); else if(currentTab==='profile') html=await renderProfile(); else if(currentTab==='result') html=renderResult(); else html=renderHome();
-        c.innerHTML = html;
-        document.querySelectorAll('.nav-item').forEach(n=>{ let t=n.getAttribute('data-tab'); if(currentTab===t||(currentTab==='result'&&t==='home')) n.classList.add('active'); else n.classList.remove('active'); });
-        
-        if(currentTab==='home' && document.querySelector('.banner-container')) { 
-            startBannerLoop(); 
-            const firstBanner = document.getElementById('bannerFirst');
-            if(firstBanner) {
-                firstBanner.style.cursor = 'pointer';
-                firstBanner.addEventListener('click', (e) => {
+        function renderDevice() {
+            return `<div class="card" style="text-align:center; padding:40px 20px;"><div style="font-size:48px; margin-bottom:16px;">⌚</div><h2 style="margin-bottom:12px;">华为手环</h2><p style="color:#64748b; margin-bottom:24px;">功能正在开发中，敬请期待...</p><button class="btn-primary" id="backHomeFromDeviceBtn">返回首页</button></div>`;
+        }
+
+        async function renderProfile() {
+            if (!currentUser) {
+                return `<div class="login-container">
+                    <div class="login-card">
+                        <div class="login-title">${authMode === 'login' ? '欢迎回来' : '创建账号'}</div>
+                        <div class="login-sub">${authMode === 'login' ? '登录后查看历史测评记录' : '注册后保存每次测评结果'}</div>
+                        <div class="auth-form">
+                            <input type="email" id="authEmail" placeholder="邮箱" class="auth-input" autocomplete="email">
+                            <input type="password" id="authPassword" placeholder="密码（至少6位）" class="auth-input" autocomplete="${authMode === 'login' ? 'current-password' : 'new-password'}">
+                            <button class="btn-primary" id="authSubmitBtn">${authMode === 'login' ? '登录' : '注册'}</button>
+                        </div>
+                        <div class="auth-switch" id="authSwitchBtn">${authMode === 'login' ? '还没有账号？点击注册' : '已有账号？点击登录'}</div>
+                        <div class="footer-links"><a href="mailto:${CONTACT_EMAIL}">📧 联系客服</a></div>
+                    </div>
+                </div>`;
+            }
+            
+            await loadUserProfile();
+            let latestScore = await loadUserScore();
+            let historyList = await loadHistory();
+            
+            let userName = currentUser.email ? currentUser.email.split('@')[0] : '用户';
+            let avatarChar = userName.charAt(0).toUpperCase();
+            
+            let statsHtml = `<div class="stats-grid">
+                <div class="stat-item"><div class="stat-number">${latestScore !== null ? latestScore : '--'}</div><div class="stat-label">最近评估</div></div>
+                <div class="stat-item"><div class="stat-number">${historyList.length}</div><div class="stat-label">测评次数</div></div>
+                <div class="stat-item"><div class="stat-number">${userProfile.age ? userProfile.age : '--'}</div><div class="stat-label">年龄</div></div>
+            </div>`;
+            
+            let historyHtml = '<h3 style="margin:18px 0 10px; font-size:17px;">📋 历史测评</h3>';
+            if(historyList.length === 0) {
+                historyHtml += '<div class="text-center" style="color:#94a3b8;padding:20px;">暂无测评记录，去做一次测试吧~</div>';
+            } else {
+                let displayList = showAllHistory ? historyList : historyList.slice(0, 3);
+                for(let h of displayList) {
+                    let d = new Date(h.created_at);
+                    let dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+                    let riskColor = h.score<=25?'#10b981':(h.score<=50?'#f59e0b':'#ef4444');
+                    historyHtml += `<div class="history-item" data-id="${h.id}"><div><div class="history-score">${h.score} 分</div><div class="history-date">${dateStr}</div></div><div style="color:${riskColor}; font-weight:600;">${h.risk_level}</div></div>`;
+                }
+                if(historyList.length > 3 && !showAllHistory) {
+                    historyHtml += '<button class="btn-outline" id="showAllHistoryBtn" style="margin-top:10px;">📋 查看全部历史报告</button>';
+                }
+                if(showAllHistory) {
+                    historyHtml += '<button class="btn-outline" id="hideAllHistoryBtn" style="margin-top:10px;">⬆️ 收起</button>';
+                }
+            }
+            
+            if(isEditing) {
+                return `<div class="profile-card"><h3 style="margin-bottom:14px;">编辑个人资料</h3><select id="editGender" class="profile-input" style="margin-bottom:10px;"><option value="">请选择性别</option><option value="男" ${userProfile.gender==='男'?'selected':''}>男</option><option value="女" ${userProfile.gender==='女'?'selected':''}>女</option></select><input type="number" id="editAge" class="profile-input" placeholder="年龄" value="${userProfile.age||''}"><button class="btn-primary" id="saveProfileBtn" style="margin-top:14px;">保存修改</button><button class="btn-outline" id="cancelEditBtn" style="margin-top:10px;">取消</button></div>`;
+            }
+            
+            return `<div class="profile-card">
+                <div class="profile-header"><div class="profile-avatar">${avatarChar}</div><div class="profile-info"><div class="profile-name">${userName}</div><div class="profile-email">${currentUser.email}</div></div><div><button id="editProfileBtn" class="edit-btn">编辑</button></div></div>
+                ${statsHtml}
+                <div class="flex-between" style="margin:12px 0;"><div class="info-row" style="flex:1; border-bottom:none; padding:6px 0;"><span class="info-label">👤 性别</span><span>${userProfile.gender || '未设置'}</span></div><div class="info-row" style="flex:1; border-bottom:none; padding:6px 0;"><span class="info-label">🎂 年龄</span><span>${userProfile.age ? userProfile.age+'岁' : '未设置'}</span></div></div>
+                ${historyHtml}
+                <button id="logoutProfileBtn" class="logout-btn">退出登录</button>
+            </div>`;
+        }
+
+        // 记忆力测试选项使用修正后的文字
+        function renderQuiz() {
+            if (activeQuiz === 'memory') {
+                let opts = '';
+                for (let i = 0; i < MEMORY_OPTIONS.length; i++) {
+                    let o = MEMORY_OPTIONS[i];
+                    opts += `<div class="opt-btn ${answers[currentIndex] === o.score ? 'selected' : ''}" data-score="${o.score}" style="justify-content:center;">
+                        <span class="score-label">${o.label}</span>
+                    </div>`;
+                }
+                let progress = ((currentIndex) / MEMORY_QUESTIONS.length) * 100;
+                let infoNote = '<div class="info-note">📋 日常行为模式（如睡眠、活动轨迹）的长期、无感监测，可作为社区场景下认知功能减退的早期预警指标。异常活动轨迹与睡眠碎片化程度，能独立预测轻度认知损害向阿尔茨海默病转化的风险。<div class="ref">参考来源：中国阿尔茨海默病协会（2023）. 认知障碍早期筛查社区实施专家共识；Dodge, H. H., et al. (2019). JAMA Network Open, 2(12), e1917644.</div></div>';
+                return `<div class="quiz-card"><div class="progress-area"><div class="progress-bar-bg"><div class="progress-fill" style="width:${progress}%;"></div></div><div class="question-counter"><span>第 ${currentIndex+1} / ${MEMORY_QUESTIONS.length} 题</span><span class="badge-dim">🧠 认知自测</span></div></div><div class="question-text">${MEMORY_QUESTIONS[currentIndex]}</div><div class="options" id="optionsContainer">${opts}</div><div class="nav-buttons"><div class="nav-btn ${currentIndex === 0 ? 'disabled' : ''}" id="prevBtn">← 上一题</div></div>${infoNote}</div>`;
+            } else {
+                let opts = '';
+                for (let i = 0; i < TRAIT_OPTIONS.length; i++) {
+                    let o = TRAIT_OPTIONS[i];
+                    opts += `<div class="opt-btn ${answers[currentIndex] === o.score ? 'selected' : ''}" data-score="${o.score}" style="justify-content:center;">
+                        <span class="score-label">${o.label}</span>
+                    </div>`;
+                }
+                let progress = ((currentIndex) / traitQuestionsData.length) * 100;
+                let dim = traitQuestionsData[currentIndex].dimension;
+                let dimHint = dim === "外在管理" ? "外在管理" : (dim === "经济底气" ? "经济底气" : (dim === "言行智慧" ? "言行智慧" : (dim === "生活秩序" ? "生活秩序" : "心理韧性")));
+                const isLast = (currentIndex === traitQuestionsData.length - 1);
+                
+                let actionButton = '';
+                if (isLast) {
+                    actionButton = `<div class="nav-btn generate-btn" id="generateReportBtn">📊 生成报告</div>`;
+                } else {
+                    actionButton = `<div class="nav-btn" id="resetBtn">⟳ 重置</div>`;
+                }
+                
+                return `<div class="quiz-card"><div class="progress-area"><div class="progress-bar-bg"><div class="progress-fill" style="width:${progress}%;"></div></div><div class="question-counter"><span>第 ${currentIndex+1} / ${traitQuestionsData.length} 题</span><span class="badge-dim">${dimHint}</span></div></div><div class="question-text">${traitQuestionsData[currentIndex].id}. ${traitQuestionsData[currentIndex].text}</div><div class="options" id="optionsContainer">${opts}</div><div class="nav-buttons"><div class="nav-btn ${currentIndex === 0 ? 'disabled' : ''}" id="prevBtn">← 上一题</div>${actionButton}</div></div>`;
+            }
+        }
+
+        async function renderResult() {
+            let score = getScore();
+            let aiText = await generateAIReport(score, activeQuiz);
+            
+            if (activeQuiz === 'trait') {
+                const { dimRaw, dimMax } = getTraitDimensionDetails();
+                const meta = getTraitMetaByPercent(score);
+                const passStatus = score >= 50 ? "✅ 超越及格线 · 秩序觉醒者以上" : "⚠️ 尚在潜力积累区 · 及格线为50分";
+                let dimsHtml = `<div class="dim-grid">
+                    <div class="dim-item"><strong>外在</strong><br>${dimRaw["外在管理"]}/${dimMax["外在管理"]}</div>
+                    <div class="dim-item"><strong>经济</strong><br>${dimRaw["经济底气"]}/${dimMax["经济底气"]}</div>
+                    <div class="dim-item"><strong>言行</strong><br>${dimRaw["言行智慧"]}/${dimMax["言行智慧"]}</div>
+                    <div class="dim-item"><strong>生活</strong><br>${dimRaw["生活秩序"]}/${dimMax["生活秩序"]}</div>
+                    <div class="dim-item"><strong>韧性</strong><br>${dimRaw["心理韧性"]}/${dimMax["心理韧性"]}</div>
+                </div>`;
+                return `<div class="result-container" id="resultCardForCapture"><button class="back-home-btn" id="backHomeBtn">🏠 返回首页</button><div class="result-header"><div style="text-align:center;"><span class="score-number">${score}</span><span style="font-size:20px;"> / 100分</span></div></div><div class="stage">⭐ ${meta.name} ⭐</div><div class="diagnosis"><strong>📌 核心状态描述</strong><br>${meta.desc}<div style="margin-top: 14px;"><strong>🌿 成长导航</strong><br>${meta.advice}</div><div style="margin-top: 14px;"><strong>🤖 AI 综合分析</strong><br>${aiText}</div><div style="margin-top: 14px; background:#e2efd9; padding: 8px; border-radius: 40px; text-align:center;">${passStatus}</div></div>${dimsHtml}<footer>高质量人类现实特质模型 · 50题深度版</footer><div class="share-buttons"><button class="btn-share" id="saveImageBtn">📸 保存报告图片</button><button class="btn-share" id="restartBtn">🔄 重新测评</button></div></div>`;
+            } else {
+                let riskText = score<=25?'低风险':(score<=50?'中风险':'高风险');
+                return `<div class="result-container" id="resultCardForCapture"><button class="back-home-btn" id="backHomeBtn">🏠 返回首页</button><div class="result-header"><div style="text-align:center;"><span class="score-number">${score}</span><span style="font-size:20px;"> / 100分</span></div></div><div class="stage">📋 认知评估报告 · ${riskText}</div><div class="diagnosis"><strong>📊 评估结果</strong><br>${riskText}<div style="margin-top:14px;"><strong>🤖 AI 分析</strong><br>${aiText}</div></div><div class="share-buttons"><button class="btn-share" id="saveImageBtn">📸 保存报告图片</button><button class="btn-share" id="restartBtn">🔄 重新测评</button></div></div>`;
+            }
+        }
+
+        function bindOptionEvents() {
+            const optionsContainer = document.getElementById('optionsContainer');
+            if (!optionsContainer) return;
+            
+            const optionBtns = optionsContainer.querySelectorAll('.opt-btn');
+            optionBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    quizActive = true;
-                    answers.fill(null);
-                    currentIndex = 0;
-                    render();
+                    
+                    optionBtns.forEach(opt => opt.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    
+                    const score = parseInt(btn.getAttribute('data-score'));
+                    answers[currentIndex] = score;
+                    
+                    let total = activeQuiz === 'memory' ? MEMORY_QUESTIONS.length : traitQuestionsData.length;
+                    const allAnswered = answers.every(v => v !== null);
+                    
+                    if (allAnswered) {
+                        clearAutoTimer();
+                        autoTimer = setTimeout(() => { render(); }, 400);
+                    } else if (currentIndex + 1 < total) {
+                        clearAutoTimer();
+                        autoTimer = setTimeout(() => {
+                            currentIndex++;
+                            render();
+                        }, 400);
+                    } else {
+                        render();
+                    }
+                });
+            });
+        }
+
+        async function render() {
+            let container = document.getElementById('mainContent');
+            if (!container) return;
+            let html = '';
+            
+            if (selectedHistory) {
+                let d = new Date(selectedHistory.created_at);
+                html = `<div class="detail-modal" id="detailModal"><div class="detail-card"><h3>📋 评估详情</h3><div class="score-circle" style="margin:20px auto;"><span style="font-size:48px;font-weight:800;color:#0f6e3f;">${selectedHistory.score}</span><span>/100</span></div><p>评估时间：${formatDateTime(d)}</p><button class="detail-close" id="closeDetailBtn">关闭</button></div></div>`;
+                container.innerHTML = html;
+                document.getElementById('closeDetailBtn')?.addEventListener('click', () => { selectedHistory = null; render(); });
+                return;
+            }
+            
+            if (activeQuiz && answers.length > 0) {
+                const allAnswered = answers.every(v => v !== null);
+                if (allAnswered) {
+                    html = await renderResult();
+                    if (currentUser) saveScoreToSupabase(getScore(), activeQuiz);
+                } else {
+                    html = renderQuiz();
+                }
+            } else if (currentTab === 'home') html = renderHome();
+            else if (currentTab === 'device') html = renderDevice();
+            else if (currentTab === 'profile') html = await renderProfile();
+            else html = renderHome();
+            
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.nav-item').forEach(n => {
+                let tab = n.getAttribute('data-tab');
+                if (currentTab === tab || (activeQuiz && tab === 'home')) n.classList.add('active');
+                else n.classList.remove('active');
+            });
+            
+            if (activeQuiz && !answers.every(v => v !== null)) {
+                bindOptionEvents();
+            }
+            
+            const bannerFirst = document.getElementById('bannerFirst');
+            if (bannerFirst) {
+                bannerFirst.style.cursor = 'pointer';
+                bannerFirst.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startQuiz('memory');
                 });
             }
-            document.querySelector('.banner-container')?.addEventListener('click',(e)=>{
-                if(e.target.closest('#bannerFirst')) return;
-                if(currentBannerIndex===0) showToast("认知健康月活动：免费评估中");
-                else if(currentBannerIndex===1) showToast("华为手环详情可邮件咨询");
+            
+            document.getElementById('memoryTestBtn')?.addEventListener('click', () => startQuiz('memory'));
+            document.getElementById('traitTestBtn')?.addEventListener('click', () => startQuiz('trait'));
+            document.getElementById('backHomeFromDeviceBtn')?.addEventListener('click', () => { currentTab = 'home'; activeQuiz = null; render(); });
+            document.getElementById('editProfileBtn')?.addEventListener('click', () => { isEditing = true; render(); });
+            document.getElementById('cancelEditBtn')?.addEventListener('click', () => { isEditing = false; render(); });
+            document.getElementById('saveProfileBtn')?.addEventListener('click', async () => {
+                let g = document.getElementById('editGender')?.value || '';
+                let a = document.getElementById('editAge')?.value || '';
+                if (currentUser) {
+                    await supabase.from('profiles').upsert({ id: currentUser.id, email: currentUser.email, gender: g, age: a ? parseInt(a) : null });
+                    userProfile.gender = g; userProfile.age = a;
+                    showToast("资料已更新");
+                }
+                isEditing = false;
+                render();
             });
-        } else { if(bannerInterval) clearInterval(bannerInterval); }
-        
-        const backHomeBtn = document.getElementById('backHomeBtn');
-        if(backHomeBtn) backHomeBtn.addEventListener('click', () => { currentTab = 'home'; quizActive = false; render(); });
-        
-        const showAllBtn = document.getElementById('showAllHistoryBtn');
-        if(showAllBtn) showAllBtn.addEventListener('click', () => { showAllHistory = true; render(); });
-        const hideAllBtn = document.getElementById('hideAllHistoryBtn');
-        if(hideAllBtn) hideAllBtn.addEventListener('click', () => { showAllHistory = false; render(); });
-        
-        document.getElementById('gotoDeviceBtn')?.addEventListener('click',()=>{ currentTab='device'; render(); });
-        document.getElementById('historyTestBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
-        document.getElementById('restartBtn')?.addEventListener('click',()=>{ quizActive=true; answers.fill(null); currentIndex=0; render(); });
-        document.getElementById('prevBtn')?.addEventListener('click',()=>{ if(currentIndex>0){ currentIndex--; render(); } });
-        document.getElementById('logoutBtn')?.addEventListener('click',async()=>{ await supabase.auth.signOut(); currentUser=null; render(); });
-        document.getElementById('logoutProfileBtn')?.addEventListener('click',async()=>{ await supabase.auth.signOut(); currentUser=null; render(); });
-        document.getElementById('gotoAuthBtn')?.addEventListener('click',()=>{ currentTab='profile'; render(); });
-        document.getElementById('editProfileBtn')?.addEventListener('click',()=>{ isEditing=true; render(); });
-        document.getElementById('cancelEditBtn')?.addEventListener('click',()=>{ isEditing=false; render(); });
-        document.getElementById('saveProfileBtn')?.addEventListener('click',async()=>{ let g=document.getElementById('editGender')?.value||'', a=document.getElementById('editAge')?.value||''; await updateUserProfile(g,a); isEditing=false; render(); });
-        document.getElementById('deviceContactBtn')?.addEventListener('click',()=>showToast("请发送邮件至 "+CONTACT_EMAIL+" 咨询"));
-        document.getElementById('shareImgBtn')?.addEventListener('click',async()=>{ let el=document.getElementById('captureArea'); if(el){ let c=await html2canvas(el); let l=document.createElement('a'); l.download='cognitive_report.png'; l.href=c.toDataURL(); l.click(); showToast("报告已保存为图片"); } });
-        document.getElementById('shareUrlBtn')?.addEventListener('click',()=>{ navigator.clipboard.writeText(SHARE_URL); showToast("网址已复制"); });
-        document.querySelectorAll('.history-item').forEach(item=>{ item.addEventListener('click',async()=>{ let id=item.getAttribute('data-id'); let list=await loadHistory(); let found=list.find(h=>String(h.id)===id); if(found){ selectedHistory=found; render(); } }); });
-        let authSubmit = document.getElementById('authSubmitBtn');
-        if(authSubmit) authSubmit.onclick = async()=>{ let email=document.getElementById('authEmail')?.value, pwd=document.getElementById('authPassword')?.value; if(!email||!pwd){ showToast("请填写完整"); return; } if(authMode==='login'){ let {data,error}=await supabase.auth.signInWithPassword({email,password:pwd}); if(error){ showToast(error.message); return; } currentUser=data.user; showToast("登录成功"); currentTab='home'; render(); } else { let {data,error}=await supabase.auth.signUp({email,password:pwd}); if(error){ showToast(error.message); return; } if(data.user){ await supabase.from('profiles').upsert({id:data.user.id,email:email}); showToast("注册成功！请查收验证邮件"); authMode='login'; render(); } } };
-        let authSwitch = document.getElementById('authSwitchBtn'); if(authSwitch) authSwitch.onclick = ()=>{ authMode = authMode==='login'?'register':'login'; render(); };
-    }
+            document.getElementById('logoutProfileBtn')?.addEventListener('click', async () => { await supabase.auth.signOut(); currentUser = null; render(); });
+            document.getElementById('restartBtn')?.addEventListener('click', () => { if (activeQuiz) startQuiz(activeQuiz); });
+            document.getElementById('prevBtn')?.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; render(); } });
+            document.getElementById('resetBtn')?.addEventListener('click', () => { if (confirm('确定重置所有答案吗？')) { answers.fill(null); currentIndex = 0; render(); } });
+            document.getElementById('generateReportBtn')?.addEventListener('click', async () => {
+                const allAnswered = answers.every(v => v !== null);
+                if (allAnswered) {
+                    let reportHtml = await renderResult();
+                    document.getElementById('mainContent').innerHTML = reportHtml;
+                    document.getElementById('backHomeBtn')?.addEventListener('click', () => { activeQuiz = null; currentTab = 'home'; render(); });
+                    document.getElementById('restartBtn')?.addEventListener('click', () => { if (activeQuiz) startQuiz(activeQuiz); });
+                    document.getElementById('saveImageBtn')?.addEventListener('click', async () => {
+                        let el = document.getElementById('resultCardForCapture');
+                        if (el) {
+                            let canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+                            let link = document.createElement('a');
+                            link.download = 'report.png';
+                            link.href = canvas.toDataURL();
+                            link.click();
+                            showToast("报告已保存");
+                        }
+                    });
+                    if (currentUser) saveScoreToSupabase(getScore(), activeQuiz);
+                } else {
+                    let missingCount = answers.filter(v => v === null).length;
+                    showToast(`还有 ${missingCount} 道题未作答，请完成所有题目后再生成报告`);
+                }
+            });
+            document.getElementById('backHomeBtn')?.addEventListener('click', () => { activeQuiz = null; currentTab = 'home'; render(); });
+            document.getElementById('saveImageBtn')?.addEventListener('click', async () => {
+                let el = document.getElementById('resultCardForCapture');
+                if (el) {
+                    let canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' });
+                    let link = document.createElement('a');
+                    link.download = 'report.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    showToast("报告已保存");
+                }
+            });
+            
+            document.getElementById('showAllHistoryBtn')?.addEventListener('click', () => { showAllHistory = true; render(); });
+            document.getElementById('hideAllHistoryBtn')?.addEventListener('click', () => { showAllHistory = false; render(); });
+            
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    let id = item.getAttribute('data-id');
+                    let list = await loadHistory();
+                    let found = list.find(h => String(h.id) === id);
+                    if (found) { selectedHistory = found; render(); }
+                });
+            });
+            
+            if (currentTab === 'home' && document.querySelector('.banner-slider')) {
+                if (bannerInterval) clearInterval(bannerInterval);
+                bannerInterval = setInterval(() => {
+                    let slider = document.querySelector('.banner-slider');
+                    let dots = document.querySelectorAll('.dot');
+                    if (slider && dots.length) {
+                        currentBannerIndex = (currentBannerIndex + 1) % 2;
+                        slider.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
+                        dots.forEach((dot, i) => dot.classList.toggle('active', i === currentBannerIndex));
+                    }
+                }, 4000);
+            } else {
+                if (bannerInterval) clearInterval(bannerInterval);
+            }
+            
+            let authSubmit = document.getElementById('authSubmitBtn');
+            if (authSubmit) authSubmit.onclick = async () => {
+                let email = document.getElementById('authEmail')?.value;
+                let pwd = document.getElementById('authPassword')?.value;
+                if (!email || !pwd) { showToast("请填写完整"); return; }
+                if (authMode === 'login') {
+                    let { data, error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+                    if (error) { showToast(error.message); return; }
+                    currentUser = data.user;
+                    showToast("登录成功");
+                    currentTab = 'home';
+                    render();
+                } else {
+                    let { data, error } = await supabase.auth.signUp({ email, password: pwd });
+                    if (error) { showToast(error.message); return; }
+                    if (data.user) {
+                        await supabase.from('profiles').upsert({ id: data.user.id, email: email });
+                        showToast("注册成功！请查收验证邮件");
+                        authMode = 'login';
+                        render();
+                    }
+                }
+            };
+            let authSwitch = document.getElementById('authSwitchBtn');
+            if (authSwitch) authSwitch.onclick = () => { authMode = authMode === 'login' ? 'register' : 'login'; render(); };
+        }
 
-    window.selectAnswer = function(score) { if(!quizActive) return; answers[currentIndex]=score; if(currentIndex+1<QUESTIONS.length){ currentIndex++; render(); } else { let finalScore=getPercentScore(); quizActive=false; currentTab='result'; if(currentUser) saveScoreToSupabase(finalScore); render(); } };
+        function formatDateTime(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
 
-    async function init() { let {data:{user}} = await supabase.auth.getUser(); if(user) currentUser=user; render(); document.querySelectorAll('.nav-item').forEach(nav=>{ nav.addEventListener('click',()=>{ let tab=nav.getAttribute('data-tab'); if(tab==='home'){ quizActive=false; currentTab='home'; render(); } else if(tab==='device'){ quizActive=false; currentTab='device'; render(); } else if(tab==='profile'){ quizActive=false; currentTab='profile'; render(); } }); }); }
-    init();
-})();
+        async function init() {
+            let { data: { user } } = await supabase.auth.getUser();
+            if (user) currentUser = user;
+            render();
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.addEventListener('click', () => {
+                    let tab = nav.getAttribute('data-tab');
+                    if (tab === 'home') { currentTab = 'home'; activeQuiz = null; render(); }
+                    else if (tab === 'device') { currentTab = 'device'; activeQuiz = null; render(); }
+                    else if (tab === 'profile') { currentTab = 'profile'; activeQuiz = null; render(); }
+                });
+            });
+        }
+        init();
+    })();
 </script>
 </body>
 </html>
